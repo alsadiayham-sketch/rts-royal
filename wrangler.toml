@@ -1,0 +1,8 @@
+name = "rts-royal"
+compatibility_date = "2026-09-28"
+pages_build_output_dir = "public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "rts-royal-db"
+database_id = "203ee909-e1fe-45ba-8b83-8650df2c9899"

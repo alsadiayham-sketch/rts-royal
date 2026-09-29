@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/assets/rts-mark.svg" type="image/svg+xml" />
+    <title>RTS Admin</title>
+    <link rel="stylesheet" href="/admin/admin.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content" data-i18n="skipLink">تخطي إلى المحتوى</a>
+    <header class="topbar">
+      <div class="brand">
+        <img src="/assets/rts-mark.svg" alt="" class="brand-mark" />
+        <div>
+          <p class="brand-title" data-i18n="appTitle">لوحة إدارة RTS</p>
+          <p class="brand-subtitle" data-i18n="appSubtitle">إدارة إعدادات العمل والمشرفين</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <a class="top-link" href="/" data-i18n="backToWebsite">العودة إلى الموقع</a>
+        <button id="lang-toggle" type="button" class="secondary-btn" aria-live="polite">
+          English
+        </button>
+      </div>
+    </header>
+
+    <main id="main-content" class="layout">
+      <div id="global-status" class="status-message" role="status" aria-live="polite"></div>
+      <div id="global-alert" class="alert-message" role="alert" aria-live="assertive"></div>
+      <section id="password-warning" class="warning-banner hidden" role="status" aria-live="polite"></section>
+
+      <section id="login-panel" class="panel login-panel">
+        <h1 data-i18n="loginTitle">تسجيل الدخول</h1>
+        <form id="login-form" novalidate>
+          <div class="field">
+            <label for="login-username" data-i18n="usernameLabel">اسم المستخدم</label>
+            <input id="login-username" name="username" type="text" autocomplete="username" required />
+          </div>
+          <div class="field">
+            <label for="login-password" data-i18n="passwordLabel">كلمة المرور</label>
+            <div class="password-wrap">
+              <input
+                id="login-password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+              />
+              <button type="button" class="toggle-password secondary-btn" data-target="login-password" data-i18n="showPassword">
+                إظهار
+              </button>
+            </div>
+          </div>
+          <button id="login-submit" class="primary-btn" type="submit" data-i18n="loginButton">دخول</button>
+        </form>
+      </section>
+
+      <section id="app-panel" class="hidden">
+        <div class="app-shell">
+          <nav class="sidebar" aria-label="Admin sections">
+            <button class="tab-btn active" type="button" data-tab="settings" data-i18n="tabSettings">إعدادات العمل</button>
+            <button class="tab-btn" type="button" data-tab="users" data-i18n="tabUsers">المشرفون</button>
+            <button class="tab-btn" type="button" data-tab="password" data-i18n="tabPassword">كلمة المرور الخاصة بي</button>
+            <button id="logout-btn" class="secondary-btn logout-btn" type="button" data-i18n="logoutButton">تسجيل الخروج</button>
+          </nav>
+
+          <div class="content-area">
+            <section id="tab-settings" class="tab-panel">
+              <h2 data-i18n="tabSettings">إعدادات العمل</h2>
+              <form id="settings-form" novalidate>
+                <div class="field">
+                  <label for="settings-whatsapp" data-i18n="whatsappLabel">رقم واتساب</label>
+                  <input id="settings-whatsapp" name="whatsappNumber" type="tel" dir="ltr" inputmode="tel" autocomplete="tel" aria-describedby="phone-help" required />
+                  <small id="phone-help" data-i18n="phoneHelp">أدخل رمز الدولة ورقم الهاتف. يسري التغيير على وسائل التواصل في الموقع.</small>
+                </div>
+                <div class="field">
+                  <label for="settings-download" data-i18n="downloadLabel">رابط تحميل برنامج POS</label>
+                  <input id="settings-download" name="downloadUrl" type="url" dir="ltr" autocomplete="url" required />
+                </div>
+                <button id="settings-submit" class="primary-btn" type="submit" data-i18n="saveSettings">حفظ الإعدادات</button>
+              </form>
+            </section>
+
+            <section id="tab-users" class="tab-panel hidden">
+              <h2 data-i18n="tabUsers">المشرفون</h2>
+              <div class="table-wrap">
+                <table>
+                  <caption class="sr-only" data-i18n="adminsTableCaption">قائمة المشرفين</caption>
+                  <thead>
+                    <tr>
+                      <th data-i18n="usernameLabel">اسم المستخدم</th>
+                      <th data-i18n="nameLabel">الاسم</th>
+                      <th data-i18n="statusLabel">الحالة</th>
+                      <th data-i18n="passwordStatusLabel">حالة كلمة المرور</th>
+                      <th data-i18n="actionsLabel">إجراءات</th>
+                    </tr>
+                  </thead>
+                  <tbody id="users-tbody"></tbody>
+                </table>
+              </div>
+
+              <form id="add-user-form" class="stacked-form" novalidate>
+                <h3 data-i18n="addAdminTitle">إضافة مشرف</h3>
+                <div class="field">
+                  <label for="add-username" data-i18n="usernameLabel">اسم المستخدم</label>
+                  <input id="add-username" name="username" type="text" autocomplete="username" required />
+                </div>
+                <div class="field">
+                  <label for="add-name" data-i18n="nameLabel">الاسم المعروض</label>
+                  <input id="add-name" name="name" type="text" autocomplete="name" required />
+                </div>
+                <div class="field">
+                  <label for="add-password" data-i18n="newPasswordLabel">كلمة المرور الجديدة</label>
+                  <div class="password-wrap">
+                    <input
+                      id="add-password"
+                      name="password"
+                      type="password"
+                      autocomplete="new-password"
+                      required
+                    />
+                    <button type="button" class="toggle-password secondary-btn" data-target="add-password" data-i18n="showPassword">
+                      إظهار
+                    </button>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="add-password-confirm" data-i18n="confirmPasswordLabel">تأكيد كلمة المرور</label>
+                  <div class="password-wrap">
+                    <input
+                      id="add-password-confirm"
+                      name="passwordConfirm"
+                      type="password"
+                      autocomplete="new-password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      class="toggle-password secondary-btn"
+                      data-target="add-password-confirm"
+                      data-i18n="showPassword"
+                    >
+                      إظهار
+                    </button>
+                  </div>
+                </div>
+                <button id="add-user-submit" class="primary-btn" type="submit" data-i18n="addAdminButton">إضافة</button>
+              </form>
+            </section>
+
+            <section id="tab-password" class="tab-panel hidden">
+              <h2 data-i18n="tabPassword">كلمة المرور الخاصة بي</h2>
+              <form id="password-form" novalidate>
+                <div class="field">
+                  <label for="current-password" data-i18n="currentPasswordLabel">كلمة المرور الحالية</label>
+                  <div class="password-wrap">
+                    <input
+                      id="current-password"
+                      name="currentPassword"
+                      type="password"
+                      autocomplete="current-password"
+                      required
+                    />
+                    <button type="button" class="toggle-password secondary-btn" data-target="current-password" data-i18n="showPassword">
+                      إظهار
+                    </button>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="new-password" data-i18n="newPasswordLabel">كلمة المرور الجديدة</label>
+                  <div class="password-wrap">
+                    <input id="new-password" name="newPassword" type="password" autocomplete="new-password" required />
+                    <button type="button" class="toggle-password secondary-btn" data-target="new-password" data-i18n="showPassword">
+                      إظهار
+                    </button>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="new-password-confirm" data-i18n="confirmPasswordLabel">تأكيد كلمة المرور</label>
+                  <div class="password-wrap">
+                    <input
+                      id="new-password-confirm"
+                      name="newPasswordConfirm"
+                      type="password"
+                      autocomplete="new-password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      class="toggle-password secondary-btn"
+                      data-target="new-password-confirm"
+                      data-i18n="showPassword"
+                    >
+                      إظهار
+                    </button>
+                  </div>
+                </div>
+                <button id="password-submit" class="primary-btn" type="submit" data-i18n="changePasswordButton">تحديث كلمة المرور</button>
+              </form>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="/admin/admin.js" type="module"></script>
+  </body>
+</html>
