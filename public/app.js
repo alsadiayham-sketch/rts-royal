@@ -2,10 +2,10 @@ import { DOWNLOAD_URL_REGEX, PHONE_DIGITS_REGEX } from "./settings-policy.js";
 
 const copy = {
   ar: {
-    title: "RTS | حلول تقنية لعملك", description: "RTS Royal Technology Solutions — مواقع وتطبيقات وأنظمة نقاط بيع مصممة لعملك.", navAria: "التنقل الرئيسي", menuAria: "فتح القائمة", menu: "القائمة", skip: "انتقل إلى المحتوى", navServices: "الخدمات", navPos: "نقطة البيع", navApproach: "الأسلوب", navContact: "تواصل", navCta: "ابدأ محادثة", heroKicker: "RTS · حلول تُبنى حول عملك", heroTitle: "فكرتك.<br>شغلك.<br><span>نظامك.</span>", heroIntro: "نصمم الأدوات الرقمية التي تجعل عملك أوضح وأسهل في كل يوم — من أول واجهة إلى نقطة البيع.", heroCta: "ناقش احتياجك", heroMore: "استكشف نقطة البيع <i aria-hidden=\"true\">↓</i>", settingsLoading: "جارٍ تجهيز طرق التواصل…", illustrative: "واجهة توضيحية", heroNote: "البيع، واضح في لحظته", posDemoAria: "واجهة نقطة بيع توضيحية", demo: "عرض تجريبي", heroPosTitle: "نقطة البيع", heroTab1: "الأكثر طلباً", heroTab2: "كل المنتجات", item1: "قهوة عربية", item2: "مخبوزات", item3: "عصير طازج", item4: "إضافة جديدة", order: "الطلب", total: "الإجمالي", payDemo: "إتمام تجريبي", introBand: "لا نبيع قالباً جاهزاً. نبدأ بفهم طريقة عملك، ثم نبني المسار الذي يناسبها.", servicesTag: "أدواتك الرقمية", servicesTitle: "حل واحد لا يشبه<br>كل الحلول.", service1Title: "مواقع ومتاجر إلكترونية", service1Text: "واجهة تشرح قيمتك بوضوح وتمنح عملاءك طريقاً بسيطاً للبدء.", service2Title: "تطبيقات سطح المكتب", service2Text: "أدوات عملية لعملياتك اليومية، مصممة حول فريقك وطريقة عمله.", service3Title: "تطبيقات iOS وAndroid", service3Text: "تجارب هاتفية مخصصة عندما يحتاج عملك أن يكون قريباً من المستخدم.", service4Title: "نظام نقاط البيع", service4Text: "مبيعات ومخزون وباركود وفواتير وتقارير وفروع متعددة — مع مساحة لفهم احتياجك أولاً.", posTag: "نقطة البيع · RTS", posTitle: "شاشة البيع<br>هي بداية النظام.", posText: "استكشف مثالاً مبسطاً حسب نوع نشاطك. هذه واجهة توضيحية فقط، وليست نظام عميل أو عملية دفع حقيقية.", sectorAria: "نوع النشاط", sectorMarket: "سوبرماركت", sectorRetail: "محلات تجارية", sectorRestaurant: "مطعم", sectorCoffee: "مقهى", sectorClothing: "ملابس", sectorOther: "أعمال أخرى", interactiveDemo: "تجربة توضيحية تفاعلية", productsAria: "منتجات تجريبية", basket: "سلة العرض", clear: "مسح", basketEmpty: "اختر منتجاً لإضافته هنا.", noPayment: "لن يتم إجراء أي دفع.", posDetails: "يمكن لنظام نقطة البيع أن يجمع المبيعات والمخزون والباركود والفواتير والتقارير والفروع المتعددة. التفاصيل التي تحتاجها في قطاعك نحددها معاً قبل التنفيذ.", posCta: "تحدث عن نشاطك", approachTag: "طريقة العمل", approachTitle: "من سؤال واضح<br>إلى أداة تستخدمها.", step1Title: "نسمع السياق", step1Text: "ما الذي يبطئ فريقك؟ وما الذي يجب أن يبقى بسيطاً؟", step2Title: "نرسم المسار", step2Text: "نحوّل الأولويات إلى شاشات وخطوات يفهمها الجميع.", step3Title: "نبني معك", step3Text: "نطوّر الحل المناسب ونبقى قريبين من تفاصيله العملية.", downloadTag: "لأصحاب Windows", downloadTitle: "برنامج ADA POS الحالي.", downloadText: "تجري إعادة تقديم العلامة تحت RTS. ملف التثبيت الحالي يحمل اسم ADA POS وهو متاح لنظام Windows فقط.", downloadCta: "تنزيل ADA POS لـ Windows", downloadHelp: "إذا حظر Windows الملف، تواصل مع الدعم قبل المتابعة. لا نوصي بتعطيل الحماية.", faqTag: "أسئلة سريعة", faqTitle: "لنبدأ بوضوح.", faq1Q: "هل يمكنني طلب موقع أو تطبيق فقط؟", faq1A: "نعم. نبدأ بالخدمة التي يحتاجها عملك، سواء كانت موقعاً أو تطبيقاً أو أداة مكتبية.", faq2Q: "هل شاشة نقطة البيع المعروضة نظاماً حقيقياً؟", faq2A: "لا. إنها مثال توضيحي تفاعلي يشرح فكرة الواجهة، ولا يعالج مدفوعات أو بيانات حقيقية.", faq3Q: "هل تطبيقات الهاتف تعني توفر POS على iOS أو Android؟", faq3A: "تطبيقات الهاتف هي خدمة تطوير مخصصة. لا يعني ذلك وعداً بتوفر برنامج نقطة البيع للتثبيت على الهاتف.", contactTag: "الخطوة التالية", contactTitle: "لنضع الفكرة<br>على الطاولة.", contactText: "أخبرنا بما تحاول ترتيبه. عند الإرسال، ستفتح محادثة WhatsApp برسالتك لمراجعتها قبل الإرسال.", fieldName: "الاسم", fieldService: "ما الذي تحتاجه؟", fieldBusiness: "اسم النشاط", fieldMessage: "نبذة قصيرة", choose: "اختر خدمة", optionWebsite: "موقع أو متجر إلكتروني", optionDesktop: "تطبيق سطح مكتب", optionMobile: "تطبيق هاتف", optionPos: "نقطة بيع", optionOther: "شيء آخر", formSubmit: "مراجعة رسالة WhatsApp", footerText: "تقنية مصممة للعمل الحقيقي.", privacy: "الخصوصية"
+    title: "RTS | حلول تقنية لعملك", description: "RTS Royal Technology Solutions: مواقع وتطبيقات وأنظمة نقاط بيع مصممة لعملك.", navAria: "التنقل الرئيسي", menuAria: "فتح القائمة", menuClose: "إغلاق القائمة", menu: "القائمة", skip: "انتقل إلى المحتوى", navServices: "الخدمات", navPos: "نقطة البيع", navApproach: "الأسلوب", navContact: "تواصل", navCta: "ابدأ محادثة", heroKicker: "RTS / تصميم + برمجة + تشغيل", heroTitle: "نبني النظام.<br><span>الذي يحرّك عملك.</span>", heroIntro: "مواقع وتطبيقات وأنظمة بيع مصممة لتبدو استثنائية وتعمل بوضوح.", heroCta: "ناقش احتياجك", heroMore: "شاهد نقطة البيع <i aria-hidden=\"true\">↓</i>", settingsLoading: "جارٍ تجهيز طرق التواصل…", illustrative: "واجهة توضيحية", heroNote: "البيع، واضح في لحظته", posDemoAria: "واجهة نقطة بيع توضيحية", demo: "عرض تجريبي", heroPosTitle: "نقطة البيع", heroTab1: "الأكثر طلباً", heroTab2: "كل المنتجات", item1: "قهوة عربية", item2: "مخبوزات", item3: "عصير طازج", item4: "إضافة جديدة", order: "الطلب", total: "الإجمالي", payDemo: "إتمام تجريبي", introBand: "لا نبيع قالباً جاهزاً. نبدأ بفهم طريقة عملك، ثم نبني المسار الذي يناسبها.", servicesTag: "أدواتك الرقمية", servicesTitle: "حل واحد لا يشبه<br>كل الحلول.", service1Title: "مواقع ومتاجر إلكترونية", service1Text: "واجهة تشرح قيمتك بوضوح وتمنح عملاءك طريقاً بسيطاً للبدء.", service2Title: "تطبيقات سطح المكتب", service2Text: "أدوات عملية لعملياتك اليومية، مصممة حول فريقك وطريقة عمله.", service3Title: "تطبيقات iOS وAndroid", service3Text: "تجارب هاتفية مخصصة عندما يحتاج عملك أن يكون قريباً من المستخدم.", service4Title: "نظام نقاط البيع", service4Text: "مبيعات ومخزون وباركود وفواتير وتقارير وفروع متعددة، مع مساحة لفهم احتياجك أولاً.", posTag: "نقطة البيع · RTS", posTitle: "شاشة البيع<br>هي بداية النظام.", posText: "استكشف مثالاً مبسطاً حسب نوع نشاطك. هذه واجهة توضيحية فقط، وليست نظام عميل أو عملية دفع حقيقية.", sectorAria: "نوع النشاط", sectorMarket: "سوبرماركت", sectorRetail: "محلات تجارية", sectorRestaurant: "مطعم", sectorCoffee: "مقهى", sectorClothing: "ملابس", sectorOther: "أعمال أخرى", interactiveDemo: "تجربة توضيحية تفاعلية", productsAria: "منتجات تجريبية", basket: "سلة العرض", clear: "مسح", basketEmpty: "اختر منتجاً لإضافته هنا.", noPayment: "لن يتم إجراء أي دفع.", posDetails: "يمكن لنظام نقطة البيع أن يجمع المبيعات والمخزون والباركود والفواتير والتقارير والفروع المتعددة. التفاصيل التي تحتاجها في قطاعك نحددها معاً قبل التنفيذ.", posCta: "تحدث عن نشاطك", approachTag: "طريقة العمل", approachTitle: "من سؤال واضح<br>إلى أداة تستخدمها.", step1Title: "نسمع السياق", step1Text: "ما الذي يبطئ فريقك؟ وما الذي يجب أن يبقى بسيطاً؟", step2Title: "نرسم المسار", step2Text: "نحوّل الأولويات إلى شاشات وخطوات يفهمها الجميع.", step3Title: "نبني معك", step3Text: "نطوّر الحل المناسب ونبقى قريبين من تفاصيله العملية.", downloadTag: "لأصحاب Windows", downloadTitle: "برنامج ADA POS الحالي.", downloadText: "تجري إعادة تقديم العلامة تحت RTS. ملف التثبيت الحالي يحمل اسم ADA POS وهو متاح لنظام Windows فقط.", downloadCta: "تنزيل ADA POS لـ Windows", downloadHelp: "إذا حظر Windows الملف، تواصل مع الدعم قبل المتابعة. لا نوصي بتعطيل الحماية.", faqTag: "أسئلة سريعة", faqTitle: "لنبدأ بوضوح.", faq1Q: "هل يمكنني طلب موقع أو تطبيق فقط؟", faq1A: "نعم. نبدأ بالخدمة التي يحتاجها عملك، سواء كانت موقعاً أو تطبيقاً أو أداة مكتبية.", faq2Q: "هل شاشة نقطة البيع المعروضة نظاماً حقيقياً؟", faq2A: "لا. إنها مثال توضيحي تفاعلي يشرح فكرة الواجهة، ولا يعالج مدفوعات أو بيانات حقيقية.", faq3Q: "هل تطبيقات الهاتف تعني توفر POS على iOS أو Android؟", faq3A: "تطبيقات الهاتف هي خدمة تطوير مخصصة. لا يعني ذلك وعداً بتوفر برنامج نقطة البيع للتثبيت على الهاتف.", contactTag: "الخطوة التالية", contactTitle: "لنضع الفكرة<br>على الطاولة.", contactText: "أخبرنا بما تحاول ترتيبه. عند الإرسال، ستفتح محادثة WhatsApp برسالتك لمراجعتها قبل الإرسال.", fieldName: "الاسم", fieldService: "ما الذي تحتاجه؟", fieldBusiness: "اسم النشاط", fieldMessage: "نبذة قصيرة", choose: "اختر خدمة", optionWebsite: "موقع أو متجر إلكتروني", optionDesktop: "تطبيق سطح مكتب", optionMobile: "تطبيق هاتف", optionPos: "نقطة بيع", optionOther: "شيء آخر", formSubmit: "مراجعة رسالة WhatsApp", footerText: "تقنية مصممة للعمل الحقيقي.", privacy: "الخصوصية"
   },
   en: {
-    title: "RTS | Technology for your business", description: "RTS Royal Technology Solutions — websites, apps, and point-of-sale systems built around your business.", navAria: "Primary navigation", menuAria: "Open menu", menu: "Menu", skip: "Skip to content", navServices: "Services", navPos: "Point of sale", navApproach: "Approach", navContact: "Contact", navCta: "Start a conversation", heroKicker: "RTS · Technology built around your work", heroTitle: "Your idea.<br>Your work.<br><span>Your system.</span>", heroIntro: "We design digital tools that make work clearer and easier every day — from the first screen to the point of sale.", heroCta: "Discuss your needs", heroMore: "Explore point of sale <i aria-hidden=\"true\">↓</i>", settingsLoading: "Preparing contact options…", illustrative: "Illustrative interface", heroNote: "A clearer moment of sale", posDemoAria: "Illustrative point-of-sale interface", demo: "DEMO", heroPosTitle: "Point of sale", heroTab1: "Popular", heroTab2: "All products", item1: "Arabic coffee", item2: "Pastry", item3: "Fresh juice", item4: "New add-on", order: "Order", total: "Total", payDemo: "Demo checkout", introBand: "We do not sell a ready-made template. We start by understanding how you work, then build a fitting path.", servicesTag: "Your digital tools", servicesTitle: "One solution<br>not like every other.", service1Title: "Websites & e-commerce", service1Text: "A clear front door for your value, with an easy path for customers to get started.", service2Title: "Desktop applications", service2Text: "Practical tools for daily operations, shaped around your team and its way of working.", service3Title: "iOS & Android applications", service3Text: "Purpose-built mobile experiences when your business needs to stay close to its users.", service4Title: "Point-of-sale system", service4Text: "Sales, inventory, barcode, invoices, reporting, and multiple stores — with room to understand your needs first.", posTag: "Point of sale · RTS", posTitle: "The sales screen<br>starts the system.", posText: "Explore a simple example for your business type. This is an illustrative interface only, not a customer system or a real payment.", sectorAria: "Business type", sectorMarket: "Supermarket", sectorRetail: "Retail shops", sectorRestaurant: "Restaurant", sectorCoffee: "Coffee shop", sectorClothing: "Clothing", sectorOther: "Other businesses", interactiveDemo: "Interactive illustrative demo", productsAria: "Demo products", basket: "Demo basket", clear: "Clear", basketEmpty: "Choose a product to add it here.", noPayment: "No payment will be made.", posDetails: "A POS system can bring together sales, inventory, barcode, invoices, reporting, and multiple stores. We define the details your sector needs together before implementation.", posCta: "Talk about your business", approachTag: "How we work", approachTitle: "From a clear question<br>to a tool you use.", step1Title: "We hear the context", step1Text: "What slows your team down? What must stay simple?", step2Title: "We map the path", step2Text: "We turn priorities into screens and steps everyone can understand.", step3Title: "We build with you", step3Text: "We develop the fitting solution and stay close to its practical details.", downloadTag: "For Windows owners", downloadTitle: "The current ADA POS program.", downloadText: "The brand is being presented under RTS. The current installer is named ADA POS and is available for Windows only.", downloadCta: "Download ADA POS for Windows", downloadHelp: "If Windows blocks the file, contact support before continuing. We do not recommend disabling protection.", faqTag: "Quick questions", faqTitle: "Let’s start clearly.", faq1Q: "Can I request only a website or an app?", faq1A: "Yes. We start with the service your business needs, whether that is a website, app, or desktop tool.", faq2Q: "Is the POS screen shown here a real system?", faq2A: "No. It is an interactive illustrative example of the interface idea. It does not process payments or real data.", faq3Q: "Do mobile apps mean POS is available for iOS or Android?", faq3A: "Mobile apps are a custom development service. This does not promise a POS installer for phones.", contactTag: "Next step", contactTitle: "Let’s put the idea<br>on the table.", contactText: "Tell us what you are trying to organise. On submission, WhatsApp opens with your message so you can review it before sending.", fieldName: "Name", fieldService: "What do you need?", fieldBusiness: "Business name", fieldMessage: "A short brief", choose: "Choose a service", optionWebsite: "Website or e-commerce", optionDesktop: "Desktop application", optionMobile: "Mobile application", optionPos: "Point of sale", optionOther: "Something else", formSubmit: "Review WhatsApp message", footerText: "Technology for real work.", privacy: "Privacy"
+    title: "RTS | Technology for your business", description: "RTS Royal Technology Solutions: websites, apps, and point-of-sale systems built around your business.", navAria: "Primary navigation", menuAria: "Open menu", menuClose: "Close menu", menu: "Menu", skip: "Skip to content", navServices: "Services", navPos: "Point of sale", navApproach: "Approach", navContact: "Contact", navCta: "Start a conversation", heroKicker: "RTS / DESIGN + CODE + OPERATIONS", heroTitle: "We build the system.<br><span>That moves your work.</span>", heroIntro: "Websites, apps, and point-of-sale systems designed to look exceptional and work clearly.", heroCta: "Discuss your needs", heroMore: "See point of sale <i aria-hidden=\"true\">↓</i>", settingsLoading: "Preparing contact options…", illustrative: "Illustrative interface", heroNote: "A clearer moment of sale", posDemoAria: "Illustrative point-of-sale interface", demo: "DEMO", heroPosTitle: "Point of sale", heroTab1: "Popular", heroTab2: "All products", item1: "Arabic coffee", item2: "Pastry", item3: "Fresh juice", item4: "New add-on", order: "Order", total: "Total", payDemo: "Demo checkout", introBand: "We do not sell a ready-made template. We start by understanding how you work, then build a fitting path.", servicesTag: "Your digital tools", servicesTitle: "One solution<br>not like every other.", service1Title: "Websites & e-commerce", service1Text: "A clear front door for your value, with an easy path for customers to get started.", service2Title: "Desktop applications", service2Text: "Practical tools for daily operations, shaped around your team and its way of working.", service3Title: "iOS & Android applications", service3Text: "Purpose-built mobile experiences when your business needs to stay close to its users.", service4Title: "Point-of-sale system", service4Text: "Sales, inventory, barcode, invoices, reporting, and multiple stores, with room to understand your needs first.", posTag: "Point of sale · RTS", posTitle: "The sales screen<br>starts the system.", posText: "Explore a simple example for your business type. This is an illustrative interface only, not a customer system or a real payment.", sectorAria: "Business type", sectorMarket: "Supermarket", sectorRetail: "Retail shops", sectorRestaurant: "Restaurant", sectorCoffee: "Coffee shop", sectorClothing: "Clothing", sectorOther: "Other businesses", interactiveDemo: "Interactive illustrative demo", productsAria: "Demo products", basket: "Demo basket", clear: "Clear", basketEmpty: "Choose a product to add it here.", noPayment: "No payment will be made.", posDetails: "A POS system can bring together sales, inventory, barcode, invoices, reporting, and multiple stores. We define the details your sector needs together before implementation.", posCta: "Talk about your business", approachTag: "How we work", approachTitle: "From a clear question<br>to a tool you use.", step1Title: "We hear the context", step1Text: "What slows your team down? What must stay simple?", step2Title: "We map the path", step2Text: "We turn priorities into screens and steps everyone can understand.", step3Title: "We build with you", step3Text: "We develop the fitting solution and stay close to its practical details.", downloadTag: "For Windows owners", downloadTitle: "The current ADA POS program.", downloadText: "The brand is being presented under RTS. The current installer is named ADA POS and is available for Windows only.", downloadCta: "Download ADA POS for Windows", downloadHelp: "If Windows blocks the file, contact support before continuing. We do not recommend disabling protection.", faqTag: "Quick questions", faqTitle: "Let’s start clearly.", faq1Q: "Can I request only a website or an app?", faq1A: "Yes. We start with the service your business needs, whether that is a website, app, or desktop tool.", faq2Q: "Is the POS screen shown here a real system?", faq2A: "No. It is an interactive illustrative example of the interface idea. It does not process payments or real data.", faq3Q: "Do mobile apps mean POS is available for iOS or Android?", faq3A: "Mobile apps are a custom development service. This does not promise a POS installer for phones.", contactTag: "Next step", contactTitle: "Let’s put the idea<br>on the table.", contactText: "Tell us what you are trying to organise. On submission, WhatsApp opens with your message so you can review it before sending.", fieldName: "Name", fieldService: "What do you need?", fieldBusiness: "Business name", fieldMessage: "A short brief", choose: "Choose a service", optionWebsite: "Website or e-commerce", optionDesktop: "Desktop application", optionMobile: "Mobile application", optionPos: "Point of sale", optionOther: "Something else", formSubmit: "Review WhatsApp message", footerText: "Technology for real work.", privacy: "Privacy"
   }
 };
 
@@ -16,7 +16,7 @@ const sectorData = {
     restaurant: { title: "مطعم", catalog: "قائمة الطلب", copy: "مثال لعناصر قائمة أثناء البيع.", products: [["طبق اليوم", "₪ 48", "milk"], ["مقبلات", "₪ 22", "bread"], ["مشروب", "₪ 12", "fruit"], ["حلوى", "₪ 20", "water"]], discussion: "يمكننا مناقشة احتياجات سير الطلبات والتشغيل قبل تحديد التفاصيل." },
     coffee: { title: "مقهى", catalog: "قائمة سريعة", copy: "أمثلة لمشروبات وإضافات يومية.", products: [["قهوة", "₪ 12", "milk"], ["كرواسون", "₪ 15", "bread"], ["عصير", "₪ 16", "fruit"], ["إضافة", "₪ 4", "water"]], discussion: "يمكننا مناقشة سير طلبات المقهى وما يحتاجه فريقك فعلياً." },
     clothing: { title: "ملابس", catalog: "مختارات المتجر", copy: "مثال مبسط لقطع معروضة للبيع.", products: [["قميص", "₪ 80", "milk"], ["بنطال", "₪ 120", "bread"], ["حقيبة", "₪ 95", "fruit"], ["وشاح", "₪ 45", "water"]], discussion: "يمكننا مناقشة احتياجات المقاسات والمتغيرات عند تخطيط نظامك." },
-    other: { title: "أعمال أخرى", catalog: "عناصر نموذجية", copy: "نبدأ من عناصر العمل التي تستخدمها فعلاً.", products: [["خدمة", "₪ 30", "milk"], ["منتج", "₪ 20", "bread"], ["إضافة", "₪ 10", "fruit"], ["مادة", "₪ 6", "water"]], discussion: "لنفرض أي تفاصيل مسبقاً — أخبرنا كيف تسير عملياتك ونناقش ما يناسبها." }
+    other: { title: "أعمال أخرى", catalog: "عناصر نموذجية", copy: "نبدأ من عناصر العمل التي تستخدمها فعلاً.", products: [["خدمة", "₪ 30", "milk"], ["منتج", "₪ 20", "bread"], ["إضافة", "₪ 10", "fruit"], ["مادة", "₪ 6", "water"]], discussion: "لنفرض أي تفاصيل مسبقاً. أخبرنا كيف تسير عملياتك ونناقش ما يناسبها." }
   },
   en: {
     market: { title: "Supermarket", catalog: "Quick products", copy: "Examples of items used in everyday sales.", products: [["Fresh milk", "₪ 7", "milk"], ["Bread", "₪ 5", "bread"], ["Fruit", "₪ 11", "fruit"], ["Water", "₪ 4", "water"]], discussion: "We can discuss barcode, inventory, and invoice needs in the context of your business." },
@@ -24,7 +24,7 @@ const sectorData = {
     restaurant: { title: "Restaurant", catalog: "Order menu", copy: "Examples of menu items during a sale.", products: [["Today’s dish", "₪ 48", "milk"], ["Starter", "₪ 22", "bread"], ["Drink", "₪ 12", "fruit"], ["Dessert", "₪ 20", "water"]], discussion: "We can discuss service flow and operations needs before defining details." },
     coffee: { title: "Coffee shop", catalog: "Quick menu", copy: "Examples of everyday drinks and add-ons.", products: [["Coffee", "₪ 12", "milk"], ["Croissant", "₪ 15", "bread"], ["Juice", "₪ 16", "fruit"], ["Add-on", "₪ 4", "water"]], discussion: "We can discuss coffee-order flow and what your team actually needs." },
     clothing: { title: "Clothing", catalog: "Store picks", copy: "A simple example of items for sale.", products: [["Shirt", "₪ 80", "milk"], ["Trousers", "₪ 120", "bread"], ["Bag", "₪ 95", "fruit"], ["Scarf", "₪ 45", "water"]], discussion: "We can discuss sizes and variants while planning your system." },
-    other: { title: "Other businesses", catalog: "Sample items", copy: "We start from items you actually use in your work.", products: [["Service", "₪ 30", "milk"], ["Product", "₪ 20", "bread"], ["Add-on", "₪ 10", "fruit"], ["Material", "₪ 6", "water"]], discussion: "We will not assume details — tell us how your work flows and we will discuss what fits." }
+    other: { title: "Other businesses", catalog: "Sample items", copy: "We start from items you actually use in your work.", products: [["Service", "₪ 30", "milk"], ["Product", "₪ 20", "bread"], ["Add-on", "₪ 10", "fruit"], ["Material", "₪ 6", "water"]], discussion: "We will not assume details. Tell us how your work flows and we will discuss what fits." }
   }
 };
 
@@ -38,7 +38,17 @@ const byId = (id) => document.getElementById(id);
 const text = (key) => copy[language][key] || "";
 
 Object.assign(copy.ar, {
-  heroIntro: "نصمم ونطوّر المواقع، تطبيقات سطح المكتب وiOS وAndroid، وأنظمة نقاط البيع. هوية تليق بعملك، وبرمجة تجعل كل التفاصيل تعمل معاً.",
+  heroIntro: "مواقع وتطبيقات وأنظمة بيع مصممة لتبدو استثنائية وتعمل بوضوح.",
+  introBand: "من أول انطباع إلى آخر فاتورة، نصمم تجربة واحدة تعمل معك.",
+  servicesTitle: "كل شاشة.<br>نفس الفكرة القوية.",
+  craftStrategy: "نفهم",
+  craftDesign: "نصمم",
+  craftBuild: "نبرمج",
+  craftLaunch: "نطلق",
+  craftAria: "الفهم والتصميم والبرمجة والإطلاق",
+  contactTitle: "لنصنع شيئاً<br>يستحق الاستخدام.",
+  contactText: "شاركنا احتياجك. سنفتح رسالتك في WhatsApp لتراجعها قبل الإرسال.",
+  fieldRequired: "أدخل قيمة صحيحة لهذا الحقل.",
   heroNote: "واجهة التطبيق الحالية",
   sandboxTitle: "جرّب فكرة البيع حسب نشاطك",
   sectorCoverage: "للسوبرماركت، المحلات، المطاعم، المقاهي، متاجر الملابس، ومختلف الأنشطة التجارية.",
@@ -58,14 +68,24 @@ Object.assign(copy.ar, {
   galleryTabsAria: "اختيار لقطة شاشة",
   galleryTag: "من داخل التطبيق",
   galleryTitle: "كل تفاصيل عملك.<br>في مكان واحد.",
-  galleryText: "المبيعات، الفواتير، العملاء، المخزون والإعدادات — شاهد لقطات فعلية من تطبيقنا. بعض المعرّفات أُخفيت لحماية الخصوصية.",
+  galleryText: "المبيعات والفواتير والعملاء والمخزون والإعدادات. هذه لقطات فعلية من تطبيقنا، مع إخفاء بعض المعرّفات لحماية الخصوصية.",
   gallerySales: "المبيعات",
   galleryCheckout: "الدفع",
   gallerySettings: "الإعدادات",
   mobilePreviewAria: "تصور توضيحي لتطبيق هاتف مخصص"
 });
 Object.assign(copy.en, {
-  heroIntro: "We design and build websites, desktop software, iOS and Android apps, and point-of-sale systems. Thoughtful design meets software that brings your business together.",
+  heroIntro: "Websites, apps, and point-of-sale systems designed to look exceptional and work clearly.",
+  introBand: "From first impression to final invoice, we design one experience that works with you.",
+  servicesTitle: "Every screen.<br>One strong idea.",
+  craftStrategy: "Understand",
+  craftDesign: "Design",
+  craftBuild: "Build",
+  craftLaunch: "Launch",
+  craftAria: "Understand, design, build, and launch",
+  contactTitle: "Let’s build something<br>worth using.",
+  contactText: "Share what you need. We will open your message in WhatsApp so you can review it before sending.",
+  fieldRequired: "Enter a valid value for this field.",
   heroNote: "The current application",
   sandboxTitle: "Explore a sales demo for your business",
   sectorCoverage: "For supermarkets, retail shops, restaurants, coffee shops, clothing stores, and businesses of every kind.",
@@ -85,13 +105,13 @@ Object.assign(copy.en, {
   galleryTabsAria: "Choose a screenshot",
   galleryTag: "Inside the actual app",
   galleryTitle: "Your daily business.<br>In one place.",
-  galleryText: "Sales, invoices, customers, inventory, and settings — actual screenshots from our application. Some identifiers are obscured for privacy.",
+  galleryText: "Sales, invoices, customers, inventory, and settings. These are real application screens, with some identifiers obscured for privacy.",
   gallerySales: "Sales",
   galleryCheckout: "Checkout",
   gallerySettings: "Settings",
   mobilePreviewAria: "Illustrative custom mobile application preview"
 });
-sectorData.ar.other.discussion = "لن نفترض أي تفاصيل مسبقاً — أخبرنا كيف تسير عملياتك ونناقش ما يناسبها.";
+sectorData.ar.other.discussion = "لن نفترض أي تفاصيل مسبقاً. أخبرنا كيف تسير عملياتك ونناقش ما يناسبها.";
 const screenshots = {
   sales: { src: "/assets/pos-sales.png", ar: "لقطة شاشة فعلية من شاشة المبيعات في ADA POS", en: "Actual ADA POS sales screen screenshot" },
   checkout: { src: "/assets/pos-checkout.png", ar: "لقطة شاشة فعلية من شاشة الدفع في ADA POS", en: "Actual ADA POS checkout screen screenshot" },
@@ -125,6 +145,16 @@ function translatedNodes(value) {
   });
   return fragment;
 }
+function setMenuState(open, focusTarget) {
+  const menu = document.querySelector(".menu-toggle");
+  const navigation = byId("primary-navigation");
+  if (!menu || !navigation) return;
+  menu.setAttribute("aria-expanded", String(open));
+  menu.setAttribute("aria-label", text(open ? "menuClose" : "menuAria"));
+  navigation.classList.toggle("open", open);
+  if (focusTarget === "first-link") navigation.querySelector("a")?.focus();
+  if (focusTarget === "button") menu.focus();
+}
 function updateCopy() {
   const dictionary = copy[language];
   document.documentElement.lang = language;
@@ -142,6 +172,7 @@ function updateCopy() {
   });
   document.querySelector(".language-toggle").textContent = language === "ar" ? "EN" : "ع";
   document.querySelector(".language-toggle").setAttribute("aria-label", language === "ar" ? "Switch to English" : "التبديل إلى العربية");
+  setMenuState(document.querySelector(".menu-toggle")?.getAttribute("aria-expanded") === "true");
   updateSector(activeSector, true);
   renderBasket();
   renderSettingsState();
@@ -201,6 +232,12 @@ function updateGallery(name) {
   if (!image || !data) return;
   image.src = data.src;
   image.alt = data[language];
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    image.animate(
+      [{ opacity: 0.35, transform: "scale(.985)" }, { opacity: 1, transform: "scale(1)" }],
+      { duration: 260, easing: "cubic-bezier(.16, 1, .3, 1)" }
+    );
+  }
   const galleryFrame = document.querySelector(".gallery-screen");
   if (galleryFrame) galleryFrame.dataset.shot = name;
   byId("gallery-panel")?.setAttribute("aria-labelledby", `shot-${name}`);
@@ -274,14 +311,17 @@ async function loadSettings() {
     downloadLink.setAttribute("aria-disabled", "true");
     downloadLink.removeAttribute("href");
   }
-  document.querySelectorAll(".js-contact-link").forEach(link => link.setAttribute("aria-disabled", "true"));
+  document.querySelectorAll(".js-contact-link").forEach((link) => {
+    link.setAttribute("aria-disabled", "true");
+    link.tabIndex = -1;
+  });
   if (byId("contact-submit")) byId("contact-submit").disabled = true;
   renderSettingsState();
   try {
     const response = await fetch("/api/settings", { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(8000) });
     if (!response.ok) throw new Error("Settings unavailable");
     const settings = await response.json();
-    if (!isAllowedDownloadUrl(settings.downloadUrl)) throw new Error("Invalid download URL");
+    if (downloadLink && !isAllowedDownloadUrl(settings.downloadUrl)) throw new Error("Invalid download URL");
     if (typeof settings.whatsappNumber !== "string" || !PHONE_DIGITS_REGEX.test(settings.whatsappNumber)) throw new Error("Invalid contact number");
     if (downloadLink) {
       downloadLink.href = settings.downloadUrl;
@@ -291,6 +331,7 @@ async function loadSettings() {
     document.querySelectorAll(".js-contact-link").forEach((link) => {
       link.href = "#contact";
       link.setAttribute("aria-disabled", "false");
+      link.removeAttribute("tabindex");
     });
     const contactSubmit = byId("contact-submit");
     if (contactSubmit) contactSubmit.disabled = false;
@@ -345,13 +386,25 @@ if (isMainPage) {
     renderBasket();
   }));
   byId("clear-basket").addEventListener("click", () => { basket = []; renderBasket(); });
-  byId("demo-pay").addEventListener("click", () => { byId("basket-empty").textContent = language === "ar" ? "عرض فقط — لم يتم إجراء أي دفع." : "Demo only — no payment was made."; byId("basket-empty").hidden = false; });
+  byId("demo-pay").addEventListener("click", () => { byId("basket-empty").textContent = language === "ar" ? "عرض فقط. لم يتم إجراء أي دفع." : "Demo only. No payment was made."; byId("basket-empty").hidden = false; });
   byId("settings-retry").addEventListener("click", loadSettings);
   const menu = document.querySelector(".menu-toggle");
   const navigation = byId("primary-navigation");
-  menu.addEventListener("click", () => { const open = menu.getAttribute("aria-expanded") === "true"; menu.setAttribute("aria-expanded", String(!open)); navigation.classList.toggle("open", !open); });
-  document.addEventListener("keydown", (event) => { if (event.key === "Escape" && navigation.classList.contains("open")) { menu.setAttribute("aria-expanded", "false"); navigation.classList.remove("open"); menu.focus(); } });
-  navigation.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => { menu.setAttribute("aria-expanded", "false"); navigation.classList.remove("open"); }));
+  menu.addEventListener("click", () => {
+    const open = menu.getAttribute("aria-expanded") === "true";
+    setMenuState(!open, open ? undefined : "first-link");
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && navigation.classList.contains("open")) setMenuState(false, "button");
+  });
+  navigation.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => setMenuState(false)));
+  byId("contact-form").querySelectorAll("input, select, textarea").forEach((field) => {
+    field.addEventListener("input", () => {
+      field.setAttribute("aria-invalid", "false");
+      const fieldError = byId(`${field.name}-error`);
+      if (fieldError) fieldError.textContent = "";
+    });
+  });
   byId("contact-form").addEventListener("submit", (event) => {
   event.preventDefault();
   const form = event.currentTarget;
@@ -369,6 +422,8 @@ if (isMainPage) {
     const validLength = isService || (value.length >= 2 && value.length <= limits[name]);
     const valid = validService && validLength;
     field.setAttribute("aria-invalid", String(!valid));
+    const fieldError = byId(`${name}-error`);
+    if (fieldError) fieldError.textContent = valid ? "" : text("fieldRequired");
     if (!valid && !firstInvalid) firstInvalid = field;
   });
   if (firstInvalid) {
@@ -381,6 +436,41 @@ if (isMainPage) {
   window.location.assign(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(formMessage(data))}`);
   });
   byId("year").textContent = new Date().getFullYear();
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const navSections = [...document.querySelectorAll("#services, #pos, #approach, #contact")];
+  if ("IntersectionObserver" in window) {
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        document.querySelectorAll("#primary-navigation a[href^='#']").forEach((link) => {
+          if (link.getAttribute("href") === `#${entry.target.id}`) link.setAttribute("aria-current", "location");
+          else link.removeAttribute("aria-current");
+        });
+      });
+    }, { rootMargin: "-35% 0px -55% 0px", threshold: 0 });
+    navSections.forEach((section) => navObserver.observe(section));
+  }
+  const heroScreenshot = document.querySelector(".hero-screenshot");
+  if (heroScreenshot && !reducedMotion && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    let pointerFrame;
+    heroScreenshot.addEventListener("pointermove", (event) => {
+      if (pointerFrame) return;
+      pointerFrame = requestAnimationFrame(() => {
+        const bounds = heroScreenshot.getBoundingClientRect();
+        const x = ((event.clientX - bounds.left) / bounds.width - 0.5) * 5;
+        const y = ((event.clientY - bounds.top) / bounds.height - 0.5) * -5;
+        heroScreenshot.style.setProperty("--tilt-x", `${x}deg`);
+        heroScreenshot.style.setProperty("--tilt-y", `${y}deg`);
+        pointerFrame = undefined;
+      });
+    });
+    heroScreenshot.addEventListener("pointerleave", () => {
+      if (pointerFrame) cancelAnimationFrame(pointerFrame);
+      pointerFrame = undefined;
+      heroScreenshot.style.removeProperty("--tilt-x");
+      heroScreenshot.style.removeProperty("--tilt-y");
+    });
+  }
   updateCopy();
   loadSettings();
 } else {
