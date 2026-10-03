@@ -125,6 +125,14 @@ html[dir="rtl"] .home-v2 .page-progress { transform-origin: right; }
   clip-path: polygon(0 0, 100% 0, 100% 78%, 77% 78%, 66% 100%, 0 100%);
 }
 .home-v2 .hero-copy { max-width: 640px; }
+.home-v2 .brand-motto {
+  margin: 0 0 .7rem;
+  color: var(--royal-700);
+  font-family: var(--latin);
+  font-size: clamp(.95rem, 1.3vw, 1.15rem);
+  font-weight: 800;
+  letter-spacing: .02em;
+}
 .home-v2 .hero-kicker {
   display: inline-flex;
   align-items: center;
