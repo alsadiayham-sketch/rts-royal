@@ -15,7 +15,7 @@
         <img src="/assets/rts-mark.svg" alt="" class="brand-mark" />
         <div>
           <p class="brand-title" data-i18n="appTitle">لوحة إدارة RTS</p>
-          <p class="brand-subtitle" data-i18n="appSubtitle">إدارة إعدادات العمل والمشرفين</p>
+          <p class="brand-subtitle" data-i18n="appSubtitle">إدارة العمل ومتاجر RTS POS والمشرفين</p>
         </div>
       </div>
       <div class="top-actions">
@@ -61,6 +61,7 @@
         <div class="app-shell">
           <nav class="sidebar" aria-label="Admin sections">
             <button class="tab-btn active" type="button" data-tab="settings" data-i18n="tabSettings">إعدادات العمل</button>
+            <button class="tab-btn" type="button" data-tab="stores" data-i18n="tabStores">متاجر RTS POS</button>
             <button class="tab-btn" type="button" data-tab="users" data-i18n="tabUsers">المشرفون</button>
             <button class="tab-btn" type="button" data-tab="password" data-i18n="tabPassword">كلمة المرور الخاصة بي</button>
             <button id="logout-btn" class="secondary-btn logout-btn" type="button" data-i18n="logoutButton">تسجيل الخروج</button>
@@ -81,6 +82,91 @@
                 </div>
                 <button id="settings-submit" class="primary-btn" type="submit" data-i18n="saveSettings">حفظ الإعدادات</button>
               </form>
+            </section>
+
+            <section id="tab-stores" class="tab-panel hidden">
+              <div class="section-heading">
+                <div>
+                  <h2 data-i18n="tabStores">متاجر RTS POS</h2>
+                  <p data-i18n="storesIntro">إنشاء المتاجر وإدارة مدة الترخيص من لوحة RTS المركزية.</p>
+                </div>
+                <button id="stores-refresh" class="secondary-btn" type="button" data-i18n="refreshStores">تحديث القائمة</button>
+              </div>
+
+              <form id="store-form" class="store-form" novalidate>
+                <h3 data-i18n="addStoreTitle">إضافة متجر جديد</h3>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="store-id" data-i18n="storeIdLabel">معرّف المتجر</label>
+                    <input id="store-id" name="id" type="text" dir="ltr" maxlength="32" pattern="[a-z0-9-]+" placeholder="royal-market" required />
+                    <small data-i18n="storeIdHelp">إنجليزي صغير وأرقام وشرطات فقط. لا يمكن تغييره لاحقاً.</small>
+                  </div>
+                  <div class="field">
+                    <label for="store-name" data-i18n="storeNameLabel">اسم المتجر</label>
+                    <input id="store-name" name="name" type="text" maxlength="80" required />
+                  </div>
+                  <div class="field">
+                    <label for="store-warranty" data-i18n="warrantyLabel">مدة الترخيص بالأشهر</label>
+                    <input id="store-warranty" name="warrantyMonths" type="number" min="1" max="60" value="12" required />
+                  </div>
+                  <div class="field">
+                    <label for="store-backend" data-i18n="backendLabel">مصدر البيانات</label>
+                    <select id="store-backend" name="backend">
+                      <option value="d1" data-i18n="backendD1">D1 — مرتبط بمشروع ويب (موصى به)</option>
+                      <option value="firestore" data-i18n="backendFirestore">Firestore — متجر مستقل قديم</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div id="d1-store-fields" class="backend-fields">
+                  <div class="field">
+                    <label for="store-linked-project" data-i18n="linkedProjectLabel">معرّف مشروع الويب</label>
+                    <input id="store-linked-project" name="linkedProject" type="text" dir="ltr" maxlength="32" placeholder="aqqad" />
+                  </div>
+                  <div class="field">
+                    <label for="store-api-url" data-i18n="apiUrlLabel">رابط واجهة المشروع</label>
+                    <input id="store-api-url" name="apiBaseUrl" type="url" dir="ltr" placeholder="https://example.pages.dev" />
+                  </div>
+                  <p class="backend-note" data-i18n="d1UserNote">تُنشأ حسابات الكاشير من لوحة المشروع المرتبط لأن كلمات المرور مشفرة على الخادم.</p>
+                </div>
+
+                <div id="firestore-store-fields" class="backend-fields hidden">
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="store-admin-username" data-i18n="storeAdminUsernameLabel">اسم مستخدم المدير الأول</label>
+                      <input id="store-admin-username" name="adminUsername" type="text" dir="ltr" maxlength="32" autocomplete="off" />
+                    </div>
+                    <div class="field">
+                      <label for="store-admin-name" data-i18n="storeAdminNameLabel">اسم المدير المعروض</label>
+                      <input id="store-admin-name" name="adminName" type="text" maxlength="80" autocomplete="off" />
+                    </div>
+                    <div class="field">
+                      <label for="store-admin-password" data-i18n="storeAdminPasswordLabel">كلمة مرور المدير الأول</label>
+                      <input id="store-admin-password" name="adminPassword" type="password" minlength="12" maxlength="128" autocomplete="new-password" />
+                    </div>
+                  </div>
+                  <p class="backend-note warning-note" data-i18n="firestoreWarning">استخدم هذا الخيار فقط للمتاجر القديمة غير المرتبطة بمشروع ويب.</p>
+                </div>
+
+                <button id="store-submit" class="primary-btn" type="submit" data-i18n="createStore">إنشاء المتجر</button>
+              </form>
+
+              <div class="table-wrap store-table-wrap">
+                <table>
+                  <caption class="sr-only" data-i18n="storesTableCaption">قائمة متاجر RTS POS</caption>
+                  <thead>
+                    <tr>
+                      <th data-i18n="storeNameLabel">اسم المتجر</th>
+                      <th data-i18n="storeIdLabel">المعرّف</th>
+                      <th data-i18n="backendLabel">مصدر البيانات</th>
+                      <th data-i18n="warrantyStatusLabel">حالة الترخيص</th>
+                      <th data-i18n="actionsLabel">إجراءات</th>
+                    </tr>
+                  </thead>
+                  <tbody id="stores-tbody"></tbody>
+                </table>
+              </div>
+              <p id="stores-empty" class="empty-state hidden" data-i18n="noStores">لا توجد متاجر مسجلة بعد.</p>
             </section>
 
             <section id="tab-users" class="tab-panel hidden">

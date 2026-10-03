@@ -12,6 +12,13 @@ import { jsonResponse, requireTrustedMutationRequest } from "../functions/_lib/h
 import { createPasswordRecord, verifyPassword } from "../functions/_lib/crypto.js";
 import { assertUserStatusChangeAllowed } from "../functions/_lib/user-rules.js";
 import { createRateLimitKey } from "../functions/_lib/rate-limit.js";
+import {
+  normalizeApiBaseUrl,
+  normalizeBackend,
+  normalizeStoreId,
+  normalizeStoreName,
+  normalizeWarrantyMonths,
+} from "../functions/_lib/pos-store-validation.js";
 
 test("normalizeUsername enforces lowercase ascii format", () => {
   assert.equal(normalizeUsername(" Admin.User-1 "), "admin.user-1");
@@ -48,6 +55,19 @@ test("download URL allowlist rejects arbitrary destinations", () => {
     true
   );
   assert.equal(isAllowedDownloadUrl("https://example.com/file.exe"), false);
+});
+
+test("POS store provisioning inputs are strictly normalized", () => {
+  assert.equal(normalizeStoreId(" Royal-Market "), "royal-market");
+  assert.equal(normalizeStoreId("../market"), null);
+  assert.equal(normalizeStoreName("  Royal Market  "), "Royal Market");
+  assert.equal(normalizeStoreName("x"), null);
+  assert.equal(normalizeBackend("d1"), "d1");
+  assert.equal(normalizeBackend("other"), null);
+  assert.equal(normalizeWarrantyMonths(12), 12);
+  assert.equal(normalizeWarrantyMonths(0), null);
+  assert.equal(normalizeApiBaseUrl("https://shop.pages.dev/"), "https://shop.pages.dev");
+  assert.equal(normalizeApiBaseUrl("http://shop.example.com"), null);
 });
 
 test("new passwords require minimum length", () => {

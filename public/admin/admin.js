@@ -5,7 +5,7 @@ const I18N = {
     phoneHelp: "أدخل رمز الدولة ورقم الهاتف. يسري التغيير على وسائل التواصل في الموقع.",
     sectionsLabel: "أقسام الإدارة",
     appTitle: "لوحة إدارة RTS",
-    appSubtitle: "إدارة إعدادات العمل والمشرفين",
+    appSubtitle: "إدارة العمل ومتاجر RTS POS والمشرفين",
     backToWebsite: "العودة إلى الموقع",
     loginTitle: "تسجيل الدخول",
     usernameLabel: "اسم المستخدم",
@@ -14,6 +14,7 @@ const I18N = {
     hidePassword: "إخفاء",
     loginButton: "دخول",
     tabSettings: "إعدادات العمل",
+    tabStores: "متاجر RTS POS",
     tabUsers: "المشرفون",
     tabPassword: "كلمة المرور الخاصة بي",
     logoutButton: "تسجيل الخروج",
@@ -31,6 +32,36 @@ const I18N = {
     currentPasswordLabel: "كلمة المرور الحالية",
     changePasswordButton: "تحديث كلمة المرور",
     adminsTableCaption: "قائمة المشرفين",
+    storesIntro: "إنشاء المتاجر وإدارة مدة الترخيص من لوحة RTS المركزية.",
+    refreshStores: "تحديث القائمة",
+    addStoreTitle: "إضافة متجر جديد",
+    storeIdLabel: "معرّف المتجر",
+    storeIdHelp: "إنجليزي صغير وأرقام وشرطات فقط. لا يمكن تغييره لاحقاً.",
+    storeNameLabel: "اسم المتجر",
+    warrantyLabel: "مدة الترخيص بالأشهر",
+    backendLabel: "مصدر البيانات",
+    backendD1: "D1 — مرتبط بمشروع ويب (موصى به)",
+    backendFirestore: "Firestore — متجر مستقل قديم",
+    linkedProjectLabel: "معرّف مشروع الويب",
+    apiUrlLabel: "رابط واجهة المشروع",
+    d1UserNote: "تُنشأ حسابات الكاشير من لوحة المشروع المرتبط لأن كلمات المرور مشفرة على الخادم.",
+    storeAdminUsernameLabel: "اسم مستخدم المدير الأول",
+    storeAdminNameLabel: "اسم المدير المعروض",
+    storeAdminPasswordLabel: "كلمة مرور المدير الأول",
+    firestoreWarning: "استخدم هذا الخيار فقط للمتاجر القديمة غير المرتبطة بمشروع ويب.",
+    createStore: "إنشاء المتجر",
+    storesTableCaption: "قائمة متاجر RTS POS",
+    warrantyStatusLabel: "حالة الترخيص",
+    noStores: "لا توجد متاجر مسجلة بعد.",
+    storeCreated: "تم إنشاء المتجر وأصبح جاهزاً لتسجيل الدخول.",
+    licenceActive: "نشط",
+    licenceExpired: "منتهي",
+    licenceDisabled: "معطل",
+    extendLicence: "تمديد",
+    disableStore: "تعطيل",
+    warrantyPrompt: "عدد أشهر التمديد من اليوم:",
+    confirmDisableStore: "تعطيل هذا المتجر؟ لن يتمكن مستخدموه من تسجيل الدخول.",
+    licenceUpdated: "تم تحديث ترخيص المتجر.",
     active: "نشط",
     inactive: "معطل",
     recommended: "مطلوب تغيير",
@@ -58,7 +89,7 @@ const I18N = {
     phoneHelp: "Include the country code. Changes apply to the website's contact options.",
     sectionsLabel: "Admin sections",
     appTitle: "RTS Admin Panel",
-    appSubtitle: "Manage business settings and administrators",
+    appSubtitle: "Manage business settings, RTS POS stores, and administrators",
     backToWebsite: "Back to Website",
     loginTitle: "Sign In",
     usernameLabel: "Username",
@@ -67,6 +98,7 @@ const I18N = {
     hidePassword: "Hide",
     loginButton: "Sign In",
     tabSettings: "Business Settings",
+    tabStores: "RTS POS Stores",
     tabUsers: "Admins",
     tabPassword: "My Password",
     logoutButton: "Logout",
@@ -84,6 +116,36 @@ const I18N = {
     currentPasswordLabel: "Current Password",
     changePasswordButton: "Update Password",
     adminsTableCaption: "Admins list",
+    storesIntro: "Create stores and manage licence periods from the central RTS administration panel.",
+    refreshStores: "Refresh List",
+    addStoreTitle: "Add New Store",
+    storeIdLabel: "Store ID",
+    storeIdHelp: "Lowercase English letters, numbers, and hyphens only. It cannot be changed later.",
+    storeNameLabel: "Store Name",
+    warrantyLabel: "Licence Period in Months",
+    backendLabel: "Data Source",
+    backendD1: "D1 — Linked Website Project (Recommended)",
+    backendFirestore: "Firestore — Legacy Standalone Store",
+    linkedProjectLabel: "Website Project ID",
+    apiUrlLabel: "Project API URL",
+    d1UserNote: "Cashier accounts are created in the linked project admin because passwords are encrypted server-side.",
+    storeAdminUsernameLabel: "Initial Admin Username",
+    storeAdminNameLabel: "Admin Display Name",
+    storeAdminPasswordLabel: "Initial Admin Password",
+    firestoreWarning: "Use this option only for legacy stores that are not linked to a website project.",
+    createStore: "Create Store",
+    storesTableCaption: "RTS POS stores list",
+    warrantyStatusLabel: "Licence Status",
+    noStores: "No stores are registered yet.",
+    storeCreated: "The store was created and is ready for sign-in.",
+    licenceActive: "Active",
+    licenceExpired: "Expired",
+    licenceDisabled: "Disabled",
+    extendLicence: "Extend",
+    disableStore: "Disable",
+    warrantyPrompt: "Extension months from today:",
+    confirmDisableStore: "Disable this store? Its users will no longer be able to sign in.",
+    licenceUpdated: "Store licence updated.",
     active: "Active",
     inactive: "Inactive",
     recommended: "Change recommended",
@@ -113,6 +175,8 @@ let state = {
   passwordChangeRecommended: false,
   users: [],
   settings: null,
+  stores: [],
+  storesLoaded: false,
   pending: new Set(),
 };
 
@@ -130,6 +194,12 @@ const els = {
   settingsForm: document.getElementById("settings-form"),
   settingsWhatsapp: document.getElementById("settings-whatsapp"),
   settingsDownload: document.getElementById("settings-download"),
+  storeForm: document.getElementById("store-form"),
+  storeBackend: document.getElementById("store-backend"),
+  storeSubmit: document.getElementById("store-submit"),
+  storesRefresh: document.getElementById("stores-refresh"),
+  storesTbody: document.getElementById("stores-tbody"),
+  storesEmpty: document.getElementById("stores-empty"),
   usersTbody: document.getElementById("users-tbody"),
   addUserForm: document.getElementById("add-user-form"),
   passwordForm: document.getElementById("password-form"),
@@ -139,6 +209,157 @@ const els = {
 
 function t(key) {
   return I18N[state.lang][key] || key;
+}
+
+function formatLicenceDate(value) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat(state.lang === "ar" ? "ar-PS" : "en-GB", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(date);
+}
+
+function renderStoresTable() {
+  if (!els.storesTbody) return;
+  els.storesTbody.textContent = "";
+  els.storesEmpty.classList.toggle("hidden", state.stores.length !== 0);
+  const now = Date.now();
+  for (const store of state.stores) {
+    const row = document.createElement("tr");
+    const nameCell = document.createElement("td");
+    nameCell.textContent = store.name;
+    const idCell = document.createElement("td");
+    idCell.dir = "ltr";
+    idCell.textContent = store.id;
+    const backendCell = document.createElement("td");
+    const backendPill = document.createElement("span");
+    backendPill.className = `status-pill backend-${store.backend}`;
+    backendPill.textContent = store.backend === "d1" ? `D1${store.linkedProject ? ` · ${store.linkedProject}` : ""}` : "Firestore";
+    backendCell.append(backendPill);
+
+    const warrantyCell = document.createElement("td");
+    const active = store.warrantyEnd && new Date(store.warrantyEnd).getTime() > now;
+    const warrantyPill = document.createElement("span");
+    warrantyPill.className = `status-pill ${active ? "active" : "inactive"}`;
+    warrantyPill.textContent = `${active ? t("licenceActive") : t("licenceExpired")} · ${formatLicenceDate(store.warrantyEnd)}`;
+    warrantyCell.append(warrantyPill);
+
+    const actionsCell = document.createElement("td");
+    const actions = document.createElement("div");
+    actions.className = "row-actions";
+    const extend = document.createElement("button");
+    extend.type = "button";
+    extend.className = "secondary-btn compact-btn";
+    extend.textContent = t("extendLicence");
+    extend.addEventListener("click", () => updateStoreLicence(store, "extend"));
+    actions.append(extend);
+    if (active) {
+      const disable = document.createElement("button");
+      disable.type = "button";
+      disable.className = "secondary-btn compact-btn danger-btn";
+      disable.textContent = t("disableStore");
+      disable.addEventListener("click", () => updateStoreLicence(store, "disable"));
+      actions.append(disable);
+    }
+    actionsCell.append(actions);
+    row.append(nameCell, idCell, backendCell, warrantyCell, actionsCell);
+    els.storesTbody.append(row);
+  }
+}
+
+function syncStoreBackendFields() {
+  const d1 = els.storeBackend.value === "d1";
+  document.getElementById("d1-store-fields").classList.toggle("hidden", !d1);
+  document.getElementById("firestore-store-fields").classList.toggle("hidden", d1);
+  for (const id of ["store-linked-project", "store-api-url"]) {
+    document.getElementById(id).required = d1;
+  }
+  for (const id of ["store-admin-username", "store-admin-name", "store-admin-password"]) {
+    document.getElementById(id).required = !d1;
+  }
+}
+
+async function loadStores() {
+  const data = await apiFetch("/api/pos-stores");
+  state.stores = data.stores || [];
+  state.storesLoaded = true;
+  renderStoresTable();
+}
+
+async function handleCreateStore(event) {
+  event.preventDefault();
+  clearMessages();
+  if (state.pending.has("create-store")) return;
+  const formData = new FormData(els.storeForm);
+  const payload = Object.fromEntries(formData.entries());
+  payload.warrantyMonths = Number(payload.warrantyMonths);
+  if (payload.backend === "d1") {
+    delete payload.adminUsername;
+    delete payload.adminName;
+    delete payload.adminPassword;
+  } else {
+    delete payload.linkedProject;
+    delete payload.apiBaseUrl;
+  }
+
+  setPending("create-store", true, els.storeSubmit);
+  try {
+    await apiFetch("/api/pos-stores", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    els.storeForm.reset();
+    els.storeBackend.value = "d1";
+    syncStoreBackendFields();
+    clearSensitiveInputs();
+    await loadStores();
+    showStatus(t("storeCreated"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    setPending("create-store", false, els.storeSubmit);
+  }
+}
+
+async function updateStoreLicence(store, action) {
+  clearMessages();
+  const key = `store-${action}-${store.id}`;
+  if (state.pending.has(key)) return;
+  let warrantyMonths;
+  if (action === "extend") {
+    const value = window.prompt(t("warrantyPrompt"), "12");
+    if (value === null) return;
+    warrantyMonths = Number(value);
+    if (!Number.isInteger(warrantyMonths) || warrantyMonths < 1 || warrantyMonths > 60) {
+      showAlert(state.lang === "ar" ? "أدخل عدداً من 1 إلى 60 شهراً." : "Enter a period from 1 to 60 months.");
+      return;
+    }
+  } else if (!window.confirm(t("confirmDisableStore"))) {
+    return;
+  }
+
+  state.pending.add(key);
+  try {
+    await apiFetch("/api/pos-stores", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: store.id,
+        action,
+        ...(action === "extend" ? { warrantyMonths } : {}),
+      }),
+    });
+    await loadStores();
+    showStatus(t("licenceUpdated"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    state.pending.delete(key);
+  }
 }
 
 function clearMessages() {
@@ -179,6 +400,7 @@ function updateLanguageUi() {
   els.passwordWarning.textContent = state.passwordChangeRecommended ? t("warningChangePassword") : "";
   els.passwordWarning.classList.toggle("hidden", !state.passwordChangeRecommended);
   renderUsersTable();
+  renderStoresTable();
 }
 
 function mapApiError(errorCode, fallbackMessage) {
@@ -208,6 +430,12 @@ function mapApiError(errorCode, fallbackMessage) {
       state.lang === "ar" ? "الطلب غير مسموح من هذا المصدر." : "Request origin is not allowed.",
     UNKNOWN_FIELDS:
       state.lang === "ar" ? "تم إرسال حقول غير معروفة." : "Unknown fields were provided.",
+    STORE_EXISTS:
+      state.lang === "ar" ? "معرّف المتجر مستخدم بالفعل." : "Store ID already exists.",
+    POS_REGISTRY_UNAVAILABLE:
+      state.lang === "ar"
+        ? "تعذر الوصول إلى سجل متاجر نقطة البيع."
+        : "The POS store registry is currently unavailable.",
   };
 
   return dictionary[errorCode] || fallbackMessage || t("unexpectedError");
@@ -261,6 +489,9 @@ function switchTab(name) {
     els.settingsWhatsapp.focus();
   } else if (name === "users") {
     document.getElementById("add-username").focus();
+  } else if (name === "stores") {
+    document.getElementById("store-id").focus();
+    if (!state.storesLoaded) loadStores().catch((error) => showAlert(error.message));
   } else if (name === "password") {
     document.getElementById("current-password").focus();
   }
@@ -273,6 +504,7 @@ function clearSensitiveInputs() {
   document.getElementById("current-password").value = "";
   document.getElementById("new-password").value = "";
   document.getElementById("new-password-confirm").value = "";
+  document.getElementById("store-admin-password").value = "";
   for (const button of document.querySelectorAll(".toggle-password")) {
     document.getElementById(button.dataset.target).type = "password";
     button.textContent = t("showPassword");
@@ -392,6 +624,8 @@ async function handleLogout() {
     await apiFetch("/api/logout", { method: "POST" });
     state.users = [];
     state.settings = null;
+    state.stores = [];
+    state.storesLoaded = false;
     clearSensitiveInputs();
     await bootstrapSession();
     showStatus(t("loggedOut"));
@@ -560,6 +794,12 @@ function initLanguageToggle() {
 function initForms() {
   els.loginForm.addEventListener("submit", handleLogin);
   els.settingsForm.addEventListener("submit", handleSaveSettings);
+  els.storeForm.addEventListener("submit", handleCreateStore);
+  els.storeBackend.addEventListener("change", syncStoreBackendFields);
+  els.storesRefresh.addEventListener("click", () => {
+    clearMessages();
+    loadStores().catch((error) => showAlert(error.message));
+  });
   els.addUserForm.addEventListener("submit", handleAddUser);
   els.passwordForm.addEventListener("submit", handlePasswordChange);
   els.logoutBtn.addEventListener("click", handleLogout);
@@ -569,5 +809,6 @@ initForms();
 initTabs();
 initLanguageToggle();
 wirePasswordToggleButtons();
+syncStoreBackendFields();
 updateLanguageUi();
 bootstrapSession();
