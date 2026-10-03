@@ -11,7 +11,7 @@ INSERT OR IGNORE INTO site_settings (id, whatsapp_number, download_url)
 VALUES (
   1,
   '972569236758',
-  'https://github.com/alsadiayham-sketch/ada-pos-releases/releases/latest/download/ADA-POS-Setup.exe'
+  'https://github.com/alsadiayham-sketch/ada-pos-releases/releases/latest/download/RTS-POS-Setup.exe'
 );
 
 CREATE TABLE IF NOT EXISTS users (

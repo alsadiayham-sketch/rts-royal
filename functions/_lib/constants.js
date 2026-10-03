@@ -5,7 +5,7 @@ export const PASSWORD_ITERATIONS = 100000;
 export const PASSWORD_DERIVED_BITS = 256;
 
 export const DEFAULT_DOWNLOAD_URL =
-  "https://github.com/alsadiayham-sketch/ada-pos-releases/releases/latest/download/ADA-POS-Setup.exe";
+  "https://github.com/alsadiayham-sketch/ada-pos-releases/releases/latest/download/RTS-POS-Setup.exe";
 
 export { DOWNLOAD_URL_REGEX, PHONE_DIGITS_REGEX } from "../../public/settings-policy.js";
 

@@ -49,29 +49,30 @@ Object.assign(copy.ar, {
   contactTitle: "لنصنع شيئاً<br>يستحق الاستخدام.",
   contactText: "شاركنا احتياجك. سنفتح رسالتك في WhatsApp لتراجعها قبل الإرسال.",
   fieldRequired: "أدخل قيمة صحيحة لهذا الحقل.",
-  heroNote: "واجهة التطبيق الحالية",
+  heroNote: "واجهة RTS POS الجديدة",
   sandboxTitle: "جرّب فكرة البيع حسب نشاطك",
   sectorCoverage: "للسوبرماركت، المحلات، المطاعم، المقاهي، متاجر الملابس، ومختلف الأنشطة التجارية.",
   faq2Q: "هل الصور من التطبيق الفعلي؟",
-  faq2A: "نعم، صور المعرض من تطبيق ADA POS الحالي. أما التجربة التفاعلية فهي مثال مبسط ولا تعالج أي عملية دفع.",
+  faq2A: "نعم، صورة المعرض من تطبيق RTS POS 4.0 الفعلي. أما التجربة التفاعلية فهي مثال مبسط ولا تعالج أي عملية دفع.",
   designExamplesAria: "أمثلة تصميم توضيحية",
   designExamplesTitle: "هوية واحدة.<br>تجربة متكاملة.",
   designExamplesText: "من واجهة الموقع إلى تفاصيل التطبيق، نصمم تجربة متناسقة على كل شاشة. تصورات توضيحية لما يمكن أن نبنيه لعلامتك.",
   sitePreviewTitle: "مكان واضح لعلامتك.",
   phonePreviewTitle: "مهمة اليوم",
   retry: "إعادة المحاولة",
-  actualAppAria: "لقطة شاشة فعلية من تطبيق ADA POS",
+  actualAppAria: "لقطة شاشة فعلية من تطبيق RTS POS",
   insideApp: "من داخل التطبيق",
   openImage: "عرض بالحجم الكامل",
   closeImage: "إغلاق",
-  galleryAria: "معرض لقطات فعلية من ADA POS",
+  galleryAria: "لقطة فعلية من تطبيق RTS POS",
   galleryTabsAria: "اختيار لقطة شاشة",
   galleryTag: "من داخل التطبيق",
   galleryTitle: "كل تفاصيل عملك.<br>في مكان واحد.",
-  galleryText: "المبيعات والفواتير والعملاء والمخزون والإعدادات. هذه لقطات فعلية من تطبيقنا، مع إخفاء بعض المعرّفات لحماية الخصوصية.",
+  galleryText: "واجهة بيع فعلية من RTS POS 4.0 بهويته الجديدة، مصممة للسرعة والوضوح أثناء العمل اليومي.",
   gallerySales: "المبيعات",
-  galleryCheckout: "الدفع",
-  gallerySettings: "الإعدادات",
+  downloadTitle: "RTS POS 4.0.",
+  downloadText: "هوية جديدة وواجهة تشغيل واضحة للمبيعات والمخزون والفواتير وإدارة نشاطك.",
+  downloadCta: "تنزيل RTS POS لـ Windows",
   mobilePreviewAria: "تصور توضيحي لتطبيق هاتف مخصص"
 });
 Object.assign(copy.en, {
@@ -86,36 +87,35 @@ Object.assign(copy.en, {
   contactTitle: "Let’s build something<br>worth using.",
   contactText: "Share what you need. We will open your message in WhatsApp so you can review it before sending.",
   fieldRequired: "Enter a valid value for this field.",
-  heroNote: "The current application",
+  heroNote: "The new RTS POS interface",
   sandboxTitle: "Explore a sales demo for your business",
   sectorCoverage: "For supermarkets, retail shops, restaurants, coffee shops, clothing stores, and businesses of every kind.",
   faq2Q: "Are these images from the real application?",
-  faq2A: "Yes. The gallery shows the current ADA POS application. The interactive sales demo is a simplified illustration and does not process payments.",
+  faq2A: "Yes. The gallery shows the real RTS POS 4.0 application. The interactive sales demo is a simplified illustration and does not process payments.",
   designExamplesAria: "Illustrative design examples",
   designExamplesTitle: "One identity.<br>Every screen.",
   designExamplesText: "From the website to the smallest app interaction, we design a connected experience. Illustrative concepts of what we can build for your brand.",
   sitePreviewTitle: "A clear place for your brand.",
   phonePreviewTitle: "Today’s task",
   retry: "Try again",
-  actualAppAria: "Actual ADA POS application screenshot",
+  actualAppAria: "Actual RTS POS application screenshot",
   insideApp: "Inside the actual app",
   openImage: "View full size",
   closeImage: "Close",
-  galleryAria: "Gallery of actual ADA POS screenshots",
+  galleryAria: "Actual RTS POS application screenshot",
   galleryTabsAria: "Choose a screenshot",
   galleryTag: "Inside the actual app",
   galleryTitle: "Your daily business.<br>In one place.",
-  galleryText: "Sales, invoices, customers, inventory, and settings. These are real application screens, with some identifiers obscured for privacy.",
+  galleryText: "A real RTS POS 4.0 sales interface in its new identity, designed for speed and clarity during daily work.",
   gallerySales: "Sales",
-  galleryCheckout: "Checkout",
-  gallerySettings: "Settings",
+  downloadTitle: "RTS POS 4.0.",
+  downloadText: "A new identity and a clear workspace for sales, inventory, invoices, and business operations.",
+  downloadCta: "Download RTS POS for Windows",
   mobilePreviewAria: "Illustrative custom mobile application preview"
 });
 sectorData.ar.other.discussion = "لن نفترض أي تفاصيل مسبقاً. أخبرنا كيف تسير عملياتك ونناقش ما يناسبها.";
 const screenshots = {
-  sales: { src: "/assets/pos-sales.png", ar: "لقطة شاشة فعلية من شاشة المبيعات في ADA POS", en: "Actual ADA POS sales screen screenshot" },
-  checkout: { src: "/assets/pos-checkout.png", ar: "لقطة شاشة فعلية من شاشة الدفع في ADA POS", en: "Actual ADA POS checkout screen screenshot" },
-  settings: { src: "/assets/pos-settings.png", ar: "لقطة شاشة فعلية من شاشة الإعدادات في ADA POS", en: "Actual ADA POS settings screen screenshot" }
+  sales: { src: "/assets/pos-sales.png", ar: "لقطة شاشة فعلية من شاشة المبيعات في RTS POS", en: "Actual RTS POS sales screen screenshot" }
 };
 let activeScreenshot = "sales";
 let dialogTrigger;
@@ -125,8 +125,8 @@ const subpageCopy = {
     en: { title: "RTS | Privacy", back: "Back to site", tag: "RTS · PRIVACY", heading: "Your privacy, clearly.", collectionH: "What does this site collect?", collection: "The public site uses no analytics or marketing cookies. Contact-form details are not stored on the site server; choosing to submit prepares a message and opens WhatsApp so you can review it before sending.", whatsappH: "WhatsApp", whatsapp: "Continuing from the contact form sends the message to WhatsApp, a third-party service governed by its own privacy policy. Do not submit the form if you do not want to share its content through WhatsApp.", cookiesH: "Cookies and the admin session", cookies: "The public site sets no cookies. The private admin area uses a necessary administrative session cookie to keep an administrator signed in.", hostingH: "Hosting", hosting: "Cloudflare processes normal connection and security data, including IP address, to serve and protect the site. We do not use this for marketing analytics.", updatesH: "Policy updates", updates: "We may update this page if the site’s operation changes. The updated version will be published here.", return: "Back to RTS", privacy: "Privacy" }
   },
   download: {
-    ar: { title: "RTS | تنزيل ADA POS", back: "العودة للموقع", tag: "RTS · WINDOWS", heading: "تنزيل ADA POS.", installerH: "ملف التثبيت الحالي", installer: "تجري إعادة تقديم العلامة تحت RTS. برنامج Windows الحالي يحمل اسم ADA POS. حجم ملف التثبيت يقارب 731 MiB؛ قد يستغرق التنزيل وقتاً حسب اتصالك.", download: "تنزيل ADA POS لـ Windows", beforeH: "قبل المتابعة", before: "هذا التنزيل مخصص لـ Windows فقط. إذا حظر Windows الملف أو ظهرت لك رسالة أمان، تواصل مع الدعم قبل المتابعة. لا نوصي بتعطيل حماية Windows.", return: "العودة إلى RTS", privacy: "الخصوصية", retry: "إعادة المحاولة" },
-    en: { title: "RTS | Download ADA POS", back: "Back to site", tag: "RTS · WINDOWS", heading: "Download ADA POS.", installerH: "The current installer", installer: "RTS is presenting the brand anew. The current Windows program is named ADA POS. The installer is about 731 MiB, so download time depends on your connection.", download: "Download ADA POS for Windows", beforeH: "Before you continue", before: "This download is for Windows only. If Windows blocks the file or shows a security message, contact support before proceeding. We do not recommend disabling Windows protection.", return: "Back to RTS", privacy: "Privacy", retry: "Try again" }
+    ar: { title: "RTS | تنزيل RTS POS", back: "العودة للموقع", tag: "RTS · WINDOWS", heading: "تنزيل RTS POS.", installerH: "الإصدار 4.0 لنظام Windows", installer: "هوية RTS الجديدة، وواجهة تشغيل أكثر وضوحاً، مع الحفاظ على بياناتك عند الترقية. حجم ملف التثبيت يقارب 192 MiB.", download: "تنزيل RTS POS لـ Windows", beforeH: "قبل المتابعة", before: "هذا التنزيل مخصص لـ Windows فقط. إذا حظر Windows الملف أو ظهرت لك رسالة أمان، تواصل مع الدعم قبل المتابعة. لا نوصي بتعطيل حماية Windows.", return: "العودة إلى RTS", privacy: "الخصوصية", retry: "إعادة المحاولة" },
+    en: { title: "RTS | Download RTS POS", back: "Back to site", tag: "RTS · WINDOWS", heading: "Download RTS POS.", installerH: "Version 4.0 for Windows", installer: "The new RTS identity and a clearer workspace, while preserving your data during upgrades. The installer is approximately 192 MiB.", download: "Download RTS POS for Windows", beforeH: "Before you continue", before: "This download is for Windows only. If Windows blocks the file or shows a security message, contact support before proceeding. We do not recommend disabling Windows protection.", return: "Back to RTS", privacy: "Privacy", retry: "Try again" }
   }
 };
 

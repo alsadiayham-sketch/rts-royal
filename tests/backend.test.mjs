@@ -37,13 +37,13 @@ test("canonicalizePhone validates canonical business number format", () => {
 test("download URL allowlist rejects arbitrary destinations", () => {
   assert.equal(
     isAllowedDownloadUrl(
-      "https://github.com/alsadiayham-sketch/ada-pos-releases/releases/latest/download/ADA-POS-Setup.exe"
+      "https://github.com/alsadiayham-sketch/ada-pos-releases/releases/latest/download/RTS-POS-Setup.exe"
     ),
     true
   );
   assert.equal(
     isAllowedDownloadUrl(
-      "https://github.com/alsadiayham-sketch/ada-pos-releases/releases/download/v1.4.3/ADA-POS-Setup.exe"
+      "https://github.com/alsadiayham-sketch/ada-pos-releases/releases/download/v4.0.0/RTS-POS-Setup.exe"
     ),
     true
   );

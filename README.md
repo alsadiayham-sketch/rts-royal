@@ -49,9 +49,9 @@ passwords, database exports, and `.wrangler/` out of source control.
 
 ## Product and assets
 
-Actual POS screenshots were supplied by the business; public copies obscure
-visible customer/store identifiers. The application and current installer still
-use the name **ADA POS**. The website's RTS identity does not modify that binary.
+The website showcases the real **RTS POS 4.0** Windows application. Public
+screenshots avoid customer/store identifiers, and the release download is restricted
+to the approved RTS installer in the compatibility release repository.
 The separate interactive sector demo is illustrative and never takes payments.
 
 Fonts are locally hosted Manrope and Noto Sans Arabic, with their OFL license
