@@ -40,15 +40,16 @@ const I18N = {
     storeNameLabel: "اسم المتجر",
     warrantyLabel: "مدة الترخيص بالأشهر",
     backendLabel: "مصدر البيانات",
-    backendD1: "D1 — مرتبط بمشروع ويب (موصى به)",
-    backendFirestore: "Firestore — متجر مستقل قديم",
+    backendD1: "RTS POS + موقع إلكتروني — مخزون مشترك",
+    backendFirestore: "RTS POS فقط — بدون موقع إلكتروني",
+    backendStandalone: "RTS POS فقط",
     linkedProjectLabel: "معرّف مشروع الويب",
     apiUrlLabel: "رابط واجهة المشروع",
     d1UserNote: "تُنشأ حسابات الكاشير من لوحة المشروع المرتبط لأن كلمات المرور مشفرة على الخادم.",
     storeAdminUsernameLabel: "اسم مستخدم المدير الأول",
     storeAdminNameLabel: "اسم المدير المعروض",
     storeAdminPasswordLabel: "كلمة مرور المدير الأول",
-    firestoreWarning: "استخدم هذا الخيار فقط للمتاجر القديمة غير المرتبطة بمشروع ويب.",
+    firestoreWarning: "كتالوج مستقل للمتجر. تُدار حسابات المستخدمين وبيانات الدخول مباشرة من RTS.",
     createStore: "إنشاء المتجر",
     storesTableCaption: "قائمة متاجر RTS POS",
     warrantyStatusLabel: "حالة الترخيص",
@@ -124,15 +125,16 @@ const I18N = {
     storeNameLabel: "Store Name",
     warrantyLabel: "Licence Period in Months",
     backendLabel: "Data Source",
-    backendD1: "D1 — Linked Website Project (Recommended)",
-    backendFirestore: "Firestore — Legacy Standalone Store",
+    backendD1: "RTS POS + Website — Shared Inventory",
+    backendFirestore: "RTS POS Only — No Website",
+    backendStandalone: "RTS POS Only",
     linkedProjectLabel: "Website Project ID",
     apiUrlLabel: "Project API URL",
     d1UserNote: "Cashier accounts are created in the linked project admin because passwords are encrypted server-side.",
     storeAdminUsernameLabel: "Initial Admin Username",
     storeAdminNameLabel: "Admin Display Name",
     storeAdminPasswordLabel: "Initial Admin Password",
-    firestoreWarning: "Use this option only for legacy stores that are not linked to a website project.",
+    firestoreWarning: "An independent store catalogue. User accounts and sign-in details are managed directly from RTS.",
     createStore: "Create Store",
     storesTableCaption: "RTS POS stores list",
     warrantyStatusLabel: "Licence Status",
@@ -237,7 +239,10 @@ function renderStoresTable() {
     const backendCell = document.createElement("td");
     const backendPill = document.createElement("span");
     backendPill.className = `status-pill backend-${store.backend}`;
-    backendPill.textContent = store.backend === "d1" ? `D1${store.linkedProject ? ` · ${store.linkedProject}` : ""}` : "Firestore";
+    backendPill.textContent =
+      store.backend === "d1"
+        ? `${state.lang === "ar" ? "موقع + POS" : "Website + POS"}${store.linkedProject ? ` · ${store.linkedProject}` : ""}`
+        : t("backendStandalone");
     backendCell.append(backendPill);
 
     const warrantyCell = document.createElement("td");
