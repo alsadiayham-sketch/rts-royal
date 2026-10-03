@@ -70,7 +70,7 @@ Object.assign(copy.ar, {
   galleryTitle: "كل تفاصيل عملك.<br>في مكان واحد.",
   galleryText: "واجهة بيع فعلية من RTS POS 4.0 بهويته الجديدة، مصممة للسرعة والوضوح أثناء العمل اليومي.",
   gallerySales: "المبيعات",
-  downloadTitle: "RTS POS 4.0.",
+  downloadTitle: "RTS POS 4.0.1.",
   downloadText: "هوية جديدة وواجهة تشغيل واضحة للمبيعات والمخزون والفواتير وإدارة نشاطك.",
   downloadCta: "تنزيل RTS POS لـ Windows",
   mobilePreviewAria: "تصور توضيحي لتطبيق هاتف مخصص"
@@ -108,7 +108,7 @@ Object.assign(copy.en, {
   galleryTitle: "Your daily business.<br>In one place.",
   galleryText: "A real RTS POS 4.0 sales interface in its new identity, designed for speed and clarity during daily work.",
   gallerySales: "Sales",
-  downloadTitle: "RTS POS 4.0.",
+  downloadTitle: "RTS POS 4.0.1.",
   downloadText: "A new identity and a clear workspace for sales, inventory, invoices, and business operations.",
   downloadCta: "Download RTS POS for Windows",
   mobilePreviewAria: "Illustrative custom mobile application preview"
@@ -125,8 +125,8 @@ const subpageCopy = {
     en: { title: "RTS | Privacy", back: "Back to site", tag: "RTS · PRIVACY", heading: "Your privacy, clearly.", collectionH: "What does this site collect?", collection: "The public site uses no analytics or marketing cookies. Contact-form details are not stored on the site server; choosing to submit prepares a message and opens WhatsApp so you can review it before sending.", whatsappH: "WhatsApp", whatsapp: "Continuing from the contact form sends the message to WhatsApp, a third-party service governed by its own privacy policy. Do not submit the form if you do not want to share its content through WhatsApp.", cookiesH: "Cookies and the admin session", cookies: "The public site sets no cookies. The private admin area uses a necessary administrative session cookie to keep an administrator signed in.", hostingH: "Hosting", hosting: "Cloudflare processes normal connection and security data, including IP address, to serve and protect the site. We do not use this for marketing analytics.", updatesH: "Policy updates", updates: "We may update this page if the site’s operation changes. The updated version will be published here.", return: "Back to RTS", privacy: "Privacy" }
   },
   download: {
-    ar: { title: "RTS | تنزيل RTS POS", back: "العودة للموقع", tag: "RTS · WINDOWS", heading: "تنزيل RTS POS.", installerH: "الإصدار 4.0 لنظام Windows", installer: "هوية RTS الجديدة، وواجهة تشغيل أكثر وضوحاً، مع الحفاظ على بياناتك عند الترقية. حجم ملف التثبيت يقارب 192 MiB.", download: "تنزيل RTS POS لـ Windows", beforeH: "قبل المتابعة", before: "هذا التنزيل مخصص لـ Windows فقط. إذا حظر Windows الملف أو ظهرت لك رسالة أمان، تواصل مع الدعم قبل المتابعة. لا نوصي بتعطيل حماية Windows.", return: "العودة إلى RTS", privacy: "الخصوصية", retry: "إعادة المحاولة" },
-    en: { title: "RTS | Download RTS POS", back: "Back to site", tag: "RTS · WINDOWS", heading: "Download RTS POS.", installerH: "Version 4.0 for Windows", installer: "The new RTS identity and a clearer workspace, while preserving your data during upgrades. The installer is approximately 192 MiB.", download: "Download RTS POS for Windows", beforeH: "Before you continue", before: "This download is for Windows only. If Windows blocks the file or shows a security message, contact support before proceeding. We do not recommend disabling Windows protection.", return: "Back to RTS", privacy: "Privacy", retry: "Try again" }
+    ar: { title: "RTS | تنزيل RTS POS", back: "العودة للموقع", tag: "RTS · WINDOWS", heading: "تنزيل RTS POS.", installerH: "الإصدار 4.0.1 لنظام Windows", installer: "هوية RTS الجديدة، وواجهة تشغيل أكثر وضوحاً، مع الحفاظ على بياناتك عند الترقية. حجم ملف التثبيت يقارب 192 MiB.", download: "تنزيل RTS POS لـ Windows", beforeH: "قبل المتابعة", before: "هذا التنزيل مخصص لـ Windows فقط. إذا حظر Windows الملف أو ظهرت لك رسالة أمان، تواصل مع الدعم قبل المتابعة. لا نوصي بتعطيل حماية Windows.", return: "العودة إلى RTS", privacy: "الخصوصية", retry: "إعادة المحاولة" },
+    en: { title: "RTS | Download RTS POS", back: "Back to site", tag: "RTS · WINDOWS", heading: "Download RTS POS.", installerH: "Version 4.0.1 for Windows", installer: "The new RTS identity and a clearer workspace, while preserving your data during upgrades. The installer is approximately 192 MiB.", download: "Download RTS POS for Windows", beforeH: "Before you continue", before: "This download is for Windows only. If Windows blocks the file or shows a security message, contact support before proceeding. We do not recommend disabling Windows protection.", return: "Back to RTS", privacy: "Privacy", retry: "Try again" }
   }
 };
 
