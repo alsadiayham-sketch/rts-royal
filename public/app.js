@@ -324,7 +324,8 @@ async function loadSettings() {
     if (downloadLink && !isAllowedDownloadUrl(settings.downloadUrl)) throw new Error("Invalid download URL");
     if (typeof settings.whatsappNumber !== "string" || !PHONE_DIGITS_REGEX.test(settings.whatsappNumber)) throw new Error("Invalid contact number");
     if (downloadLink) {
-      downloadLink.href = settings.downloadUrl;
+      downloadLink.href = "/download/rts-pos";
+      downloadLink.download = "R.T.S POS Setup.exe";
       downloadLink.setAttribute("aria-disabled", "false");
     }
     whatsappNumber = settings.whatsappNumber;
