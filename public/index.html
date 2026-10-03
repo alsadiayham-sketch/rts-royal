@@ -40,7 +40,7 @@
   <main id="main">
     <section class="hero">
       <div class="hero-copy">
-        <p class="brand-motto" data-i18n="motto">Royal code, Royal power</p>
+        <p class="brand-motto" data-i18n="motto">Where code becomes power</p>
         <p class="hero-kicker" data-i18n="heroKicker">RTS / تصميم + برمجة + تشغيل</p>
         <h1 data-i18n="heroTitle">نبني النظام.<br><span>الذي يحرّك عملك.</span></h1>
         <p class="hero-intro" data-i18n="heroIntro">مواقع وتطبيقات وأنظمة بيع مصممة لتبدو استثنائية وتعمل بوضوح.</p>
@@ -51,6 +51,13 @@
         <p class="settings-status" role="status" aria-live="polite" data-i18n="settingsLoading">جارٍ تجهيز طرق التواصل…</p><button id="settings-retry" type="button" hidden>إعادة المحاولة</button>
       </div>
       <div class="hero-visual actual-app" aria-label="Actual RTS POS application screenshot" data-i18n-aria="actualAppAria">
+        <div class="hero-media" aria-hidden="true">
+          <video class="hero-video" autoplay muted loop playsinline poster="/assets/hero-royal.svg">
+            <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+          </video>
+          <span class="hero-video-overlay"></span>
+          <img class="hero-media-art" src="/assets/hero-royal.svg" alt="">
+        </div>
         <img class="hero-watermark" src="/assets/rts-mark.svg" alt="" aria-hidden="true">
         <span class="r-beam beam-one" aria-hidden="true"></span><span class="r-beam beam-two" aria-hidden="true"></span>
         <div class="hero-note"><span data-i18n="insideApp">من داخل التطبيق</span><b data-i18n="heroNote">واجهة RTS POS الجديدة</b></div>
@@ -71,17 +78,20 @@
         <div class="service-sigil" aria-hidden="true"><img src="/assets/rts-mark.svg" alt=""><span></span></div>
       </div>
       <div class="service-list">
-        <a href="#contact" data-request-service="website" class="service-item"><span class="service-icon" aria-hidden="true">⌘</span><div><h3 data-i18n="service1Title">مواقع ومتاجر إلكترونية</h3><p data-i18n="service1Text">واجهة تشرح قيمتك بوضوح وتمنح عملاءك طريقاً بسيطاً للبدء.</p></div><span class="arrow" aria-hidden="true">←</span></a>
-        <a href="#contact" data-request-service="desktop" class="service-item"><span class="service-icon" aria-hidden="true">▣</span><div><h3 data-i18n="service2Title">تطبيقات سطح المكتب</h3><p data-i18n="service2Text">أدوات عملية لعملياتك اليومية، مصممة حول فريقك وطريقة عمله.</p></div><span class="arrow" aria-hidden="true">←</span></a>
-        <a href="#pos" class="service-item featured"><span class="service-icon" aria-hidden="true">▤</span><div><h3 data-i18n="service4Title">نظام نقاط البيع</h3><p data-i18n="service4Text">مبيعات ومخزون وباركود وفواتير وتقارير وفروع متعددة، مع مساحة لفهم احتياجك أولاً.</p></div><span class="arrow" aria-hidden="true">←</span></a>
+        <a href="#contact" data-request-service="website" class="service-item"><span class="service-icon" aria-hidden="true">⌘</span><div><h3 data-i18n="service1Title">مواقع تحوّل حضورك إلى حركة</h3><p data-i18n="service1Text">تجارب رقمية تشرح قيمتك بسرعة، وتحوّل الزيارة الأولى إلى خطوة واضحة.</p></div><span class="arrow" aria-hidden="true">←</span></a>
+        <a href="#contact" data-request-service="desktop" class="service-item"><span class="service-icon" aria-hidden="true">▣</span><div><h3 data-i18n="service2Title">أدوات تشغيل تقلل الاحتكاك</h3><p data-i18n="service2Text">تطبيقات مكتبية مصممة حول عمليات فريقك، من أول إدخال إلى القرار الأخير.</p></div><span class="arrow" aria-hidden="true">←</span></a>
+        <a href="#pos" class="service-item featured"><span class="service-icon" aria-hidden="true">▤</span><div><h3 data-i18n="service4Title">RTS POS: قوة البيع في لحظتها</h3><p data-i18n="service4Text">مبيعات، مخزون، فواتير وتقارير مترابطة تمنحك صورة أسرع وتحكماً أكبر.</p></div><span class="arrow" aria-hidden="true">←</span></a>
       </div>
     </section>
 
     <section class="leadership section" id="leadership">
       <div class="leadership-card">
+        <span class="leadership-orbit leadership-orbit-one" aria-hidden="true"></span>
+        <span class="leadership-orbit leadership-orbit-two" aria-hidden="true"></span>
         <p class="section-tag" data-i18n="ceoTag">رسالة القيادة</p>
-        <h2 id="ceo-name">Ahmad Dawabsheh</h2>
+        <div class="leadership-heading"><span class="leadership-mark" aria-hidden="true">R</span><h2 id="ceo-name">Ahmad Dawabsheh</h2></div>
         <p id="ceo-message" data-i18n="ceoMessage">نؤمن أن التقنية الجيدة تجعل العمل أوضح، والقرار أسرع، وتجربة العميل أكثر ثقة.</p>
+        <p class="leadership-signature" data-i18n="motto">Where code becomes power</p>
       </div>
     </section>
 

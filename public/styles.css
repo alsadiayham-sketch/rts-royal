@@ -39,7 +39,8 @@ h1, h2, h3 { text-wrap: balance; }
 .site-header nav { display: flex; gap: 1.55rem; align-items: center; font-size: .9rem; font-weight: 650; }
 .site-header nav > a:not(.nav-cta) { opacity: .87; }
 .site-header nav > a:not(.nav-cta):hover { opacity: 1; }
-.language-toggle { min-width: 38px; height: 31px; border: 1px solid oklch(.72 .06 320); background: transparent; color: var(--white); font: 800 .8rem var(--latin); }
+.language-toggle { min-width: 38px; height: 31px; border: 1px solid oklch(.72 .06 320); background: transparent; color: var(--white); font: 800 .8rem var(--latin); transition: color .2s ease, background .2s ease, border-color .2s ease, transform .2s ease; }
+.language-toggle:hover { border-color: var(--mint); background: color-mix(in srgb, var(--mint) 18%, transparent); color: var(--white); transform: translateY(-2px); }
 .nav-cta, .button { display: inline-flex; gap: .7rem; align-items: center; justify-content: center; min-height: 46px; border: 0; border-radius: 7px; font-weight: 800; transition: transform .2s ease, background .2s ease; }
 .nav-cta { padding: .55rem .9rem; background: var(--white); color: var(--purple); }
 .nav-cta:hover, .button:hover { transform: translateY(-2px); }

@@ -75,13 +75,16 @@ html[dir="rtl"] .home-v2 .page-progress { transform-origin: right; }
 .home-v2 .language-toggle {
   min-width: 44px;
   min-height: 44px;
-  border-color: var(--line);
+  border-color: var(--royal-700);
+  background: var(--surface-strong);
+  color: var(--royal-950);
   border-radius: 999px;
   transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
 }
 .home-v2 .menu-toggle { color: var(--ink); }
 .home-v2 .menu-toggle > span { background: var(--ink); }
 .home-v2 .language-toggle:hover { border-color: var(--royal-700); background: var(--surface); color: var(--royal-700); }
+.home-v2[data-theme="dark"] .language-toggle { background: var(--surface-strong); color: var(--ink); }
 .home-v2 .theme-toggle {
   min-width: 44px;
   min-height: 44px;
@@ -123,6 +126,20 @@ html[dir="rtl"] .home-v2 .page-progress { transform-origin: right; }
   z-index: -1;
   background: var(--surface);
   clip-path: polygon(0 0, 100% 0, 100% 78%, 77% 78%, 66% 100%, 0 100%);
+}
+.home-v2 .hero::before {
+  background:
+    linear-gradient(112deg, transparent 0 42%, oklch(.62 .22 315 / .16) 42.2% 42.35%, transparent 42.5%),
+    linear-gradient(72deg, transparent 0 68%, oklch(.72 .18 315 / .12) 68.2% 68.35%, transparent 68.5%),
+    var(--surface);
+  animation: hero-surface-drift 16s ease-in-out infinite alternate;
+}
+.home-v2 .hero::after {
+  box-shadow: 0 0 0 1px oklch(.62 .2 315 / .18), 0 0 80px oklch(.62 .2 315 / .12);
+}
+@keyframes hero-surface-drift {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to { background-position: 9rem -3rem, -7rem 4rem, 0 0; }
 }
 .home-v2 .hero-copy { max-width: 640px; }
 .home-v2 .brand-motto {
@@ -168,6 +185,33 @@ html[dir="rtl"] .home-v2 .page-progress { transform-origin: right; }
   perspective: 1400px;
   transform-style: preserve-3d;
 }
+.home-v2 .hero-media {
+  position: absolute;
+  inset: 7% 2% 5% 4%;
+  overflow: hidden;
+  border: 1px solid oklch(.72 .18 315 / .42);
+  border-radius: 1.25rem;
+  background: oklch(.13 .06 318);
+  box-shadow: 0 24px 70px oklch(.18 .1 318 / .28);
+  transform: rotate(-3deg);
+  transition: transform 450ms var(--ease-out), border-color 220ms ease, box-shadow 220ms ease;
+}
+.home-v2 .hero-media:hover {
+  border-color: oklch(.8 .2 315 / .75);
+  box-shadow: 0 30px 90px oklch(.18 .12 318 / .4);
+  transform: rotate(-1deg) translateY(-5px);
+}
+.home-v2 .hero-video,
+.home-v2 .hero-media-art,
+.home-v2 .hero-video-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.home-v2 .hero-video { object-fit: cover; opacity: .24; mix-blend-mode: screen; filter: saturate(1.4) hue-rotate(215deg) contrast(1.15); }
+.home-v2 .hero-video-overlay { background: linear-gradient(135deg, oklch(.22 .15 315 / .68), oklch(.4 .18 300 / .28) 55%, oklch(.08 .08 318 / .86)); }
+.home-v2 .hero-media-art { object-fit: cover; opacity: .72; mix-blend-mode: screen; }
 .home-v2 .hero-watermark {
   position: absolute;
   inset-inline-end: -2rem;
@@ -332,16 +376,26 @@ html[dir="ltr"] .home-v2 .service-item:hover .arrow { transform: translateX(6px)
 
 .home-v2 .leadership { padding-block: 3rem; }
 .home-v2 .leadership-card {
+  position: relative;
+  overflow: hidden;
   max-width: 900px;
   margin-inline: auto;
   padding: clamp(2rem, 5vw, 4rem);
   border: 1px solid var(--line);
   border-radius: 1.5rem;
-  background: linear-gradient(135deg, var(--surface-strong), var(--surface));
+  background:
+    radial-gradient(circle at 88% 18%, oklch(.62 .22 315 / .22), transparent 28%),
+    linear-gradient(135deg, var(--surface-strong), var(--surface));
   box-shadow: 0 24px 60px oklch(.25 .08 318 / .12);
 }
+.home-v2 .leadership-heading { display: flex; gap: 1rem; align-items: center; }
+.home-v2 .leadership-mark { display: grid; flex: 0 0 3.5rem; width: 3.5rem; height: 3.5rem; place-items: center; border: 1px solid var(--royal-700); border-radius: 50%; background: var(--royal-700); color: var(--on-brand); font: 800 1.5rem var(--latin); box-shadow: 0 0 0 8px oklch(.62 .22 315 / .12); }
 .home-v2 .leadership-card h2 { margin: .5rem 0 1rem; color: var(--ink); font-size: clamp(2rem, 4vw, 4rem); }
-.home-v2 .leadership-card > p:last-child { max-width: 48rem; color: var(--ink-muted); font-size: clamp(1.1rem, 2vw, 1.5rem); line-height: 1.9; }
+.home-v2 .leadership-card > #ceo-message { max-width: 48rem; margin: 1.6rem 0 1.5rem; color: var(--ink); font-size: clamp(1.25rem, 2.4vw, 1.8rem); font-weight: 650; line-height: 1.75; }
+.home-v2 .leadership-signature { margin: 0; color: var(--royal-700); font: 800 clamp(.95rem, 1.4vw, 1.15rem) var(--latin); letter-spacing: .02em; }
+.home-v2 .leadership-orbit { position: absolute; border: 1px solid oklch(.62 .2 315 / .3); border-radius: 50%; pointer-events: none; }
+.home-v2 .leadership-orbit-one { inset-inline-end: -5rem; top: -7rem; width: 18rem; height: 18rem; }
+.home-v2 .leadership-orbit-two { inset-inline-end: 4rem; bottom: -8rem; width: 13rem; height: 13rem; border-color: oklch(.72 .18 315 / .22); }
 .home-v2 .testimonials { padding-top: 3rem; }
 .home-v2 .section-heading h2 { margin-top: .5rem; color: var(--ink); font-size: clamp(2.5rem, 5vw, 5rem); }
 .home-v2 .testimonial-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-top: 2rem; }
@@ -463,6 +517,14 @@ html[dir="ltr"] .home-v2 .service-item:hover .arrow { transform: translateX(6px)
 .home-v2 .faq summary { color: var(--ink); }
 .home-v2 .faq summary::after { color: var(--royal-700); }
 .home-v2 .faq details p { color: var(--ink-muted); }
+.home-v2 .faq details:hover { padding-inline: .8rem; background: var(--surface-strong); }
+.home-v2 .faq summary:hover { color: var(--royal-700); }
+.home-v2 .service-item:focus-visible,
+.home-v2 .testimonial-card:hover { transform: translateY(-3px); }
+.home-v2 .service-item { transition: background-color 220ms ease, transform 220ms var(--ease-out), padding-inline 220ms ease; }
+.home-v2 .service-item:hover { padding-inline: 1.4rem; }
+.home-v2 .testimonial-card { transition: transform 220ms var(--ease-out), border-color 220ms ease, background-color 220ms ease; }
+.home-v2 .testimonial-card:hover { border-color: var(--royal-700); background: var(--surface-strong); }
 
 .home-v2 .contact {
   position: relative;
@@ -594,4 +656,7 @@ html[dir="ltr"] .home-v2 .service-item:hover .arrow { transform: translateX(6px)
 @media (prefers-reduced-motion: reduce) {
   .home-v2 .page-progress { display: none; }
   .home-v2 .testimonial-card { animation: none; }
+  .home-v2 .hero::before,
+  .home-v2 .hero-media,
+  .home-v2 .hero-video { animation: none; transition: none; }
 }
