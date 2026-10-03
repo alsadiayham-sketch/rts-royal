@@ -167,6 +167,56 @@
                 </table>
               </div>
               <p id="stores-empty" class="empty-state hidden" data-i18n="noStores">لا توجد متاجر مسجلة بعد.</p>
+
+              <section id="store-users-panel" class="store-users-panel hidden" aria-labelledby="store-users-title">
+                <div class="section-heading">
+                  <div>
+                    <h3 id="store-users-title">مستخدمو المتجر</h3>
+                    <p id="store-users-context"></p>
+                  </div>
+                  <button id="store-users-close" class="secondary-btn" type="button" data-i18n="closeStoreUsers">إغلاق</button>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <caption class="sr-only" data-i18n="storeUsersCaption">مستخدمو متجر RTS POS</caption>
+                    <thead>
+                      <tr>
+                        <th data-i18n="usernameLabel">اسم المستخدم</th>
+                        <th data-i18n="nameLabel">الاسم</th>
+                        <th data-i18n="roleLabel">الدور</th>
+                        <th data-i18n="statusLabel">الحالة</th>
+                        <th data-i18n="actionsLabel">إجراءات</th>
+                      </tr>
+                    </thead>
+                    <tbody id="store-users-tbody"></tbody>
+                  </table>
+                </div>
+                <form id="store-user-form" class="stacked-form" novalidate>
+                  <h3 data-i18n="addStoreUserTitle">إضافة أو تحديث مستخدم</h3>
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="store-user-username" data-i18n="usernameLabel">اسم المستخدم</label>
+                      <input id="store-user-username" name="username" type="text" dir="ltr" maxlength="32" required />
+                    </div>
+                    <div class="field">
+                      <label for="store-user-name" data-i18n="nameLabel">الاسم المعروض</label>
+                      <input id="store-user-name" name="name" type="text" maxlength="80" required />
+                    </div>
+                    <div class="field">
+                      <label for="store-user-role" data-i18n="roleLabel">الدور</label>
+                      <select id="store-user-role" name="role">
+                        <option value="worker" data-i18n="roleWorker">كاشير / موظف</option>
+                        <option value="admin" data-i18n="roleAdmin">مدير</option>
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label for="store-user-password" data-i18n="newPasswordLabel">كلمة المرور الجديدة</label>
+                      <input id="store-user-password" name="password" type="password" minlength="12" maxlength="128" autocomplete="new-password" required />
+                    </div>
+                  </div>
+                  <button id="store-user-submit" class="primary-btn" type="submit" data-i18n="saveStoreUser">حفظ المستخدم</button>
+                </form>
+              </section>
             </section>
 
             <section id="tab-users" class="tab-panel hidden">

@@ -63,6 +63,17 @@ const I18N = {
     warrantyPrompt: "عدد أشهر التمديد من اليوم:",
     confirmDisableStore: "تعطيل هذا المتجر؟ لن يتمكن مستخدموه من تسجيل الدخول.",
     licenceUpdated: "تم تحديث ترخيص المتجر.",
+    manageStoreUsers: "المستخدمون",
+    closeStoreUsers: "إغلاق",
+    storeUsersCaption: "مستخدمو متجر RTS POS",
+    addStoreUserTitle: "إضافة أو تحديث مستخدم",
+    roleLabel: "الدور",
+    roleWorker: "كاشير / موظف",
+    roleAdmin: "مدير",
+    saveStoreUser: "حفظ المستخدم",
+    storeUserSaved: "تم حفظ مستخدم المتجر.",
+    storeUsersContext: "إدارة حسابات",
+    confirmStoreUserDeactivate: "تعطيل هذا المستخدم؟ لن يتمكن من تسجيل الدخول إلى RTS POS.",
     active: "نشط",
     inactive: "معطل",
     recommended: "مطلوب تغيير",
@@ -148,6 +159,17 @@ const I18N = {
     warrantyPrompt: "Extension months from today:",
     confirmDisableStore: "Disable this store? Its users will no longer be able to sign in.",
     licenceUpdated: "Store licence updated.",
+    manageStoreUsers: "Users",
+    closeStoreUsers: "Close",
+    storeUsersCaption: "RTS POS store users",
+    addStoreUserTitle: "Add or Update User",
+    roleLabel: "Role",
+    roleWorker: "Cashier / Staff",
+    roleAdmin: "Manager",
+    saveStoreUser: "Save User",
+    storeUserSaved: "Store user saved.",
+    storeUsersContext: "Managing accounts for",
+    confirmStoreUserDeactivate: "Deactivate this user? They will no longer be able to sign in to RTS POS.",
     active: "Active",
     inactive: "Inactive",
     recommended: "Change recommended",
@@ -179,6 +201,8 @@ let state = {
   settings: null,
   stores: [],
   storesLoaded: false,
+  currentStore: null,
+  storeUsers: [],
   pending: new Set(),
 };
 
@@ -202,6 +226,12 @@ const els = {
   storesRefresh: document.getElementById("stores-refresh"),
   storesTbody: document.getElementById("stores-tbody"),
   storesEmpty: document.getElementById("stores-empty"),
+  storeUsersPanel: document.getElementById("store-users-panel"),
+  storeUsersTitle: document.getElementById("store-users-title"),
+  storeUsersContext: document.getElementById("store-users-context"),
+  storeUsersTbody: document.getElementById("store-users-tbody"),
+  storeUserForm: document.getElementById("store-user-form"),
+  storeUsersClose: document.getElementById("store-users-close"),
   usersTbody: document.getElementById("users-tbody"),
   addUserForm: document.getElementById("add-user-form"),
   passwordForm: document.getElementById("password-form"),
@@ -213,6 +243,65 @@ function t(key) {
   return I18N[state.lang][key] || key;
 }
 
+function renderStoreUsersTable() {
+  els.storeUsersTbody.textContent = "";
+  for (const user of state.storeUsers) {
+    const row = document.createElement("tr");
+    const usernameCell = document.createElement("td");
+    usernameCell.dir = "ltr";
+    usernameCell.textContent = user.username;
+    const nameCell = document.createElement("td");
+    nameCell.textContent = user.name;
+    const roleCell = document.createElement("td");
+    roleCell.textContent = user.role === "admin" ? t("roleAdmin") : t("roleWorker");
+    const statusCell = document.createElement("td");
+    const status = document.createElement("span");
+    status.className = `status-pill ${user.active ? "active" : "inactive"}`;
+    status.textContent = user.active ? t("active") : t("inactive");
+    statusCell.append(status);
+    const actionCell = document.createElement("td");
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "secondary-btn compact-btn";
+    toggle.textContent = user.active ? t("deactivate") : t("activate");
+    toggle.addEventListener("click", () => toggleStoreUser(user));
+    actionCell.append(toggle);
+    row.append(usernameCell, nameCell, roleCell, statusCell, actionCell);
+    els.storeUsersTbody.append(row);
+  }
+}
+
+async function loadStoreUsers() {
+  if (!state.currentStore) return;
+  const data = await apiFetch(`/api/pos-store-users?storeId=${encodeURIComponent(state.currentStore.id)}`);
+  state.storeUsers = data.users || [];
+  renderStoreUsersTable();
+}
+
+async function openStoreUsers(store) {
+  clearMessages();
+  state.currentStore = store;
+  state.storeUsers = [];
+  els.storeUsersTitle.textContent = `${t("manageStoreUsers")} · ${store.name}`;
+  els.storeUsersContext.textContent = `${t("storeUsersContext")} ${store.id}`;
+  els.storeUsersPanel.classList.remove("hidden");
+  els.storeUserForm.reset();
+  try {
+    await loadStoreUsers();
+    els.storeUsersPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById("store-user-username").focus({ preventScroll: true });
+  } catch (error) {
+    showAlert(error.message);
+  }
+}
+
+function closeStoreUsers() {
+  state.currentStore = null;
+  state.storeUsers = [];
+  els.storeUserForm.reset();
+  els.storeUsersPanel.classList.add("hidden");
+}
+
 function formatLicenceDate(value) {
   if (!value) return "—";
   const date = new Date(value);
@@ -222,6 +311,62 @@ function formatLicenceDate(value) {
     month: "short",
     day: "numeric",
   }).format(date);
+}
+
+async function handleStoreUserSave(event) {
+  event.preventDefault();
+  clearMessages();
+  if (!state.currentStore || state.pending.has("store-user-save")) return;
+  const data = new FormData(els.storeUserForm);
+  const payload = {
+    storeId: state.currentStore.id,
+    username: String(data.get("username") || "").trim(),
+    name: String(data.get("name") || "").trim(),
+    role: String(data.get("role") || ""),
+    password: String(data.get("password") || ""),
+  };
+  const submit = document.getElementById("store-user-submit");
+  setPending("store-user-save", true, submit);
+  try {
+    await apiFetch("/api/pos-store-users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    els.storeUserForm.reset();
+    await loadStoreUsers();
+    showStatus(t("storeUserSaved"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    setPending("store-user-save", false, submit);
+    document.getElementById("store-user-password").value = "";
+  }
+}
+
+async function toggleStoreUser(user) {
+  clearMessages();
+  const nextActive = !user.active;
+  if (!nextActive && !window.confirm(t("confirmStoreUserDeactivate"))) return;
+  const key = `store-user-${user.username}`;
+  if (!state.currentStore || state.pending.has(key)) return;
+  state.pending.add(key);
+  try {
+    await apiFetch("/api/pos-store-users", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        storeId: state.currentStore.id,
+        username: user.username,
+        active: nextActive,
+      }),
+    });
+    await loadStoreUsers();
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    state.pending.delete(key);
+  }
 }
 
 function renderStoresTable() {
@@ -268,6 +413,14 @@ function renderStoresTable() {
       disable.textContent = t("disableStore");
       disable.addEventListener("click", () => updateStoreLicence(store, "disable"));
       actions.append(disable);
+    }
+    if (store.backend === "firestore") {
+      const users = document.createElement("button");
+      users.type = "button";
+      users.className = "secondary-btn compact-btn";
+      users.textContent = t("manageStoreUsers");
+      users.addEventListener("click", () => openStoreUsers(store));
+      actions.prepend(users);
     }
     actionsCell.append(actions);
     row.append(nameCell, idCell, backendCell, warrantyCell, actionsCell);
@@ -406,6 +559,11 @@ function updateLanguageUi() {
   els.passwordWarning.classList.toggle("hidden", !state.passwordChangeRecommended);
   renderUsersTable();
   renderStoresTable();
+  renderStoreUsersTable();
+  if (state.currentStore) {
+    els.storeUsersTitle.textContent = `${t("manageStoreUsers")} · ${state.currentStore.name}`;
+    els.storeUsersContext.textContent = `${t("storeUsersContext")} ${state.currentStore.id}`;
+  }
 }
 
 function mapApiError(errorCode, fallbackMessage) {
@@ -441,6 +599,10 @@ function mapApiError(errorCode, fallbackMessage) {
       state.lang === "ar"
         ? "تعذر الوصول إلى سجل متاجر نقطة البيع."
         : "The POS store registry is currently unavailable.",
+    LAST_POS_ADMIN_FORBIDDEN:
+      state.lang === "ar"
+        ? "لا يمكن تعطيل آخر مدير نشط للمتجر."
+        : "The last active store manager cannot be disabled.",
   };
 
   return dictionary[errorCode] || fallbackMessage || t("unexpectedError");
@@ -631,6 +793,7 @@ async function handleLogout() {
     state.settings = null;
     state.stores = [];
     state.storesLoaded = false;
+    closeStoreUsers();
     clearSensitiveInputs();
     await bootstrapSession();
     showStatus(t("loggedOut"));
@@ -800,6 +963,8 @@ function initForms() {
   els.loginForm.addEventListener("submit", handleLogin);
   els.settingsForm.addEventListener("submit", handleSaveSettings);
   els.storeForm.addEventListener("submit", handleCreateStore);
+  els.storeUserForm.addEventListener("submit", handleStoreUserSave);
+  els.storeUsersClose.addEventListener("click", closeStoreUsers);
   els.storeBackend.addEventListener("change", syncStoreBackendFields);
   els.storesRefresh.addEventListener("click", () => {
     clearMessages();
