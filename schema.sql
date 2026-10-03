@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS site_settings (
   id INTEGER PRIMARY KEY CHECK (id = 1),
   whatsapp_number TEXT NOT NULL CHECK (length(whatsapp_number) BETWEEN 8 AND 15),
   download_url TEXT NOT NULL,
+  content_json TEXT NOT NULL DEFAULT '{}',
   updated_at INTEGER NOT NULL DEFAULT (unixepoch())
 );
 

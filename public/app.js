@@ -34,10 +34,20 @@ let basket = [];
 let whatsappNumber = "";
 const isMainPage = document.body.dataset.page === "home";
 let settingsState = "loading";
+const defaultSiteContent = {
+  ceoName: "Ahmad Dawabsheh",
+  ceoMessage: "نؤمن أن التقنية الجيدة تجعل العمل أوضح، والقرار أسرع، وتجربة العميل أكثر ثقة.",
+  feedbacks: []
+};
 const byId = (id) => document.getElementById(id);
 const text = (key) => copy[language][key] || "";
 
 Object.assign(copy.ar, {
+  navFeedback: "آراء العملاء",
+  ceoTag: "رسالة القيادة",
+  ceoMessage: defaultSiteContent.ceoMessage,
+  feedbackTag: "أصوات العملاء",
+  feedbackTitle: "تجارب تُقاس بما تغيّره.",
   heroIntro: "مواقع وتطبيقات وأنظمة بيع مصممة لتبدو استثنائية وتعمل بوضوح.",
   introBand: "من أول انطباع إلى آخر فاتورة، نصمم تجربة واحدة تعمل معك.",
   servicesTitle: "كل شاشة.<br>نفس الفكرة القوية.",
@@ -76,6 +86,11 @@ Object.assign(copy.ar, {
   mobilePreviewAria: "تصور توضيحي لتطبيق هاتف مخصص"
 });
 Object.assign(copy.en, {
+  navFeedback: "Client feedback",
+  ceoTag: "A message from leadership",
+  ceoMessage: "Good technology makes work clearer, decisions faster, and the customer experience more confident.",
+  feedbackTag: "Client feedback",
+  feedbackTitle: "Experiences measured by what they change.",
   heroIntro: "Websites, apps, and point-of-sale systems designed to look exceptional and work clearly.",
   introBand: "From first impression to final invoice, we design one experience that works with you.",
   servicesTitle: "Every screen.<br>One strong idea.",
@@ -303,6 +318,60 @@ function renderSettingsState() {
 function isAllowedDownloadUrl(value) {
   return typeof value === "string" && DOWNLOAD_URL_REGEX.test(value);
 }
+function applySiteContent(content) {
+  const data = { ...defaultSiteContent, ...(content || {}) };
+  const ceoName = byId("ceo-name");
+  const ceoMessage = byId("ceo-message");
+  if (ceoName && data.ceoName) ceoName.textContent = data.ceoName;
+  if (ceoMessage && data.ceoMessage) ceoMessage.textContent = data.ceoMessage;
+  const grid = byId("testimonial-grid");
+  if (grid && Array.isArray(data.feedbacks) && data.feedbacks.length) {
+    grid.replaceChildren(...data.feedbacks.slice(0, 6).map((item) => {
+      const card = document.createElement("article");
+      card.className = "testimonial-card";
+      const name = document.createElement("strong");
+      name.textContent = item.name || "RTS client";
+      const textNode = document.createElement("p");
+      textNode.textContent = item.text || "";
+      card.append(name, textNode);
+      return card;
+    }));
+  }
+  const media = Array.isArray(data.heroMedia) ? data.heroMedia.find((item) => item && item.url) : null;
+  const frame = document.querySelector(".hero-screenshot");
+  if (media && frame) {
+    const current = frame.querySelector("img");
+    if (media.type === "video") {
+      const video = document.createElement("video");
+      video.src = media.url;
+      video.autoplay = true;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.alt = media.alt || "";
+      if (current) current.replaceWith(video);
+    } else if (current) {
+      current.src = media.url;
+      current.alt = media.alt || current.alt;
+    }
+  }
+}
+function setupThemeToggle() {
+  const toggle = document.querySelector(".theme-toggle");
+  if (!toggle) return;
+  let theme = localStorage.getItem("rts-theme") === "dark" ? "dark" : "light";
+  const apply = () => {
+    document.body.dataset.theme = theme;
+    toggle.textContent = theme === "dark" ? "☀" : "☾";
+    toggle.setAttribute("aria-label", theme === "dark" ? "تفعيل المظهر الفاتح" : "تفعيل المظهر الداكن");
+  };
+  apply();
+  toggle.addEventListener("click", () => {
+    theme = theme === "dark" ? "light" : "dark";
+    localStorage.setItem("rts-theme", theme);
+    apply();
+  });
+}
 async function loadSettings() {
   settingsState = "loading";
   whatsappNumber = "";
@@ -321,6 +390,7 @@ async function loadSettings() {
     const response = await fetch("/api/settings", { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(8000) });
     if (!response.ok) throw new Error("Settings unavailable");
     const settings = await response.json();
+    applySiteContent(settings.content);
     if (downloadLink && !isAllowedDownloadUrl(settings.downloadUrl)) throw new Error("Invalid download URL");
     if (typeof settings.whatsappNumber !== "string" || !PHONE_DIGITS_REGEX.test(settings.whatsappNumber)) throw new Error("Invalid contact number");
     if (downloadLink) {
@@ -438,7 +508,7 @@ if (isMainPage) {
   });
   byId("year").textContent = new Date().getFullYear();
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const navSections = [...document.querySelectorAll("#services, #pos, #approach, #contact")];
+  const navSections = [...document.querySelectorAll("#services, #pos, #testimonials, #contact")];
   if ("IntersectionObserver" in window) {
     const navObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -473,6 +543,7 @@ if (isMainPage) {
     });
   }
   updateCopy();
+  setupThemeToggle();
   loadSettings();
 } else {
   updateSubpageCopy();

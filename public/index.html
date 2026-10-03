@@ -29,9 +29,10 @@
     <nav id="primary-navigation" aria-label="التنقل الرئيسي" data-i18n-aria="navAria">
       <a href="#services" data-i18n="navServices">الخدمات</a>
       <a href="#pos" data-i18n="navPos">نقطة البيع</a>
-      <a href="#approach" data-i18n="navApproach">الأسلوب</a>
+      <a href="#testimonials" data-i18n="navFeedback">آراء العملاء</a>
       <a href="#contact" data-i18n="navContact">تواصل</a>
       <button class="language-toggle" type="button" aria-label="Switch to English">EN</button>
+      <button class="theme-toggle" type="button" aria-label="تبديل المظهر">☾</button>
       <a class="nav-cta js-contact-link" href="#contact" aria-disabled="true" data-i18n="navCta">ابدأ محادثة</a>
     </nav>
   </header>
@@ -61,7 +62,6 @@
 
     <section class="intro-band">
       <p data-i18n="introBand">من أول انطباع إلى آخر فاتورة، نصمم تجربة واحدة تعمل معك.</p>
-      <div class="capability-line" aria-hidden="true"><span>WEB</span><span>DESKTOP</span><span>iOS</span><span>ANDROID</span><span>POS</span></div>
     </section>
 
     <section class="services section" id="services">
@@ -72,17 +72,26 @@
       <div class="service-list">
         <a href="#contact" data-request-service="website" class="service-item"><span class="service-icon" aria-hidden="true">⌘</span><div><h3 data-i18n="service1Title">مواقع ومتاجر إلكترونية</h3><p data-i18n="service1Text">واجهة تشرح قيمتك بوضوح وتمنح عملاءك طريقاً بسيطاً للبدء.</p></div><span class="arrow" aria-hidden="true">←</span></a>
         <a href="#contact" data-request-service="desktop" class="service-item"><span class="service-icon" aria-hidden="true">▣</span><div><h3 data-i18n="service2Title">تطبيقات سطح المكتب</h3><p data-i18n="service2Text">أدوات عملية لعملياتك اليومية، مصممة حول فريقك وطريقة عمله.</p></div><span class="arrow" aria-hidden="true">←</span></a>
-        <a href="#contact" data-request-service="mobile" class="service-item"><span class="service-icon" aria-hidden="true">◫</span><div><h3 data-i18n="service3Title">تطبيقات iOS وAndroid</h3><p data-i18n="service3Text">تجارب هاتفية مخصصة عندما يحتاج عملك أن يكون قريباً من المستخدم.</p></div><span class="arrow" aria-hidden="true">←</span></a>
         <a href="#pos" class="service-item featured"><span class="service-icon" aria-hidden="true">▤</span><div><h3 data-i18n="service4Title">نظام نقاط البيع</h3><p data-i18n="service4Text">مبيعات ومخزون وباركود وفواتير وتقارير وفروع متعددة، مع مساحة لفهم احتياجك أولاً.</p></div><span class="arrow" aria-hidden="true">←</span></a>
       </div>
-      <div class="craft-statement">
-        <p data-i18n="designExamplesTitle">هوية واحدة. تجربة متكاملة.</p>
-        <div class="craft-steps" aria-label="الفهم والتصميم والبرمجة والإطلاق" data-i18n-aria="craftAria">
-          <span data-i18n="craftStrategy">نفهم</span><i aria-hidden="true"></i>
-          <span data-i18n="craftDesign">نصمم</span><i aria-hidden="true"></i>
-          <span data-i18n="craftBuild">نبرمج</span><i aria-hidden="true"></i>
-          <span data-i18n="craftLaunch">نطلق</span>
-        </div>
+    </section>
+
+    <section class="leadership section" id="leadership">
+      <div class="leadership-card">
+        <p class="section-tag" data-i18n="ceoTag">رسالة القيادة</p>
+        <h2 id="ceo-name">Ahmad Dawabsheh</h2>
+        <p id="ceo-message" data-i18n="ceoMessage">نؤمن أن التقنية الجيدة تجعل العمل أوضح، والقرار أسرع، وتجربة العميل أكثر ثقة.</p>
+      </div>
+    </section>
+
+    <section class="testimonials section" id="testimonials">
+      <div class="section-heading">
+        <p class="section-tag" data-i18n="feedbackTag">أصوات العملاء</p>
+        <h2 data-i18n="feedbackTitle">تجارب تُقاس بما تغيّره.</h2>
+      </div>
+      <div class="testimonial-grid" id="testimonial-grid">
+        <article class="testimonial-card"><strong>عميل RTS</strong><p>أصبح مسار العمل أوضح لفريقنا، وأصبحنا نعرف ما الذي يحتاجه العميل في اللحظة المناسبة.</p></article>
+        <article class="testimonial-card"><strong>صاحب مشروع</strong><p>الهوية الجديدة لا تبدو جميلة فقط؛ هي تشرح ما نقدمه وتفتح حواراً أفضل مع العملاء.</p></article>
       </div>
     </section>
 
@@ -99,7 +108,7 @@
           </button>
         </div>
       </section>
-      <details class="interactive-sandbox">
+      <details class="interactive-sandbox" open>
         <summary data-i18n="sandboxTitle">جرّب فكرة البيع حسب نشاطك</summary>
       <div class="pos-intro">
         <p class="section-tag" data-i18n="posTag">نقطة البيع · RTS</p>
@@ -143,15 +152,6 @@
       </div>
       </details>
       <p class="sector-coverage" data-i18n="sectorCoverage">للسوبرماركت، المحلات، المطاعم، المقاهي، متاجر الملابس، ومختلف الأنشطة التجارية.</p>
-    </section>
-
-    <section class="workflow section" id="approach">
-      <div class="workflow-heading"><p class="section-tag" data-i18n="approachTag">طريقة العمل</p><h2 data-i18n="approachTitle">من سؤال واضح<br>إلى أداة تستخدمها.</h2></div>
-      <ol>
-        <li><span aria-hidden="true"></span><div><h3 data-i18n="step1Title">نسمع السياق</h3><p data-i18n="step1Text">ما الذي يبطئ فريقك؟ وما الذي يجب أن يبقى بسيطاً؟</p></div></li>
-        <li><span aria-hidden="true"></span><div><h3 data-i18n="step2Title">نرسم المسار</h3><p data-i18n="step2Text">نحوّل الأولويات إلى شاشات وخطوات يفهمها الجميع.</p></div></li>
-        <li><span aria-hidden="true"></span><div><h3 data-i18n="step3Title">نبني معك</h3><p data-i18n="step3Text">نطوّر الحل المناسب ونبقى قريبين من تفاصيله العملية.</p></div></li>
-      </ol>
     </section>
 
     <section class="download-strip" id="download">

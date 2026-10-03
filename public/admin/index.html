@@ -80,6 +80,11 @@
                   <label for="settings-download" data-i18n="downloadLabel">رابط تحميل برنامج POS</label>
                   <input id="settings-download" name="downloadUrl" type="url" dir="ltr" autocomplete="url" required />
                 </div>
+                <div class="field field-full">
+                  <label for="settings-content" data-i18n="contentLabel">محتوى الصفحة الرئيسية (JSON)</label>
+                  <textarea id="settings-content" name="content" rows="12" dir="ltr" spellcheck="false" placeholder='{"ceoName":"Ahmad Dawabsheh","ceoMessage":"...","feedbacks":[{"name":"اسم العميل","text":"التقييم"}],"heroMedia":[{"type":"image","url":"https://...","alt":"RTS"}]}'></textarea>
+                  <small data-i18n="contentHelp">يمكن تعديل رسالة المدير، التقييمات، ورابط صورة أو فيديو البطل. يجب أن يكون JSON صالحاً.</small>
+                </div>
                 <button id="settings-submit" class="primary-btn" type="submit" data-i18n="saveSettings">حفظ الإعدادات</button>
               </form>
             </section>

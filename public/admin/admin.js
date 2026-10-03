@@ -20,6 +20,8 @@ const I18N = {
     logoutButton: "تسجيل الخروج",
     whatsappLabel: "رقم واتساب",
     downloadLabel: "رابط تحميل برنامج POS",
+    contentLabel: "محتوى الصفحة الرئيسية (JSON)",
+    contentHelp: "يمكن تعديل رسالة المدير، التقييمات، ورابط صورة أو فيديو البطل. يجب أن يكون JSON صالحاً.",
     saveSettings: "حفظ الإعدادات",
     nameLabel: "الاسم المعروض",
     statusLabel: "الحالة",
@@ -82,6 +84,7 @@ const I18N = {
     activate: "تفعيل",
     welcome: "مرحباً",
     settingsSaved: "تم حفظ الإعدادات.",
+    invalidContent: "تحقق من صحة JSON لمحتوى الصفحة الرئيسية.",
     userAdded: "تمت إضافة المشرف.",
     passwordChanged: "تم تغيير كلمة المرور. يرجى تسجيل الدخول مجدداً.",
     loggedOut: "تم تسجيل الخروج.",
@@ -116,6 +119,8 @@ const I18N = {
     logoutButton: "Logout",
     whatsappLabel: "WhatsApp Number",
     downloadLabel: "POS Download URL",
+    contentLabel: "Homepage content (JSON)",
+    contentHelp: "Edit the CEO message, testimonials, and a hero image or video URL. The JSON must be valid.",
     saveSettings: "Save Settings",
     nameLabel: "Display Name",
     statusLabel: "Status",
@@ -178,6 +183,7 @@ const I18N = {
     activate: "Activate",
     welcome: "Welcome",
     settingsSaved: "Settings saved.",
+    invalidContent: "Check that the homepage content is valid JSON.",
     userAdded: "Admin added.",
     passwordChanged: "Password changed. Please sign in again.",
     loggedOut: "Logged out.",
@@ -220,6 +226,7 @@ const els = {
   settingsForm: document.getElementById("settings-form"),
   settingsWhatsapp: document.getElementById("settings-whatsapp"),
   settingsDownload: document.getElementById("settings-download"),
+  settingsContent: document.getElementById("settings-content"),
   storeForm: document.getElementById("store-form"),
   storeBackend: document.getElementById("store-backend"),
   storeSubmit: document.getElementById("store-submit"),
@@ -722,6 +729,7 @@ async function loadSettings() {
   state.settings = data;
   els.settingsWhatsapp.value = data.whatsappNumber ?? "";
   els.settingsDownload.value = data.downloadUrl ?? "";
+  els.settingsContent.value = JSON.stringify(data.content || {}, null, 2);
 }
 
 async function loadUsers() {
@@ -811,9 +819,18 @@ async function handleSaveSettings(event) {
   if (state.pending.has("settings")) return;
   setPending("settings", true, submit);
   try {
+    let content;
+    try {
+      content = JSON.parse(els.settingsContent.value || "{}");
+    } catch {
+      showAlert(t("invalidContent"));
+      setPending("settings", false, submit);
+      return;
+    }
     const payload = {
       whatsappNumber: els.settingsWhatsapp.value.trim(),
       downloadUrl: els.settingsDownload.value.trim(),
+      content,
     };
     const data = await apiFetch("/api/settings", {
       method: "PUT",
@@ -822,6 +839,7 @@ async function handleSaveSettings(event) {
     });
     els.settingsWhatsapp.value = data.whatsappNumber;
     els.settingsDownload.value = data.downloadUrl;
+    els.settingsContent.value = JSON.stringify(data.content || {}, null, 2);
     showStatus(t("settingsSaved"));
   } catch (error) {
     showAlert(error.message);
