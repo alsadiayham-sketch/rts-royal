@@ -44,6 +44,7 @@ const text = (key) => copy[language][key] || "";
 
 Object.assign(copy.ar, {
   motto: "Where code becomes power",
+  brandStatementTag: "RTS / البوصلة التي تقودنا",
   service1Title: "مواقع تحوّل حضورك إلى حركة",
   service1Text: "تجارب رقمية تشرح قيمتك بسرعة، وتحوّل الزيارة الأولى إلى خطوة واضحة.",
   service2Title: "أدوات تشغيل تقلل الاحتكاك",
@@ -95,6 +96,7 @@ Object.assign(copy.ar, {
 });
 Object.assign(copy.en, {
   motto: "Where code becomes power",
+  brandStatementTag: "RTS / OUR NORTH STAR",
   service1Title: "Websites that move your presence",
   service1Text: "Digital experiences that explain your value quickly and turn a first visit into a clear next step.",
   service2Title: "Operations with less friction",
