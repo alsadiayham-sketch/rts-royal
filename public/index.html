@@ -12,7 +12,7 @@
   <link rel="canonical" href="https://rts-royal.pages.dev/">
   <link rel="icon" href="/assets/rts-mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="/home-v2.css?v=2">
+  <link rel="stylesheet" href="/home-v2.css?v=3">
   <title>RTS | حلول تقنية لعملك</title>
 </head>
 <body class="home-v2" data-page="home">
@@ -39,6 +39,12 @@
 
   <main id="main">
     <section class="hero">
+      <svg class="hero-weave" viewBox="0 0 760 720" aria-hidden="true" focusable="false">
+        <path d="M96 90h420v116L310 364l222 250H368L190 420 96 510V90Z"></path>
+        <path d="M132 116h350v76L268 366l184 208H386L214 390 132 470V116Z"></path>
+        <path d="M168 144h280v38L230 368l146 174h-64L240 410l-72 70V144Z"></path>
+        <path d="M208 174h206v6L252 368l106 126h-42l-80-96-28 28V174Z"></path>
+      </svg>
       <div class="hero-copy">
         <p class="hero-kicker" data-i18n="heroKicker">RTS / تصميم + برمجة + تشغيل</p>
         <h1 data-i18n="heroTitle">نبني النظام.<br><span>الذي يحرّك عملك.</span></h1>
@@ -50,6 +56,13 @@
         <p class="settings-status" role="status" aria-live="polite" data-i18n="settingsLoading">جارٍ تجهيز طرق التواصل…</p><button id="settings-retry" type="button" hidden>إعادة المحاولة</button>
       </div>
       <div class="hero-visual actual-app" aria-label="Actual RTS POS application screenshot" data-i18n-aria="actualAppAria">
+        <div class="hero-floaters" aria-hidden="true">
+          <span class="hero-floater floater-rts"><img src="/assets/rts-mark.svg" alt=""><b>RTS</b></span>
+          <span class="hero-floater floater-pos"><b>POS</b><small>SALES</small></span>
+          <span class="hero-floater floater-web"><b>WEB</b><small>BRAND</small></span>
+          <span class="hero-floater floater-data"><b>DATA</b><small>LIVE</small></span>
+          <span class="hero-floater floater-app"><b>APP</b><small>FLOW</small></span>
+        </div>
         <div class="hero-media" aria-hidden="true">
           <video class="hero-video" autoplay muted loop playsinline poster="/assets/hero-royal.svg">
             <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
@@ -84,7 +97,7 @@
     <section class="services section" id="services">
       <div class="section-lead">
         <h2 data-i18n="servicesTitle">كل شاشة.<br>نفس الفكرة القوية.</h2>
-        <div class="service-sigil" aria-hidden="true"><img src="/assets/rts-mark.svg" alt=""><span></span></div>
+        <div class="service-sigil" aria-hidden="true"><img src="/assets/rts-mark.svg" alt=""><span></span><i></i><b></b></div>
       </div>
       <div class="service-list">
         <a href="#contact" data-request-service="website" class="service-item"><span class="service-icon" aria-hidden="true">⌘</span><div><h3 data-i18n="service1Title">مواقع تحوّل حضورك إلى حركة</h3><p data-i18n="service1Text">تجارب رقمية تشرح قيمتك بسرعة، وتحوّل الزيارة الأولى إلى خطوة واضحة.</p></div><span class="arrow" aria-hidden="true">←</span></a>

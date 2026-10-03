@@ -104,6 +104,7 @@ html[dir="rtl"] .home-v2 .page-progress { transform-origin: right; }
 .home-v2 .nav-cta { padding-inline: 1.15rem; background: var(--royal-700); color: var(--on-brand); }
 
 .home-v2 .hero {
+  position: relative;
   isolation: isolate;
   grid-template-columns: minmax(290px, .78fr) minmax(480px, 1.22fr);
   gap: clamp(3rem, 7vw, 8rem);
@@ -111,6 +112,28 @@ html[dir="rtl"] .home-v2 .page-progress { transform-origin: right; }
   padding-top: clamp(8rem, 12vh, 10rem);
   background: var(--canvas);
 }
+.home-v2 .hero-weave {
+  position: absolute;
+  inset-inline-start: -7rem;
+  top: 10%;
+  z-index: -1;
+  width: min(58vw, 760px);
+  height: auto;
+  overflow: visible;
+  opacity: .2;
+  transform: rotate(-7deg);
+  pointer-events: none;
+}
+.home-v2 .hero-weave path {
+  fill: none;
+  stroke: var(--electric);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.home-v2 .hero-weave path:nth-child(2) { opacity: .7; }
+.home-v2 .hero-weave path:nth-child(3) { opacity: .46; }
+.home-v2 .hero-weave path:nth-child(4) { opacity: .26; }
 .home-v2 .hero::after {
   right: auto;
   inset-inline-end: -12rem;
@@ -233,6 +256,35 @@ html[dir="rtl"] .home-v2 .page-progress { transform-origin: right; }
   perspective: 1400px;
   transform-style: preserve-3d;
 }
+.home-v2 .hero-floaters {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+.home-v2 .hero-floater {
+  position: absolute;
+  display: grid;
+  min-width: 4.8rem;
+  min-height: 3.2rem;
+  place-items: center;
+  padding: .55rem .7rem;
+  border: 1px solid oklch(.62 .2 315 / .4);
+  border-radius: .8rem;
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  color: var(--ink);
+  box-shadow: 0 8px 20px oklch(.25 .12 315 / .12);
+  font-family: var(--latin);
+  transform: translateZ(30px);
+}
+.home-v2 .hero-floater b { font-size: .72rem; letter-spacing: .08em; }
+.home-v2 .hero-floater small { margin-top: .12rem; color: var(--ink-muted); font-size: .48rem; letter-spacing: .12em; }
+.home-v2 .hero-floater img { width: 1.05rem; height: 1.05rem; margin-bottom: .18rem; }
+.home-v2 .floater-rts { inset-inline-start: 4%; top: 16%; }
+.home-v2 .floater-pos { inset-inline-end: -2%; top: 29%; }
+.home-v2 .floater-web { inset-inline-start: -3%; bottom: 20%; }
+.home-v2 .floater-data { inset-inline-end: 8%; bottom: 7%; }
+.home-v2 .floater-app { inset-inline-start: 36%; top: 0; }
 .home-v2 .hero-media {
   position: absolute;
   inset: 7% 2% 5% 4%;
@@ -389,6 +441,20 @@ html[dir="rtl"] .home-v2 .hero-note { transform: rotate(-2deg); }
   background: var(--electric);
   transform: rotate(-37deg);
 }
+.home-v2 .service-sigil::before,
+.home-v2 .service-sigil::after,
+.home-v2 .service-sigil i,
+.home-v2 .service-sigil b {
+  content: "";
+  position: absolute;
+  border: 1px solid oklch(.62 .2 315 / .3);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.home-v2 .service-sigil::before { inset: 8%; transform: rotate(24deg) scaleX(1.55); }
+.home-v2 .service-sigil::after { inset: 22%; transform: rotate(-28deg) scaleX(1.42); }
+.home-v2 .service-sigil i { inset: 35%; border-color: var(--electric); opacity: .7; }
+.home-v2 .service-sigil b { inset: 49%; width: .42rem; height: .42rem; border: 0; background: var(--electric); box-shadow: 0 0 0 .4rem oklch(.62 .22 315 / .12); }
 .home-v2 .service-list { border-top-color: var(--line); }
 .home-v2 .service-item {
   position: relative;
@@ -569,8 +635,8 @@ html[dir="ltr"] .home-v2 .service-item:hover .arrow { transform: translateX(6px)
 .home-v2 .faq summary:hover { color: var(--royal-700); }
 .home-v2 .service-item:focus-visible,
 .home-v2 .testimonial-card:hover { transform: translateY(-3px); }
-.home-v2 .service-item { transition: background-color 220ms ease, transform 220ms var(--ease-out), padding-inline 220ms ease; }
-.home-v2 .service-item:hover { padding-inline: 1.4rem; }
+.home-v2 .service-item { transition: background-color 220ms ease, transform 220ms var(--ease-out); }
+.home-v2 .service-item:hover { padding-inline: 1rem; }
 .home-v2 .testimonial-card { transition: transform 220ms var(--ease-out), border-color 220ms ease, background-color 220ms ease; }
 .home-v2 .testimonial-card:hover { border-color: var(--royal-700); background: var(--surface-strong); }
 
@@ -651,6 +717,9 @@ html[dir="ltr"] .home-v2 .service-item:hover .arrow { transform: translateX(6px)
   .home-v2 .hero-copy { max-width: 620px; }
   .home-v2 .hero-visual { width: min(94%, 700px); }
   .home-v2 .hero-watermark { width: 60vw; }
+  .home-v2 .hero-weave { inset-inline-start: -15rem; top: 18%; width: 46rem; opacity: .14; }
+  .home-v2 .hero-floaters { inset: 2% 0 0; }
+  .home-v2 .floater-app { top: 1%; }
   .home-v2 .brand-statement { grid-template-columns: 1fr; gap: 1.5rem; }
   .home-v2 .brand-statement-motto { max-width: 12ch; }
   .home-v2 .intro-band { grid-template-columns: 1fr; gap: 2rem; }
@@ -671,6 +740,12 @@ html[dir="ltr"] .home-v2 .service-item:hover .arrow { transform: translateX(6px)
   .home-v2 h1 { max-width: 8.5ch; font-size: clamp(3rem, 15vw, 4.25rem); }
   .home-v2 .hero::before { clip-path: polygon(0 0, 100% 0, 100% 88%, 72% 88%, 60% 100%, 0 100%); }
   .home-v2 .hero-note { inset-inline-end: -.4rem; top: -1.1rem; }
+  .home-v2 .hero-weave { inset-inline-start: -17rem; top: 27%; width: 38rem; opacity: .1; }
+  .home-v2 .hero-floater { min-width: 4rem; min-height: 2.8rem; padding: .45rem .55rem; }
+  .home-v2 .floater-web { inset-inline-start: 0; bottom: 17%; }
+  .home-v2 .floater-pos { inset-inline-end: 0; top: 28%; }
+  .home-v2 .floater-data { inset-inline-end: 4%; bottom: 3%; }
+  .home-v2 .floater-app { inset-inline-start: 42%; top: -1%; }
   .home-v2 .brand-statement { padding-block: 3.5rem; }
   .home-v2 .brand-statement-mark { width: 4.25rem; height: 4.25rem; }
   .home-v2 .brand-statement-motto { font-size: clamp(2.7rem, 15vw, 4.6rem); }
@@ -699,8 +774,23 @@ html[dir="ltr"] .home-v2 .service-item:hover .arrow { transform: translateX(6px)
   .home-v2 .hero-copy > :nth-child(6) { animation-delay: 320ms; }
   .home-v2 .hero-visual { animation: visual-enter 900ms 180ms var(--ease-out) both; }
   .home-v2 .r-beam { animation: beam-enter 1.1s 420ms var(--ease-out) both; }
+  .home-v2 .hero-weave path {
+    stroke-dasharray: 920;
+    stroke-dashoffset: 920;
+    animation: weave-draw 1.8s 280ms var(--ease-out) forwards;
+  }
+  .home-v2 .hero-floater { animation: floater-drift 6s ease-in-out infinite; }
+  .home-v2 .floater-pos { animation-delay: -1.2s; }
+  .home-v2 .floater-web { animation-delay: -2.8s; }
+  .home-v2 .floater-data { animation-delay: -4.1s; }
+  .home-v2 .floater-app { animation-delay: -3.4s; }
   @keyframes hero-enter { from { opacity: 0; transform: translateY(22px); } }
   @keyframes visual-enter { from { opacity: 0; transform: translateY(26px) scale(.97); } }
+  @keyframes weave-draw { to { stroke-dashoffset: 0; } }
+  @keyframes floater-drift {
+    0%, 100% { transform: translate3d(0, 0, 30px); }
+    50% { transform: translate3d(0, -8px, 30px); }
+  }
   @keyframes beam-enter {
     from { opacity: 0; transform: scaleX(.2) rotate(var(--beam-angle)); }
     to { transform: scaleX(1) rotate(var(--beam-angle)); }
@@ -713,5 +803,7 @@ html[dir="ltr"] .home-v2 .service-item:hover .arrow { transform: translateX(6px)
   .home-v2 .hero::before,
   .home-v2 .hero-media,
   .home-v2 .hero-video,
-  .home-v2 .brand-statement-mark { animation: none; transition: none; }
+  .home-v2 .brand-statement-mark,
+  .home-v2 .hero-weave,
+  .home-v2 .hero-floater { animation: none; transition: none; }
 }
