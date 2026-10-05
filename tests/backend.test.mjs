@@ -44,13 +44,13 @@ test("canonicalizePhone validates canonical business number format", () => {
 test("download URL allowlist rejects arbitrary destinations", () => {
   assert.equal(
     isAllowedDownloadUrl(
-      "https://github.com/alsadiayham-sketch/rts-pos-releases/releases/latest/download/RTS-POS-Setup.exe"
+      "https://github.com/alsadiayham-sketch/rts-business-releases/releases/latest/download/RTS-Business-Setup.exe"
     ),
     true
   );
   assert.equal(
     isAllowedDownloadUrl(
-      "https://github.com/alsadiayham-sketch/rts-pos-releases/releases/download/v4.0.0/RTS-POS-Setup.exe"
+      "https://github.com/alsadiayham-sketch/rts-business-releases/releases/download/v4.0.0/RTS-Business-Setup.exe"
     ),
     true
   );

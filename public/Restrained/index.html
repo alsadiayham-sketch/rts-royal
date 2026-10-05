@@ -29,7 +29,7 @@
     </button>
     <nav id="primary-navigation" aria-label="التنقل الرئيسي" data-i18n-aria="navAria">
       <a href="#services" data-i18n="navServices">الخدمات</a>
-      <a href="#products" data-i18n="navProducts">المنتجات الرقمية</a>
+      <a href="#pos" data-i18n="navPos">نقطة البيع</a>
       <a href="#testimonials" data-i18n="navFeedback">آراء العملاء</a>
       <a href="#contact" data-i18n="navContact">تواصل</a>
       <button class="language-toggle" type="button" aria-label="Switch to English">EN</button>
@@ -60,7 +60,7 @@
         </div>
         <p class="settings-status" role="status" aria-live="polite" data-i18n="settingsLoading">جارٍ تجهيز طرق التواصل…</p><button id="settings-retry" type="button" hidden>إعادة المحاولة</button>
       </div>
-      <div class="hero-visual actual-app" aria-label="Actual RTS Business application screenshot" data-i18n-aria="actualAppAria">
+      <div class="hero-visual actual-app" aria-label="Actual RTS POS application screenshot" data-i18n-aria="actualAppAria">
         <div class="hero-floaters" aria-hidden="true">
           <span class="hero-floater floater-rts"><img src="/assets/rts-mark.svg" alt=""><b>RTS</b></span>
           <span class="hero-floater floater-pos"><b>POS</b><small>SALES</small></span>
@@ -68,22 +68,19 @@
           <span class="hero-floater floater-data"><b>DATA</b><small>LIVE</small></span>
           <span class="hero-floater floater-app"><b>APP</b><small>FLOW</small></span>
         </div>
-        <div class="hero-media" data-hero-scroller aria-label="Hero media scroller" data-i18n-aria="heroScrollerAria">
-          <div class="hero-media-track" data-hero-track></div>
+        <div class="hero-media" aria-hidden="true">
+          <video class="hero-video" autoplay muted loop playsinline poster="/assets/hero-royal.svg">
+            <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+          </video>
           <span class="hero-video-overlay"></span>
-          <div class="hero-scroller-controls" aria-label="Hero media controls" data-i18n-aria="heroScrollerControls">
-            <button type="button" class="hero-scroller-button" data-hero-prev aria-label="Previous hero media">←</button>
-            <span class="hero-scroller-counter" data-hero-counter>01 / 01</span>
-            <button type="button" class="hero-scroller-button" data-hero-next aria-label="Next hero media">→</button>
-          </div>
-          <div class="hero-scroller-progress" aria-hidden="true"><span data-hero-progress></span></div>
+          <img class="hero-media-art" src="/assets/hero-royal.svg" alt="">
         </div>
         <img class="hero-watermark" src="/assets/rts-mark.svg" alt="" aria-hidden="true">
         <span class="r-beam beam-one" aria-hidden="true"></span><span class="r-beam beam-two" aria-hidden="true"></span>
-        <div class="hero-note"><span data-i18n="insideApp">من داخل التطبيق</span><b data-i18n="heroNote">واجهة RTS Business الجديدة</b></div>
+        <div class="hero-note"><span data-i18n="insideApp">من داخل التطبيق</span><b data-i18n="heroNote">واجهة RTS POS الجديدة</b></div>
         <button class="screenshot-frame hero-screenshot" type="button" data-shot="sales" data-dialog-open aria-haspopup="dialog">
-          <span class="app-frame-top"><i></i><i></i><i></i><b>RTS Business</b><em data-i18n="openImage">عرض بالحجم الكامل</em></span>
-          <img src="/assets/pos-sales.png" width="1270" height="800" fetchpriority="high" alt="لقطة شاشة فعلية من شاشة المبيعات في RTS Business">
+          <span class="app-frame-top"><i></i><i></i><i></i><b>RTS POS</b><em data-i18n="openImage">عرض بالحجم الكامل</em></span>
+          <img src="/assets/pos-sales.png" width="1270" height="800" fetchpriority="high" alt="لقطة شاشة فعلية من شاشة المبيعات في RTS POS">
         </button>
       </div>
     </section>
@@ -110,8 +107,7 @@
       <div class="service-list">
         <a href="#contact" data-request-service="website" class="service-item"><span class="service-icon" aria-hidden="true">⌘</span><div><h3 data-i18n="service1Title">مواقع تحوّل حضورك إلى حركة</h3><p data-i18n="service1Text">تجارب رقمية تشرح قيمتك بسرعة، وتحوّل الزيارة الأولى إلى خطوة واضحة.</p></div><span class="arrow" aria-hidden="true">←</span></a>
         <a href="#contact" data-request-service="desktop" class="service-item"><span class="service-icon" aria-hidden="true">▣</span><div><h3 data-i18n="service2Title">أدوات تشغيل تقلل الاحتكاك</h3><p data-i18n="service2Text">تطبيقات مكتبية مصممة حول عمليات فريقك، من أول إدخال إلى القرار الأخير.</p></div><span class="arrow" aria-hidden="true">←</span></a>
-        <a href="#products" class="service-item featured"><span class="service-icon" aria-hidden="true">▤</span><div><h3>RTS Business: تشغيل أوضح لنشاطك</h3><p>مبيعات، مخزون، فواتير وتقارير مترابطة تمنحك صورة أسرع وتحكماً أكبر.</p></div><span class="arrow" aria-hidden="true">←</span></a>
-        <a href="#products" class="service-item"><span class="service-icon" aria-hidden="true">✚</span><div><h3>RTS Clinic: إدارة العيادة من مكان واحد</h3><p>مرضى، جلسات، حجوزات، مدفوعات، تأمين وتقارير فواتير للعيادات.</p></div><span class="arrow" aria-hidden="true">←</span></a>
+        <a href="#pos" class="service-item featured"><span class="service-icon" aria-hidden="true">▤</span><div><h3 data-i18n="service4Title">RTS POS: قوة البيع في لحظتها</h3><p data-i18n="service4Text">مبيعات، مخزون، فواتير وتقارير مترابطة تمنحك صورة أسرع وتحكماً أكبر.</p></div><span class="arrow" aria-hidden="true">←</span></a>
       </div>
     </section>
 
@@ -138,15 +134,15 @@
     </section>
 
     <section class="pos-section" id="pos">
-      <section class="actual-gallery" aria-label="Actual RTS Business app screenshot" data-i18n-aria="galleryAria">
-        <div><p class="section-tag" data-i18n="galleryTag">من داخل التطبيق</p><h2 data-i18n="galleryTitle">كل تفاصيل عملك.<br>في مكان واحد.</h2><p data-i18n="galleryText">واجهة تشغيل فعلية من RTS Business بهويته الجديدة، مصممة للسرعة والوضوح أثناء العمل اليومي.</p></div>
+      <section class="actual-gallery" aria-label="Actual RTS POS app screenshot" data-i18n-aria="galleryAria">
+        <div><p class="section-tag" data-i18n="galleryTag">من داخل التطبيق</p><h2 data-i18n="galleryTitle">كل تفاصيل عملك.<br>في مكان واحد.</h2><p data-i18n="galleryText">واجهة بيع فعلية من RTS POS 4.0 بهويته الجديدة، مصممة للسرعة والوضوح أثناء العمل اليومي.</p></div>
         <div class="gallery-controls" role="tablist" aria-label="POS screenshots" data-i18n-aria="galleryTabsAria">
           <button id="shot-sales" type="button" role="tab" aria-controls="gallery-panel" aria-selected="true" data-shot="sales" data-i18n="gallerySales">المبيعات</button>
         </div>
         <div id="gallery-panel" class="gallery-panel" role="tabpanel" aria-labelledby="shot-sales">
           <button class="screenshot-frame gallery-screen" type="button" data-shot="sales" data-dialog-open aria-haspopup="dialog">
-            <span class="app-frame-top"><i></i><i></i><i></i><b>RTS Business</b><em data-i18n="openImage">عرض بالحجم الكامل</em></span>
-            <img id="gallery-image" src="/assets/pos-sales.png" width="1270" height="800" loading="lazy" alt="لقطة شاشة فعلية من شاشة المبيعات في RTS Business">
+            <span class="app-frame-top"><i></i><i></i><i></i><b>RTS POS</b><em data-i18n="openImage">عرض بالحجم الكامل</em></span>
+            <img id="gallery-image" src="/assets/pos-sales.png" width="1270" height="800" loading="lazy" alt="لقطة شاشة فعلية من شاشة المبيعات في RTS POS">
           </button>
         </div>
       </section>
@@ -196,20 +192,16 @@
       <p class="sector-coverage" data-i18n="sectorCoverage">للسوبرماركت، المحلات، المطاعم، المقاهي، متاجر الملابس، ومختلف الأنشطة التجارية.</p>
     </section>
 
-    <section class="download-strip" id="products">
-      <div><p class="section-tag">RTS PRODUCTS</p><h2>تطبيقات RTS للعمل الحقيقي.</h2><p>اختر المنتج الذي يناسب نشاطك وابدأ من نسخة Windows أو تطبيق المالك.</p></div>
-      <div class="product-downloads">
-        <a class="button button-accent" href="/download-POS/">تنزيل RTS Business لـ Windows</a>
-        <a class="button button-dark" href="/download-clinic/">تنزيل RTS Clinic لـ Windows</a>
-        <a class="text-link" href="https://github.com/alsadiayham-sketch/rts-tracking">RTS Tracking للمالكين</a>
-      </div>
+    <section class="download-strip" id="download">
+      <div><p class="section-tag" data-i18n="downloadTag">لأصحاب Windows</p><h2 data-i18n="downloadTitle">RTS POS 4.0.1.</h2><p data-i18n="downloadText">هوية جديدة وواجهة تشغيل واضحة للمبيعات والمخزون والفواتير وإدارة نشاطك.</p></div>
+      <div><a class="button button-accent" href="/download-POS/" data-i18n="downloadCta">تنزيل RTS POS لـ Windows</a><small data-i18n="downloadHelp">إذا حظر Windows الملف، تواصل مع الدعم قبل المتابعة. لا نوصي بتعطيل الحماية.</small></div>
     </section>
 
     <section class="faq section">
       <div><h2 data-i18n="faqTitle">لنبدأ بوضوح.</h2></div>
       <div class="faq-list">
         <details><summary data-i18n="faq1Q">هل يمكنني طلب موقع أو تطبيق فقط؟</summary><p data-i18n="faq1A">نعم. نبدأ بالخدمة التي يحتاجها عملك، سواء كانت موقعاً أو تطبيقاً أو أداة مكتبية.</p></details>
-        <details><summary data-i18n="faq2Q">هل الصور من التطبيق الفعلي؟</summary><p data-i18n="faq2A">نعم، صورة المعرض من تطبيق RTS Business الفعلي. أما التجربة التفاعلية فهي مثال مبسط ولا تعالج أي عملية دفع.</p></details>
+        <details><summary data-i18n="faq2Q">هل الصور من التطبيق الفعلي؟</summary><p data-i18n="faq2A">نعم، صورة المعرض من تطبيق RTS POS 4.0 الفعلي. أما التجربة التفاعلية فهي مثال مبسط ولا تعالج أي عملية دفع.</p></details>
         <details><summary data-i18n="faq3Q">هل تطبيقات الهاتف تعني توفر POS على iOS أو Android؟</summary><p data-i18n="faq3A">تطبيقات الهاتف هي خدمة تطوير مخصصة. لا يعني ذلك وعداً بتوفر برنامج نقطة البيع للتثبيت على الهاتف.</p></details>
       </div>
     </section>

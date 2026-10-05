@@ -85,6 +85,11 @@
                   <textarea id="settings-content" name="content" rows="12" dir="ltr" spellcheck="false" placeholder='{"ceoName":"Ahmad Dawabsheh","ceoMessage":"...","feedbacks":[{"name":"اسم العميل","text":"التقييم"}],"heroMedia":[{"type":"image","url":"https://...","alt":"RTS"}]}'></textarea>
                   <small data-i18n="contentHelp">يمكن تعديل رسالة المدير، التقييمات، ورابط صورة أو فيديو البطل. يجب أن يكون JSON صالحاً.</small>
                 </div>
+                <div class="field field-full">
+                  <label for="settings-hero-slides" data-i18n="heroSlidesLabel">شرائح البطل (صور وفيديو)</label>
+                  <textarea id="settings-hero-slides" name="heroSlides" rows="8" dir="ltr" spellcheck="false" placeholder='[{"type":"image","url":"/assets/hero-royal.svg","alt":"RTS"},{"type":"video","url":"https://example.com/hero.mp4","poster":"/assets/hero-royal.svg","alt":"RTS motion"}]'></textarea>
+                  <small data-i18n="heroSlidesHelp">أضف حتى 8 عناصر. النوع image أو video، والرابط يجب أن يكون HTTPS أو مساراً محلياً يبدأ بـ /.</small>
+                </div>
                 <button id="settings-submit" class="primary-btn" type="submit" data-i18n="saveSettings">حفظ الإعدادات</button>
               </form>
             </section>

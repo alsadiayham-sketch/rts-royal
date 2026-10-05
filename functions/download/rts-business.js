@@ -1,7 +1,7 @@
 import { DEFAULT_DOWNLOAD_URL } from "../_lib/constants.js";
 import { isAllowedDownloadUrl } from "../_lib/validation.js";
 
-export const DOWNLOAD_FILENAME = "R.T.S POS Setup.exe";
+export const DOWNLOAD_FILENAME = "RTS-Business-Setup.exe";
 
 async function getDownloadUrl(env) {
   const row = await env.DB.prepare("SELECT download_url FROM site_settings WHERE id = 1").first();
@@ -16,7 +16,7 @@ function createDownloadHeaders(upstreamHeaders) {
   const headers = new Headers(upstreamHeaders);
   headers.set(
     "Content-Disposition",
-    `attachment; filename="${DOWNLOAD_FILENAME}"; filename*=UTF-8''R.T.S%20POS%20Setup.exe`
+    `attachment; filename="${DOWNLOAD_FILENAME}"; filename*=UTF-8''RTS-Business-Setup.exe`
   );
   headers.set("Content-Type", "application/vnd.microsoft.portable-executable");
   headers.set("X-Content-Type-Options", "nosniff");
@@ -38,7 +38,7 @@ async function serveInstaller({ request, env }) {
       redirect: "follow",
     });
     if (!upstream.ok) {
-      return new Response("The RTS POS installer is temporarily unavailable.", {
+      return new Response("The RTS Business installer is temporarily unavailable.", {
         status: 502,
         headers: { "Content-Type": "text/plain; charset=utf-8" },
       });
@@ -49,7 +49,7 @@ async function serveInstaller({ request, env }) {
       headers: createDownloadHeaders(upstream.headers),
     });
   } catch {
-    return new Response("The RTS POS installer is temporarily unavailable.", {
+    return new Response("The RTS Business installer is temporarily unavailable.", {
       status: 503,
       headers: { "Content-Type": "text/plain; charset=utf-8" },
     });

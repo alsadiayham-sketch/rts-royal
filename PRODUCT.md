@@ -20,7 +20,7 @@ The confirmed initial business number is managed through authenticated site sett
 ## Brand Personality
 
 Confident, precise, approachable. Retain the supplied angular R mark and royal purple
-but create a distinct identity, not a recoloring of the ADA reference.
+but create a distinct identity, not a recoloring of the legacy Business reference.
 
 ## Anti-references
 

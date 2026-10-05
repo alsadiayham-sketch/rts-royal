@@ -38,6 +38,44 @@ function parseContent(value) {
   }
 }
 
+function isSafeMediaUrl(value) {
+  if (typeof value !== "string" || !value.trim()) return false;
+  const url = value.trim();
+  if (url.startsWith("/") && !url.startsWith("//")) return true;
+  try {
+    return new URL(url).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function normalizeHeroSlides(content) {
+  if (!Object.hasOwn(content, "heroSlides")) return content;
+  if (!Array.isArray(content.heroSlides) || content.heroSlides.length > 8) {
+    throw new ApiError(400, "INVALID_HERO_SLIDES", "Hero slides must contain at most 8 items.");
+  }
+  const heroSlides = content.heroSlides.map((slide) => {
+    if (!slide || typeof slide !== "object" || Array.isArray(slide)) {
+      throw new ApiError(400, "INVALID_HERO_SLIDE", "Each hero slide must be an object.");
+    }
+    if (!["image", "video"].includes(slide.type) || !isSafeMediaUrl(slide.url)) {
+      throw new ApiError(400, "INVALID_HERO_SLIDE", "Hero slides must use image/video types and safe URLs.");
+    }
+    if (slide.poster !== undefined && slide.poster !== "" && !isSafeMediaUrl(slide.poster)) {
+      throw new ApiError(400, "INVALID_HERO_SLIDE_POSTER", "Hero video posters must use safe URLs.");
+    }
+    return {
+      type: slide.type,
+      url: slide.url.trim(),
+      ...(slide.poster ? { poster: slide.poster.trim() } : {}),
+      ...(typeof slide.alt === "string" && slide.alt.trim()
+        ? { alt: slide.alt.trim().slice(0, 160) }
+        : {}),
+    };
+  });
+  return { ...content, heroSlides };
+}
+
 export async function onRequestGet(context) {
   return withApiGuard(context, async ({ env }) => {
     await opportunisticCleanup(env.DB, Math.floor(Date.now() / 1000));
@@ -78,7 +116,7 @@ export async function onRequestPut(context) {
       : current.downloadUrl;
     const nextContent = Object.hasOwn(payload, "content")
       ? payload.content && typeof payload.content === "object" && !Array.isArray(payload.content)
-        ? JSON.stringify(payload.content)
+        ? JSON.stringify(normalizeHeroSlides(payload.content))
         : null
       : JSON.stringify(current.content || {});
 

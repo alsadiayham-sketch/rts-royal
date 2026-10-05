@@ -12,7 +12,7 @@ INSERT OR IGNORE INTO site_settings (id, whatsapp_number, download_url)
 VALUES (
   1,
   '972569236758',
-  'https://github.com/alsadiayham-sketch/rts-pos-releases/releases/latest/download/RTS-POS-Setup.exe'
+  'https://github.com/alsadiayham-sketch/rts-business-releases/releases/latest/download/RTS-Business-Setup.exe'
 );
 
 CREATE TABLE IF NOT EXISTS users (

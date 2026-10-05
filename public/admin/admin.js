@@ -21,7 +21,9 @@ const I18N = {
     whatsappLabel: "رقم واتساب",
     downloadLabel: "رابط تحميل برنامج POS",
     contentLabel: "محتوى الصفحة الرئيسية (JSON)",
-    contentHelp: "يمكن تعديل رسالة المدير، التقييمات، ورابط صورة أو فيديو البطل. يجب أن يكون JSON صالحاً.",
+    contentHelp: "يمكن تعديل رسالة المدير والتقييمات والمحتوى العام. يجب أن يكون JSON صالحاً.",
+    heroSlidesLabel: "شرائح البطل (صور وفيديو)",
+    heroSlidesHelp: "أضف حتى 8 عناصر. النوع image أو video، والرابط يجب أن يكون HTTPS أو مساراً محلياً يبدأ بـ /.",
     saveSettings: "حفظ الإعدادات",
     nameLabel: "الاسم المعروض",
     statusLabel: "الحالة",
@@ -120,7 +122,9 @@ const I18N = {
     whatsappLabel: "WhatsApp Number",
     downloadLabel: "POS Download URL",
     contentLabel: "Homepage content (JSON)",
-    contentHelp: "Edit the CEO message, testimonials, and a hero image or video URL. The JSON must be valid.",
+    contentHelp: "Edit the CEO message, testimonials, and general homepage content. The JSON must be valid.",
+    heroSlidesLabel: "Hero slides (images and videos)",
+    heroSlidesHelp: "Add up to 8 items. Use image or video; URLs must be HTTPS or same-origin paths beginning with /.",
     saveSettings: "Save Settings",
     nameLabel: "Display Name",
     statusLabel: "Status",
@@ -227,6 +231,7 @@ const els = {
   settingsWhatsapp: document.getElementById("settings-whatsapp"),
   settingsDownload: document.getElementById("settings-download"),
   settingsContent: document.getElementById("settings-content"),
+  settingsHeroSlides: document.getElementById("settings-hero-slides"),
   storeForm: document.getElementById("store-form"),
   storeBackend: document.getElementById("store-backend"),
   storeSubmit: document.getElementById("store-submit"),
@@ -730,6 +735,12 @@ async function loadSettings() {
   els.settingsWhatsapp.value = data.whatsappNumber ?? "";
   els.settingsDownload.value = data.downloadUrl ?? "";
   els.settingsContent.value = JSON.stringify(data.content || {}, null, 2);
+  const heroSlides = Array.isArray(data.content?.heroSlides)
+    ? data.content.heroSlides
+    : Array.isArray(data.content?.heroMedia)
+      ? data.content.heroMedia
+      : [];
+  els.settingsHeroSlides.value = JSON.stringify(heroSlides, null, 2);
 }
 
 async function loadUsers() {
@@ -822,11 +833,22 @@ async function handleSaveSettings(event) {
     let content;
     try {
       content = JSON.parse(els.settingsContent.value || "{}");
+      if (!content || typeof content !== "object" || Array.isArray(content)) throw new Error("Invalid content");
     } catch {
       showAlert(t("invalidContent"));
       setPending("settings", false, submit);
       return;
     }
+    let heroSlides;
+    try {
+      heroSlides = JSON.parse(els.settingsHeroSlides.value || "[]");
+      if (!Array.isArray(heroSlides)) throw new Error("Invalid hero slides");
+    } catch {
+      showAlert(t("invalidContent"));
+      setPending("settings", false, submit);
+      return;
+    }
+    content.heroSlides = heroSlides;
     const payload = {
       whatsappNumber: els.settingsWhatsapp.value.trim(),
       downloadUrl: els.settingsDownload.value.trim(),
@@ -840,6 +862,7 @@ async function handleSaveSettings(event) {
     els.settingsWhatsapp.value = data.whatsappNumber;
     els.settingsDownload.value = data.downloadUrl;
     els.settingsContent.value = JSON.stringify(data.content || {}, null, 2);
+    els.settingsHeroSlides.value = JSON.stringify(data.content?.heroSlides || [], null, 2);
     showStatus(t("settingsSaved"));
   } catch (error) {
     showAlert(error.message);
