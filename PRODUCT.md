@@ -33,7 +33,7 @@ Never present an illustrative POS interface as a live customer system.
 - Show the business outcome and a concrete example together.
 - Distinguish custom software services from the existing POS product.
 - Make the entire Arabic and English experience equally usable.
-- Present RTS POS as the production Windows point-of-sale product.
+- Present RTS Business as the production Windows point-of-sale product.
 - Keep administration private and separate from public marketing.
 
 ## Accessibility & Inclusion

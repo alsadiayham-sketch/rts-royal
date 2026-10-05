@@ -15,7 +15,7 @@
         <img src="/assets/rts-mark.svg" alt="" class="brand-mark" />
         <div>
           <p class="brand-title" data-i18n="appTitle">لوحة إدارة RTS</p>
-          <p class="brand-subtitle" data-i18n="appSubtitle">إدارة العمل ومتاجر RTS POS والمشرفين</p>
+          <p class="brand-subtitle" data-i18n="appSubtitle">إدارة العمل ومتاجر RTS Business والمشرفين</p>
         </div>
       </div>
       <div class="top-actions">
@@ -61,7 +61,7 @@
         <div class="app-shell">
           <nav class="sidebar" aria-label="Admin sections">
             <button class="tab-btn active" type="button" data-tab="settings" data-i18n="tabSettings">إعدادات العمل</button>
-            <button class="tab-btn" type="button" data-tab="stores" data-i18n="tabStores">متاجر RTS POS</button>
+            <button class="tab-btn" type="button" data-tab="stores" data-i18n="tabStores">متاجر RTS Business</button>
             <button class="tab-btn" type="button" data-tab="users" data-i18n="tabUsers">المشرفون</button>
             <button class="tab-btn" type="button" data-tab="password" data-i18n="tabPassword">كلمة المرور الخاصة بي</button>
             <button id="logout-btn" class="secondary-btn logout-btn" type="button" data-i18n="logoutButton">تسجيل الخروج</button>
@@ -97,7 +97,7 @@
             <section id="tab-stores" class="tab-panel hidden">
               <div class="section-heading">
                 <div>
-                  <h2 data-i18n="tabStores">متاجر RTS POS</h2>
+                  <h2 data-i18n="tabStores">متاجر RTS Business</h2>
                   <p data-i18n="storesIntro">إنشاء المتاجر وإدارة مدة الترخيص من لوحة RTS المركزية.</p>
                 </div>
                 <button id="stores-refresh" class="secondary-btn" type="button" data-i18n="refreshStores">تحديث القائمة</button>
@@ -122,8 +122,8 @@
                   <div class="field">
                     <label for="store-backend" data-i18n="backendLabel">مصدر البيانات</label>
                     <select id="store-backend" name="backend">
-                      <option value="d1" data-i18n="backendD1">RTS POS + موقع إلكتروني — مخزون مشترك</option>
-                      <option value="firestore" data-i18n="backendFirestore">RTS POS فقط — بدون موقع إلكتروني</option>
+                      <option value="d1" data-i18n="backendD1">RTS Business + موقع إلكتروني — مخزون مشترك</option>
+                      <option value="firestore" data-i18n="backendFirestore">RTS Business فقط — بدون موقع إلكتروني</option>
                     </select>
                   </div>
                 </div>
@@ -163,7 +163,7 @@
 
               <div class="table-wrap store-table-wrap">
                 <table>
-                  <caption class="sr-only" data-i18n="storesTableCaption">قائمة متاجر RTS POS</caption>
+                  <caption class="sr-only" data-i18n="storesTableCaption">قائمة متاجر RTS Business</caption>
                   <thead>
                     <tr>
                       <th data-i18n="storeNameLabel">اسم المتجر</th>
@@ -188,7 +188,7 @@
                 </div>
                 <div class="table-wrap">
                   <table>
-                    <caption class="sr-only" data-i18n="storeUsersCaption">مستخدمو متجر RTS POS</caption>
+                    <caption class="sr-only" data-i18n="storeUsersCaption">مستخدمو متجر RTS Business</caption>
                     <thead>
                       <tr>
                         <th data-i18n="usernameLabel">اسم المستخدم</th>

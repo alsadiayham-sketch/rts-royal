@@ -41,7 +41,7 @@ const defaultSiteContent = {
 };
 const defaultHeroSlides = [
   { type: "image", url: "/assets/hero-royal.svg", alt: "RTS Royal Technology Solutions" },
-  { type: "image", url: "/assets/pos-sales.png", alt: "RTS POS sales interface" }
+  { type: "image", url: "/assets/pos-sales.png", alt: "RTS Business sales interface" }
 ];
 let heroScrollerState;
 const byId = (id) => document.getElementById(id);

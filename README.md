@@ -5,7 +5,7 @@ iOS and Android development, and point of sale.
 
 - Website: https://rts-royal.pages.dev
 - Administration: https://rts-royal.pages.dev/admin/
-- Windows download: https://rts-royal.pages.dev/download-POS/
+- Windows download: https://rts-royal.pages.dev/download-business/
 
 ## Administration
 
@@ -49,7 +49,7 @@ passwords, database exports, and `.wrangler/` out of source control.
 
 ## Product and assets
 
-The website showcases the real **RTS POS 4.0** Windows application. Public
+The website showcases the real **RTS Business 4.0** Windows application. Public
 screenshots avoid customer/store identifiers, and the release download is restricted
 to the approved RTS installer in the compatibility release repository.
 The separate interactive sector demo is illustrative and never takes payments.
