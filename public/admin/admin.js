@@ -21,8 +21,17 @@ const I18N = {
     logoutButton: "تسجيل الخروج",
     whatsappLabel: "رقم واتساب",
     downloadLabel: "رابط تحميل برنامج POS",
-    contentLabel: "محتوى الصفحة الرئيسية (JSON)",
-    contentHelp: "يمكن تعديل رسالة المدير والتقييمات والمحتوى العام. يجب أن يكون JSON صالحاً.",
+    contentLabel: "محتوى الصفحة الرئيسية",
+    contentHelp: "عدّل رسالة المدير وشهادات العملاء من حقول واضحة، بدون الحاجة لكتابة JSON.",
+    advancedContent: "تحرير JSON متقدم",
+    ceoNameField: "اسم المدير التنفيذي",
+    ceoMessageField: "رسالة المدير التنفيذي",
+    feedbacksField: "شهادات العملاء",
+    addFeedback: "إضافة شهادة",
+    feedbackName: "اسم العميل",
+    feedbackText: "نص الشهادة",
+    removeFeedback: "حذف الشهادة",
+    noFeedbacks: "لا توجد شهادات بعد. أضف شهادة لعرضها على الصفحة الرئيسية.",
     showcasesLabel: "معارض الأعمال",
     showcasesHelp: "ارفع صوراً أو أضف روابط، ثم احذف العناصر أو غيّر ترتيبها لكل خدمة.",
     advancedShowcases: "تحرير JSON متقدم",
@@ -35,8 +44,20 @@ const I18N = {
     deleteImage: "حذف الصورة",
     galleryEmpty: "لا توجد صور بعد. أضف صورة أو رابطاً للبدء.",
     galleryUrlHelp: "استخدم HTTPS أو مساراً محلياً يبدأ بـ /.",
-    heroSlidesLabel: "شرائح البطل (صور وفيديو)",
-    heroSlidesHelp: "أضف حتى 8 عناصر. النوع image أو video، والرابط يجب أن يكون HTTPS أو مساراً محلياً يبدأ بـ /.",
+    heroSlidesLabel: "شرائح البطل",
+    heroSlidesHelp: "أضف صوراً أو فيديوهات، ارفع الملفات أو أضف روابط، ثم غيّر ترتيب العرض.",
+    addHeroSlide: "إضافة شريحة",
+    advancedHeroSlides: "تحرير شرائح JSON متقدم",
+    slideType: "نوع الشريحة",
+    imageSlide: "صورة",
+    videoSlide: "فيديو",
+    mediaUrl: "رابط الوسائط",
+    posterUrl: "رابط الصورة البديلة للفيديو",
+    slideAlt: "النص البديل",
+    uploadMedia: "رفع ملف",
+    removeSlide: "حذف الشريحة",
+    noHeroSlides: "لا توجد شرائح بعد. أضف صورة أو فيديو لبدء العرض.",
+    invalidMediaType: "نوع الملف غير مناسب لهذه الشريحة.",
     heroBackgroundLabel: "خلفية البطل",
     heroBackgroundHelp: "استخدم رابط HTTPS أو ارفع صورة صغيرة. يتم حفظ الصورة المرفوعة ضمن إعدادات الصفحة.",
     requestsIntro: "طلبات العملاء المحفوظة من نموذج الموقع.",
@@ -148,8 +169,17 @@ const I18N = {
     logoutButton: "Logout",
     whatsappLabel: "WhatsApp Number",
     downloadLabel: "POS Download URL",
-    contentLabel: "Homepage content (JSON)",
-    contentHelp: "Edit the CEO message, testimonials, and general homepage content. The JSON must be valid.",
+    contentLabel: "Homepage content",
+    contentHelp: "Edit the CEO message and testimonials with guided fields instead of writing JSON.",
+    advancedContent: "Advanced JSON editing",
+    ceoNameField: "CEO name",
+    ceoMessageField: "CEO message",
+    feedbacksField: "Customer testimonials",
+    addFeedback: "Add testimonial",
+    feedbackName: "Customer name",
+    feedbackText: "Testimonial text",
+    removeFeedback: "Remove testimonial",
+    noFeedbacks: "No testimonials yet. Add one to show it on the homepage.",
     showcasesLabel: "Work galleries",
     showcasesHelp: "Upload images or add links, then delete or reorder items for each service.",
     advancedShowcases: "Advanced JSON editing",
@@ -162,8 +192,20 @@ const I18N = {
     deleteImage: "Delete image",
     galleryEmpty: "No images yet. Add an image or link to get started.",
     galleryUrlHelp: "Use HTTPS or a same-origin path starting with /.",
-    heroSlidesLabel: "Hero slides (images and videos)",
-    heroSlidesHelp: "Add up to 8 items. Use image or video; URLs must be HTTPS or same-origin paths beginning with /.",
+    heroSlidesLabel: "Hero slides",
+    heroSlidesHelp: "Add images or videos, upload files or paste links, then change the display order.",
+    addHeroSlide: "Add slide",
+    advancedHeroSlides: "Advanced slides JSON editing",
+    slideType: "Slide type",
+    imageSlide: "Image",
+    videoSlide: "Video",
+    mediaUrl: "Media URL",
+    posterUrl: "Video poster URL",
+    slideAlt: "Alt text",
+    uploadMedia: "Upload file",
+    removeSlide: "Remove slide",
+    noHeroSlides: "No slides yet. Add an image or video to start the hero sequence.",
+    invalidMediaType: "That file type does not match this slide.",
     heroBackgroundLabel: "Hero background",
     heroBackgroundHelp: "Use an HTTPS URL or upload a small image. Uploaded images are stored with the homepage settings.",
     requestsIntro: "Customer requests saved from the public website form.",
@@ -261,6 +303,8 @@ let state = {
   passwordChangeRecommended: false,
   users: [],
   settings: null,
+  homepageContent: { ceoName: "", ceoMessage: "", feedbacks: [] },
+  heroSlides: [],
   showcases: { websites: [], applications: [], business: [], clinic: [] },
   requests: [],
   requestCounts: { new: 0, actionable: 0 },
@@ -286,9 +330,12 @@ const els = {
   settingsWhatsapp: document.getElementById("settings-whatsapp"),
   settingsDownload: document.getElementById("settings-download"),
   settingsContent: document.getElementById("settings-content"),
+  contentEditor: document.getElementById("content-editor"),
   settingsShowcases: document.getElementById("settings-showcases"),
   showcaseEditor: document.getElementById("showcase-editor"),
   settingsHeroSlides: document.getElementById("settings-hero-slides"),
+  heroSlidesEditor: document.getElementById("hero-slides-editor"),
+  heroSlideAdd: document.getElementById("hero-slide-add"),
   settingsHeroBackground: document.getElementById("settings-hero-background"),
   settingsHeroBackgroundFile: document.getElementById("settings-hero-background-file"),
   storeForm: document.getElementById("store-form"),
@@ -486,6 +533,226 @@ function moveGalleryItem(key, index, direction) {
   if (next < 0 || next >= items.length) return;
   [items[index], items[next]] = [items[next], items[index]];
   renderShowcaseEditor();
+}
+
+function normalizeHomepageContent(value) {
+  const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  return {
+    ceoName: typeof source.ceoName === "string" ? source.ceoName : "",
+    ceoMessage: typeof source.ceoMessage === "string" ? source.ceoMessage : "",
+    feedbacks: Array.isArray(source.feedbacks)
+      ? source.feedbacks
+        .filter((item) => item && typeof item === "object")
+        .slice(0, 6)
+        .map((item) => ({
+          name: typeof item.name === "string" ? item.name : "",
+          text: typeof item.text === "string" ? item.text : "",
+        }))
+      : [],
+  };
+}
+
+function normalizeHeroSlides(value) {
+  return Array.isArray(value)
+    ? value.filter((item) => item && typeof item === "object" && ["image", "video"].includes(item.type))
+      .slice(0, 8)
+      .map((item) => ({
+        type: item.type,
+        url: typeof item.url === "string" ? item.url : "",
+        ...(typeof item.poster === "string" ? { poster: item.poster } : {}),
+        alt: typeof item.alt === "string" ? item.alt : "",
+      }))
+    : [];
+}
+
+function syncContentTextarea() {
+  const current = state.settings?.content && typeof state.settings.content === "object"
+    ? state.settings.content
+    : {};
+  els.settingsContent.value = JSON.stringify({
+    ...current,
+    ...state.homepageContent,
+  }, null, 2);
+}
+
+function syncHeroSlidesTextarea() {
+  els.settingsHeroSlides.value = JSON.stringify(state.heroSlides, null, 2);
+}
+
+function createTextField(label, value, options = {}) {
+  const wrapper = document.createElement("label");
+  wrapper.className = options.className || "";
+  wrapper.textContent = label;
+  const input = document.createElement(options.multiline ? "textarea" : "input");
+  input.value = value || "";
+  input.maxLength = options.maxLength || 500;
+  if (!options.multiline) input.type = options.type || "text";
+  if (options.dir) input.dir = options.dir;
+  wrapper.append(input);
+  return { wrapper, input };
+}
+
+function renderContentEditor() {
+  if (!els.contentEditor) return;
+  els.contentEditor.textContent = "";
+  const base = document.createElement("div");
+  base.className = "guided-fields";
+  const nameField = createTextField(t("ceoNameField"), state.homepageContent.ceoName, { maxLength: 120 });
+  const messageField = createTextField(t("ceoMessageField"), state.homepageContent.ceoMessage, { maxLength: 600, multiline: true, className: "guided-field-wide" });
+  nameField.input.addEventListener("input", () => {
+    state.homepageContent.ceoName = nameField.input.value;
+    syncContentTextarea();
+  });
+  messageField.input.addEventListener("input", () => {
+    state.homepageContent.ceoMessage = messageField.input.value;
+    syncContentTextarea();
+  });
+  base.append(nameField.wrapper, messageField.wrapper);
+  const heading = document.createElement("div");
+  heading.className = "editor-subheading";
+  const title = document.createElement("h3");
+  title.textContent = t("feedbacksField");
+  const add = galleryButton(t("addFeedback"), "", () => {
+    if (state.homepageContent.feedbacks.length >= 6) return;
+    state.homepageContent.feedbacks.push({ name: "", text: "" });
+    renderContentEditor();
+  });
+  heading.append(title, add);
+  const list = document.createElement("div");
+  list.className = "feedback-editor-list";
+  if (!state.homepageContent.feedbacks.length) {
+    const empty = document.createElement("p");
+    empty.className = "gallery-empty";
+    empty.textContent = t("noFeedbacks");
+    list.append(empty);
+  }
+  state.homepageContent.feedbacks.forEach((feedback, index) => {
+    const card = document.createElement("article");
+    card.className = "feedback-editor-item";
+    const name = createTextField(t("feedbackName"), feedback.name, { maxLength: 120 });
+    const text = createTextField(t("feedbackText"), feedback.text, { maxLength: 320, multiline: true });
+    name.input.addEventListener("input", () => {
+      feedback.name = name.input.value;
+      syncContentTextarea();
+    });
+    text.input.addEventListener("input", () => {
+      feedback.text = text.input.value;
+      syncContentTextarea();
+    });
+    const remove = galleryButton(t("removeFeedback"), "danger-btn", () => {
+      state.homepageContent.feedbacks.splice(index, 1);
+      renderContentEditor();
+    });
+    card.append(name.wrapper, text.wrapper, remove);
+    list.append(card);
+  });
+  els.contentEditor.append(base, heading, list);
+  syncContentTextarea();
+}
+
+function createHeroSlide(index, slide, total) {
+  const card = document.createElement("article");
+  card.className = "hero-slide-item";
+  const head = document.createElement("div");
+  head.className = "hero-slide-heading";
+  const label = document.createElement("strong");
+  label.textContent = `${t("heroSlidesLabel")} ${index + 1}`;
+  const actions = document.createElement("div");
+  actions.className = "gallery-actions";
+  const up = galleryButton("↑", "", () => moveHeroSlide(index, -1));
+  up.disabled = index === 0;
+  up.title = t("moveUp");
+  const down = galleryButton("↓", "", () => moveHeroSlide(index, 1));
+  down.disabled = index === total - 1;
+  down.title = t("moveDown");
+  const remove = galleryButton(t("removeSlide"), "danger-btn", () => {
+    state.heroSlides.splice(index, 1);
+    renderHeroSlidesEditor();
+  });
+  actions.append(up, down, remove);
+  head.append(label, actions);
+  const grid = document.createElement("div");
+  grid.className = "hero-slide-fields";
+  const type = document.createElement("label");
+  type.textContent = t("slideType");
+  const typeSelect = document.createElement("select");
+  const imageOption = new Option(t("imageSlide"), "image");
+  const videoOption = new Option(t("videoSlide"), "video");
+  typeSelect.append(imageOption, videoOption);
+  typeSelect.value = slide.type;
+  typeSelect.addEventListener("change", () => {
+    slide.type = typeSelect.value;
+    renderHeroSlidesEditor();
+  });
+  type.append(typeSelect);
+  const url = createTextField(t("mediaUrl"), slide.url, { maxLength: 900000, type: "url", dir: "ltr", className: "guided-field-wide" });
+  url.input.placeholder = "/assets/hero-royal.svg or https://...";
+  url.input.addEventListener("input", () => {
+    slide.url = url.input.value.trim();
+    syncHeroSlidesTextarea();
+  });
+  const alt = createTextField(t("slideAlt"), slide.alt, { maxLength: 160 });
+  alt.input.addEventListener("input", () => {
+    slide.alt = alt.input.value;
+    syncHeroSlidesTextarea();
+  });
+  grid.append(type, url.wrapper, alt.wrapper);
+  if (slide.type === "image") {
+    const file = document.createElement("input");
+    file.type = "file";
+    file.accept = "image/png,image/jpeg,image/webp,image/gif";
+    file.className = "sr-only";
+    file.addEventListener("change", async () => {
+      try {
+        slide.url = await readImageAsDataUrl(file.files[0]);
+        renderHeroSlidesEditor();
+      } catch (error) {
+        showAlert(error.message);
+      } finally {
+        file.value = "";
+      }
+    });
+    const upload = galleryButton(t("uploadMedia"), "", () => file.click());
+    grid.append(upload, file);
+  } else {
+    const poster = createTextField(t("posterUrl"), slide.poster || "", { maxLength: 900000, type: "url", dir: "ltr", className: "guided-field-wide" });
+    poster.input.placeholder = "/assets/poster.png or https://...";
+    poster.input.addEventListener("input", () => {
+      slide.poster = poster.input.value.trim();
+      syncHeroSlidesTextarea();
+    });
+    grid.append(poster.wrapper);
+  }
+  card.append(head, grid);
+  return card;
+}
+
+function renderHeroSlidesEditor() {
+  if (!els.heroSlidesEditor) return;
+  els.heroSlidesEditor.textContent = "";
+  if (!state.heroSlides.length) {
+    const empty = document.createElement("p");
+    empty.className = "gallery-empty";
+    empty.textContent = t("noHeroSlides");
+    els.heroSlidesEditor.append(empty);
+  }
+  state.heroSlides.forEach((slide, index) => {
+    els.heroSlidesEditor.append(createHeroSlide(index, slide, state.heroSlides.length));
+  });
+  syncHeroSlidesTextarea();
+}
+
+function addHeroSlide() {
+  if (state.heroSlides.length >= 8) return;
+  state.heroSlides.push({ type: "image", url: "", alt: "" });
+  renderHeroSlidesEditor();
+}
+
+function moveHeroSlide(index, direction) {
+  const next = index + direction;
+  if (next < 0 || next >= state.heroSlides.length) return;
+  [state.heroSlides[index], state.heroSlides[next]] = [state.heroSlides[next], state.heroSlides[index]];
+  renderHeroSlidesEditor();
 }
 
 function renderStoreUsersTable() {
@@ -805,7 +1072,9 @@ function updateLanguageUi() {
   renderUsersTable();
   renderStoresTable();
   renderStoreUsersTable();
+  renderContentEditor();
   renderShowcaseEditor();
+  renderHeroSlidesEditor();
   if (state.currentStore) {
     els.storeUsersTitle.textContent = `${t("manageStoreUsers")} · ${state.currentStore.name}`;
     els.storeUsersContext.textContent = `${t("storeUsersContext")} ${state.currentStore.id}`;
@@ -969,9 +1238,10 @@ async function loadSettings() {
   const data = await apiFetch("/api/settings");
   state.settings = data;
   state.showcases = normalizeShowcases(data.content?.showcases);
+  state.homepageContent = normalizeHomepageContent(data.content);
   els.settingsWhatsapp.value = data.whatsappNumber ?? "";
   els.settingsDownload.value = data.downloadUrl ?? "";
-  els.settingsContent.value = JSON.stringify(data.content || {}, null, 2);
+  renderContentEditor();
   renderShowcaseEditor();
   els.settingsHeroBackground.value = typeof data.content?.heroBackground === "string" ? data.content.heroBackground : "";
   const heroSlides = Array.isArray(data.content?.heroSlides)
@@ -979,7 +1249,8 @@ async function loadSettings() {
     : Array.isArray(data.content?.heroMedia)
       ? data.content.heroMedia
       : [];
-  els.settingsHeroSlides.value = JSON.stringify(heroSlides, null, 2);
+  state.heroSlides = normalizeHeroSlides(heroSlides);
+  renderHeroSlidesEditor();
 }
 
 async function loadUsers() {
@@ -1158,6 +1429,7 @@ async function handleSaveSettings(event) {
     try {
       heroSlides = JSON.parse(els.settingsHeroSlides.value || "[]");
       if (!Array.isArray(heroSlides)) throw new Error("Invalid hero slides");
+      heroSlides = normalizeHeroSlides(heroSlides);
     } catch {
       showAlert(t("invalidContent"));
       setPending("settings", false, submit);
@@ -1188,10 +1460,13 @@ async function handleSaveSettings(event) {
     });
     els.settingsWhatsapp.value = data.whatsappNumber;
     els.settingsDownload.value = data.downloadUrl;
-    els.settingsContent.value = JSON.stringify(data.content || {}, null, 2);
+    state.settings = data;
+    state.homepageContent = normalizeHomepageContent(data.content);
+    renderContentEditor();
     state.showcases = normalizeShowcases(data.content?.showcases);
     renderShowcaseEditor();
-    els.settingsHeroSlides.value = JSON.stringify(data.content?.heroSlides || [], null, 2);
+    state.heroSlides = normalizeHeroSlides(data.content?.heroSlides || []);
+    renderHeroSlidesEditor();
     els.settingsHeroBackground.value = data.content?.heroBackground || "";
     els.settingsHeroBackgroundFile.value = "";
     showStatus(t("settingsSaved"));
@@ -1334,6 +1609,7 @@ function initLanguageToggle() {
 function initForms() {
   els.loginForm.addEventListener("submit", handleLogin);
   els.settingsForm.addEventListener("submit", handleSaveSettings);
+  els.heroSlideAdd.addEventListener("click", addHeroSlide);
   els.storeForm.addEventListener("submit", handleCreateStore);
   els.storeUserForm.addEventListener("submit", handleStoreUserSave);
   els.storeUsersClose.addEventListener("click", closeStoreUsers);

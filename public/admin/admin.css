@@ -389,6 +389,86 @@ html[lang="en"] body {
   text-align: center;
 }
 
+.content-editor,
+.hero-slides-editor {
+  display: grid;
+  gap: 1rem;
+}
+
+.guided-fields,
+.hero-slide-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .8rem;
+}
+
+.guided-fields label,
+.hero-slide-fields label {
+  display: grid;
+  gap: .35rem;
+  margin: 0;
+  font-size: .84rem;
+}
+
+.guided-field-wide {
+  grid-column: 1 / -1;
+}
+
+.guided-fields textarea,
+.feedback-editor-item textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.editor-subheading,
+.hero-slide-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+}
+
+.editor-subheading h3,
+.hero-slide-heading strong {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.feedback-editor-list {
+  display: grid;
+  gap: .7rem;
+}
+
+.feedback-editor-item,
+.hero-slide-item {
+  display: grid;
+  gap: .75rem;
+  padding: .85rem;
+  border: 1px solid var(--border);
+  border-radius: .8rem;
+  background: var(--panel-soft);
+}
+
+.feedback-editor-item label {
+  display: grid;
+  gap: .35rem;
+  margin: 0;
+  font-size: .84rem;
+}
+
+.hero-slide-item {
+  background: var(--panel);
+}
+
+.hero-slide-heading {
+  padding-bottom: .65rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero-slide-fields select {
+  min-height: 46px;
+}
+
 label {
   display: block;
   font-weight: 600;
@@ -676,6 +756,15 @@ th {
 
   .gallery-preview img {
     height: 150px;
+  }
+
+  .guided-fields,
+  .hero-slide-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .guided-field-wide {
+    grid-column: auto;
   }
 
   .logout-btn {

@@ -82,9 +82,17 @@
                   <input id="settings-download" name="downloadUrl" type="url" dir="ltr" autocomplete="url" required />
                 </div>
                 <div class="field field-full">
-                  <label for="settings-content" data-i18n="contentLabel">محتوى الصفحة الرئيسية (JSON)</label>
-                  <textarea id="settings-content" name="content" rows="12" dir="ltr" spellcheck="false" placeholder='{"ceoName":"Ahmad Dawabsheh","ceoMessage":"...","feedbacks":[{"name":"اسم العميل","text":"التقييم"}],"heroMedia":[{"type":"image","url":"https://...","alt":"RTS"}]}'></textarea>
-                  <small data-i18n="contentHelp">يمكن تعديل رسالة المدير، التقييمات، ورابط صورة أو فيديو البطل. يجب أن يكون JSON صالحاً.</small>
+                  <div class="field-heading">
+                    <div>
+                      <label data-i18n="contentLabel">محتوى الصفحة الرئيسية</label>
+                      <small data-i18n="contentHelp">عدّل رسالة المدير وشهادات العملاء من حقول واضحة، بدون الحاجة لكتابة JSON.</small>
+                    </div>
+                  </div>
+                  <div id="content-editor" class="content-editor"></div>
+                  <details class="advanced-settings">
+                    <summary data-i18n="advancedContent">تحرير JSON متقدم</summary>
+                    <textarea id="settings-content" name="content" rows="12" dir="ltr" spellcheck="false"></textarea>
+                  </details>
                 </div>
                 <div class="field field-full">
                   <div class="field-heading">
@@ -100,9 +108,18 @@
                   </details>
                 </div>
                 <div class="field field-full">
-                  <label for="settings-hero-slides" data-i18n="heroSlidesLabel">شرائح البطل (صور وفيديو)</label>
-                  <textarea id="settings-hero-slides" name="heroSlides" rows="8" dir="ltr" spellcheck="false" placeholder='[{"type":"image","url":"/assets/hero-royal.svg","alt":"RTS"},{"type":"video","url":"https://example.com/hero.mp4","poster":"/assets/hero-royal.svg","alt":"RTS motion"}]'></textarea>
-                  <small data-i18n="heroSlidesHelp">أضف حتى 8 عناصر. النوع image أو video، والرابط يجب أن يكون HTTPS أو مساراً محلياً يبدأ بـ /.</small>
+                  <div class="field-heading">
+                    <div>
+                      <label data-i18n="heroSlidesLabel">شرائح البطل</label>
+                      <small data-i18n="heroSlidesHelp">أضف صوراً أو فيديوهات، ارفع الملفات أو أضف روابط، ثم غيّر ترتيب العرض.</small>
+                    </div>
+                    <button id="hero-slide-add" class="secondary-btn compact-btn" type="button" data-i18n="addHeroSlide">إضافة شريحة</button>
+                  </div>
+                  <div id="hero-slides-editor" class="hero-slides-editor"></div>
+                  <details class="advanced-settings">
+                    <summary data-i18n="advancedHeroSlides">تحرير شرائح JSON متقدم</summary>
+                    <textarea id="settings-hero-slides" name="heroSlides" rows="8" dir="ltr" spellcheck="false"></textarea>
+                  </details>
                 </div>
                 <div class="field field-full">
                   <label for="settings-hero-background" data-i18n="heroBackgroundLabel">خلفية البطل</label>
