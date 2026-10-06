@@ -1,28 +1,58 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="تنزيل RTS Clinic لنظام Windows.">
-  <link rel="stylesheet" href="/styles.css">
-  <title>RTS | تنزيل RTS Clinic</title>
+  <meta name="description" content="Download RTS Clinic for Windows.">
+  <title>RTS | Download RTS Clinic</title>
+  <link rel="icon" href="/assets/rts-mark.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/download-pages.css?v=1">
 </head>
-<body data-page="download">
-  <header class="site-header">
-    <a class="brand" href="/" aria-label="RTS Royal Technology Solutions"><span class="brand-mark"><img src="/assets/rts-mark.svg" alt=""></span><span><b>RTS</b><small>ROYAL TECHNOLOGY SOLUTIONS</small></span></a>
-    <a class="nav-cta" href="/">العودة للموقع</a>
+<body class="download-page" data-page="download-clinic">
+  <header class="download-nav download-shell">
+    <a class="download-brand" href="/"><img src="/assets/rts-mark.svg" alt="RTS"><span>Royal Technology Solutions</span></a>
+    <div class="download-nav-actions">
+      <a href="/" data-i18n="back">Back to site</a>
+      <button class="language-toggle" type="button" aria-label="Switch to Arabic">ع</button>
+      <button class="theme-toggle" type="button" aria-label="Toggle theme">☾</button>
+    </div>
   </header>
-  <main class="product-download-page product-download-clinic">
+  <main class="download-shell">
     <section class="download-hero">
-      <div class="download-copy">
-        <p class="section-tag">RTS · WINDOWS</p>
-        <h1>RTS Clinic<br><span>لعيادة أهدأ.</span></h1>
-        <p>من ملف المريض إلى الموعد والمدفوعات، كل ما يحتاجه فريقك في مساحة واحدة.</p>
-        <a class="button button-accent" href="https://github.com/alsadiayham-sketch/rts-clinic/releases/latest/download/RTS-Clinic-Setup.exe">تنزيل RTS Clinic</a>
+      <div>
+        <p class="download-kicker">RTS · CLINIC WORKSPACE</p>
+        <h1>Download <em>RTS Clinic.</em></h1>
+        <p class="download-lede">A calmer Windows workspace for patient files, appointments, billing, and the daily details your clinic cannot afford to lose.</p>
+        <div class="download-actions">
+          <a class="download-cta" href="https://github.com/alsadiayham-sketch/rts-clinic/releases/latest/download/RTS-Clinic-Setup.exe">Download RTS Clinic for Windows</a>
+          <a class="download-cta download-ghost" href="/">Back to RTS</a>
+        </div>
+        <p class="settings-status" role="status" aria-live="polite">Windows installer · latest release</p>
       </div>
-      <div class="download-visual"><div class="clinic-window large" aria-label="معاينة واجهة RTS Clinic"><div class="clinic-window-top"><b>RTS Clinic</b><span>Patient workspace</span></div><div class="clinic-window-body"><div class="clinic-calendar-preview"><b>Appointments</b><i>Mon</i><i>Tue</i><i>Wed</i><i>Thu</i><i>Fri</i><em>09:30 · Sara</em><em>11:00 · Omar</em><em>14:30 · Lina</em></div><div class="clinic-side-preview"><strong>Today</strong><span>12 patients</span><span>4 sessions</span><span>₪ 1,840 collected</span><span>3 insurance claims</span></div></div></div></div>
+      <div class="download-art">
+        <div class="download-clinic-art" aria-label="RTS Clinic appointment workspace preview">
+          <div class="clinic-window-head"><span>RTS CLINIC</span><span>WORKSPACE / TODAY</span></div>
+          <div class="clinic-schedule">
+            <div><b>09:30</b><span>Follow-up workspace</span><small>Ready</small></div>
+            <div><b>11:00</b><span>New patient file</span><small>Review</small></div>
+            <div><b>14:30</b><span>Billing and notes</span><small>Queued</small></div>
+          </div>
+        </div>
+      </div>
     </section>
-    <section class="download-details"><div><span class="product-number">PATIENT-FIRST WORKSPACE</span><h2>كل جلسة موثقة.</h2></div><div><p>ملفات المرضى، أرقام الملفات، المواعيد، الملاحظات، الملفات الطبية، التأمين وتقارير الفواتير.</p><p class="download-note">يتطلب هذا الرابط إصداراً منشوراً في GitHub Releases للمستودع المستقل.</p><a class="text-link" href="/">العودة إلى RTS</a></div></section>
+    <section class="download-section">
+      <h2>A clearer rhythm for the clinic day.</h2>
+      <div class="download-grid">
+        <article class="download-note"><strong>Focused</strong><p>Keep the next action visible without turning the workspace into a wall of noise.</p></article>
+        <article class="download-note"><strong>Private by design</strong><p>Use your clinic's own access controls and follow your operational and privacy requirements.</p></article>
+        <article class="download-note"><strong>Need a hand?</strong><p><a href="/#contact">Contact the RTS team</a> before installing or rolling out the workspace.</p></article>
+      </div>
+    </section>
   </main>
+  <footer class="download-footer download-shell">RTS · <a href="/privacy/">Privacy</a></footer>
+  <script src="/app.js?v=8" defer></script>
 </body>
 </html>

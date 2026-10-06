@@ -15,6 +15,7 @@ const I18N = {
     loginButton: "دخول",
     tabSettings: "إعدادات العمل",
     tabStores: "متاجر RTS Business",
+    tabRequests: "الطلبات",
     tabUsers: "المشرفون",
     tabPassword: "كلمة المرور الخاصة بي",
     logoutButton: "تسجيل الخروج",
@@ -22,8 +23,33 @@ const I18N = {
     downloadLabel: "رابط تحميل برنامج POS",
     contentLabel: "محتوى الصفحة الرئيسية (JSON)",
     contentHelp: "يمكن تعديل رسالة المدير والتقييمات والمحتوى العام. يجب أن يكون JSON صالحاً.",
+    showcasesLabel: "معارض الأعمال",
+    showcasesHelp: "ارفع صوراً أو أضف روابط، ثم احذف العناصر أو غيّر ترتيبها لكل خدمة.",
+    advancedShowcases: "تحرير JSON متقدم",
+    addGalleryItem: "إضافة صورة",
+    uploadImage: "رفع صورة",
+    imageUrl: "رابط الصورة",
+    altText: "النص البديل",
+    moveUp: "تحريك لأعلى",
+    moveDown: "تحريك لأسفل",
+    deleteImage: "حذف الصورة",
+    galleryEmpty: "لا توجد صور بعد. أضف صورة أو رابطاً للبدء.",
+    galleryUrlHelp: "استخدم HTTPS أو مساراً محلياً يبدأ بـ /.",
     heroSlidesLabel: "شرائح البطل (صور وفيديو)",
     heroSlidesHelp: "أضف حتى 8 عناصر. النوع image أو video، والرابط يجب أن يكون HTTPS أو مساراً محلياً يبدأ بـ /.",
+    heroBackgroundLabel: "خلفية البطل",
+    heroBackgroundHelp: "استخدم رابط HTTPS أو ارفع صورة صغيرة. يتم حفظ الصورة المرفوعة ضمن إعدادات الصفحة.",
+    requestsIntro: "طلبات العملاء المحفوظة من نموذج الموقع.",
+    refreshRequests: "تحديث الطلبات",
+    noRequests: "لا توجد طلبات بعد.",
+    markRead: "تحديد كمقروء",
+    moveInProgress: "بدء المعالجة",
+    markResolved: "تحديد كمكتمل",
+    archiveRequest: "أرشفة",
+    requestStatusNew: "جديد",
+    requestStatusInProgress: "قيد المعالجة",
+    requestStatusResolved: "مكتمل",
+    requestStatusArchived: "مؤرشف",
     saveSettings: "حفظ الإعدادات",
     nameLabel: "الاسم المعروض",
     statusLabel: "الحالة",
@@ -116,6 +142,7 @@ const I18N = {
     loginButton: "Sign In",
     tabSettings: "Business Settings",
     tabStores: "RTS Business Stores",
+    tabRequests: "Requests",
     tabUsers: "Admins",
     tabPassword: "My Password",
     logoutButton: "Logout",
@@ -123,8 +150,33 @@ const I18N = {
     downloadLabel: "POS Download URL",
     contentLabel: "Homepage content (JSON)",
     contentHelp: "Edit the CEO message, testimonials, and general homepage content. The JSON must be valid.",
+    showcasesLabel: "Work galleries",
+    showcasesHelp: "Upload images or add links, then delete or reorder items for each service.",
+    advancedShowcases: "Advanced JSON editing",
+    addGalleryItem: "Add image",
+    uploadImage: "Upload image",
+    imageUrl: "Image URL",
+    altText: "Alt text",
+    moveUp: "Move up",
+    moveDown: "Move down",
+    deleteImage: "Delete image",
+    galleryEmpty: "No images yet. Add an image or link to get started.",
+    galleryUrlHelp: "Use HTTPS or a same-origin path starting with /.",
     heroSlidesLabel: "Hero slides (images and videos)",
     heroSlidesHelp: "Add up to 8 items. Use image or video; URLs must be HTTPS or same-origin paths beginning with /.",
+    heroBackgroundLabel: "Hero background",
+    heroBackgroundHelp: "Use an HTTPS URL or upload a small image. Uploaded images are stored with the homepage settings.",
+    requestsIntro: "Customer requests saved from the public website form.",
+    refreshRequests: "Refresh requests",
+    noRequests: "No requests yet.",
+    markRead: "Mark read",
+    moveInProgress: "Start work",
+    markResolved: "Mark resolved",
+    archiveRequest: "Archive",
+    requestStatusNew: "New",
+    requestStatusInProgress: "In progress",
+    requestStatusResolved: "Resolved",
+    requestStatusArchived: "Archived",
     saveSettings: "Save Settings",
     nameLabel: "Display Name",
     statusLabel: "Status",
@@ -209,6 +261,9 @@ let state = {
   passwordChangeRecommended: false,
   users: [],
   settings: null,
+  showcases: { websites: [], applications: [], business: [], clinic: [] },
+  requests: [],
+  requestCounts: { new: 0, actionable: 0 },
   stores: [],
   storesLoaded: false,
   currentStore: null,
@@ -231,11 +286,19 @@ const els = {
   settingsWhatsapp: document.getElementById("settings-whatsapp"),
   settingsDownload: document.getElementById("settings-download"),
   settingsContent: document.getElementById("settings-content"),
+  settingsShowcases: document.getElementById("settings-showcases"),
+  showcaseEditor: document.getElementById("showcase-editor"),
   settingsHeroSlides: document.getElementById("settings-hero-slides"),
+  settingsHeroBackground: document.getElementById("settings-hero-background"),
+  settingsHeroBackgroundFile: document.getElementById("settings-hero-background-file"),
   storeForm: document.getElementById("store-form"),
   storeBackend: document.getElementById("store-backend"),
   storeSubmit: document.getElementById("store-submit"),
   storesRefresh: document.getElementById("stores-refresh"),
+  requestsRefresh: document.getElementById("requests-refresh"),
+  requestsList: document.getElementById("requests-list"),
+  requestsEmpty: document.getElementById("requests-empty"),
+  requestsBadge: document.getElementById("requests-badge"),
   storesTbody: document.getElementById("stores-tbody"),
   storesEmpty: document.getElementById("stores-empty"),
   storeUsersPanel: document.getElementById("store-users-panel"),
@@ -253,6 +316,176 @@ const els = {
 
 function t(key) {
   return I18N[state.lang][key] || key;
+}
+
+const SHOWCASE_KEYS = ["websites", "applications", "business", "clinic"];
+const SHOWCASE_LABELS = {
+  websites: { en: "Websites", ar: "المواقع" },
+  applications: { en: "Applications", ar: "التطبيقات" },
+  business: { en: "RTS Business", ar: "RTS Business" },
+  clinic: { en: "RTS Clinic", ar: "RTS Clinic" },
+};
+
+function readImageAsDataUrl(file) {
+  if (!file) return Promise.resolve("");
+  if (!/^image\/(png|jpeg|webp|gif)$/.test(file.type)) {
+    return Promise.reject(new Error(state.lang === "ar" ? "اختر ملف صورة PNG أو JPG أو WEBP أو GIF." : "Choose a PNG, JPG, WEBP, or GIF image."));
+  }
+  if (file.size > 650000) {
+    return Promise.reject(new Error(state.lang === "ar" ? "حجم الصورة كبير جداً. الحد الأقصى 650KB." : "Image is too large. The maximum is 650KB."));
+  }
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => resolve(String(reader.result || "")), { once: true });
+    reader.addEventListener("error", () => reject(new Error("Unable to read the image.")), { once: true });
+    reader.readAsDataURL(file);
+  });
+}
+
+function normalizeShowcases(value) {
+  const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  return Object.fromEntries(SHOWCASE_KEYS.map((key) => [
+    key,
+    Array.isArray(source[key])
+      ? source[key].filter((item) => item && typeof item.url === "string").map((item) => ({
+        url: item.url,
+        alt: typeof item.alt === "string" ? item.alt : "",
+      }))
+      : [],
+  ]));
+}
+
+function syncShowcasesTextarea() {
+  els.settingsShowcases.value = JSON.stringify(state.showcases, null, 2);
+}
+
+function galleryButton(label, className, onClick) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = `secondary-btn compact-btn ${className || ""}`.trim();
+  button.textContent = label;
+  button.addEventListener("click", onClick);
+  return button;
+}
+
+function renderShowcaseEditor() {
+  if (!els.showcaseEditor) return;
+  els.showcaseEditor.textContent = "";
+  for (const key of SHOWCASE_KEYS) {
+    const group = document.createElement("section");
+    group.className = "gallery-group";
+    const heading = document.createElement("div");
+    heading.className = "gallery-group-heading";
+    const title = document.createElement("h3");
+    title.textContent = SHOWCASE_LABELS[key][state.lang];
+    const add = galleryButton(t("addGalleryItem"), "gallery-add", () => addGalleryItem(key));
+    heading.append(title, add);
+    const list = document.createElement("div");
+    list.className = "gallery-list";
+    const items = state.showcases[key] || [];
+    if (!items.length) {
+      const empty = document.createElement("p");
+      empty.className = "gallery-empty";
+      empty.textContent = t("galleryEmpty");
+      list.append(empty);
+    }
+    items.forEach((item, index) => list.append(createGalleryItem(key, item, index, items.length)));
+    group.append(heading, list);
+    els.showcaseEditor.append(group);
+  }
+  syncShowcasesTextarea();
+}
+
+function createGalleryItem(key, item, index, total) {
+  const card = document.createElement("article");
+  card.className = "gallery-item";
+  const preview = document.createElement("div");
+  preview.className = "gallery-preview";
+  if (item.url) {
+    const image = document.createElement("img");
+    image.src = item.url;
+    image.alt = item.alt || "";
+    image.loading = "lazy";
+    image.addEventListener("error", () => {
+      preview.classList.add("is-broken");
+      preview.textContent = state.lang === "ar" ? "تعذر تحميل الصورة" : "Image unavailable";
+    }, { once: true });
+    preview.append(image);
+  } else {
+    preview.textContent = "—";
+  }
+  const fields = document.createElement("div");
+  fields.className = "gallery-fields";
+  const urlLabel = document.createElement("label");
+  urlLabel.textContent = t("imageUrl");
+  const urlInput = document.createElement("input");
+  urlInput.type = "url";
+  urlInput.dir = "ltr";
+  urlInput.value = item.url || "";
+  urlInput.placeholder = "/assets/example.png";
+  urlInput.addEventListener("input", () => {
+    item.url = urlInput.value.trim();
+    syncShowcasesTextarea();
+  });
+  urlInput.addEventListener("change", () => renderShowcaseEditor());
+  const altLabel = document.createElement("label");
+  altLabel.textContent = t("altText");
+  const altInput = document.createElement("input");
+  altInput.type = "text";
+  altInput.value = item.alt || "";
+  altInput.maxLength = 160;
+  altInput.addEventListener("input", () => {
+    item.alt = altInput.value;
+    syncShowcasesTextarea();
+  });
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = "image/png,image/jpeg,image/webp,image/gif";
+  fileInput.className = "sr-only";
+  fileInput.addEventListener("change", async () => {
+    try {
+      item.url = await readImageAsDataUrl(fileInput.files[0]);
+      renderShowcaseEditor();
+    } catch (error) {
+      showAlert(error.message);
+    } finally {
+      fileInput.value = "";
+    }
+  });
+  const upload = galleryButton(t("uploadImage"), "gallery-upload", () => fileInput.click());
+  const actions = document.createElement("div");
+  actions.className = "gallery-actions";
+  const up = galleryButton("↑", "", () => moveGalleryItem(key, index, -1));
+  up.title = t("moveUp");
+  up.setAttribute("aria-label", t("moveUp"));
+  up.disabled = index === 0;
+  const down = galleryButton("↓", "", () => moveGalleryItem(key, index, 1));
+  down.title = t("moveDown");
+  down.setAttribute("aria-label", t("moveDown"));
+  down.disabled = index === total - 1;
+  const remove = galleryButton(t("deleteImage"), "danger-btn", () => {
+    state.showcases[key].splice(index, 1);
+    renderShowcaseEditor();
+  });
+  actions.append(up, down, remove);
+  fields.append(urlLabel, urlInput, altLabel, altInput, upload, fileInput, actions);
+  card.append(preview, fields);
+  return card;
+}
+
+function addGalleryItem(key) {
+  state.showcases[key].push({ url: "", alt: "" });
+  renderShowcaseEditor();
+  const group = els.showcaseEditor.querySelector(`.gallery-group:nth-child(${SHOWCASE_KEYS.indexOf(key) + 1})`);
+  group?.querySelector(".gallery-item:last-child input")?.focus();
+}
+
+function moveGalleryItem(key, index, direction) {
+  const next = index + direction;
+  const items = state.showcases[key];
+  if (next < 0 || next >= items.length) return;
+  [items[index], items[next]] = [items[next], items[index]];
+  renderShowcaseEditor();
 }
 
 function renderStoreUsersTable() {
@@ -572,6 +805,7 @@ function updateLanguageUi() {
   renderUsersTable();
   renderStoresTable();
   renderStoreUsersTable();
+  renderShowcaseEditor();
   if (state.currentStore) {
     els.storeUsersTitle.textContent = `${t("manageStoreUsers")} · ${state.currentStore.name}`;
     els.storeUsersContext.textContent = `${t("storeUsersContext")} ${state.currentStore.id}`;
@@ -671,6 +905,8 @@ function switchTab(name) {
   } else if (name === "stores") {
     document.getElementById("store-id").focus();
     if (!state.storesLoaded) loadStores().catch((error) => showAlert(error.message));
+  } else if (name === "requests") {
+    loadRequests().catch((error) => showAlert(error.message));
   } else if (name === "password") {
     document.getElementById("current-password").focus();
   }
@@ -732,9 +968,12 @@ function renderUsersTable() {
 async function loadSettings() {
   const data = await apiFetch("/api/settings");
   state.settings = data;
+  state.showcases = normalizeShowcases(data.content?.showcases);
   els.settingsWhatsapp.value = data.whatsappNumber ?? "";
   els.settingsDownload.value = data.downloadUrl ?? "";
   els.settingsContent.value = JSON.stringify(data.content || {}, null, 2);
+  renderShowcaseEditor();
+  els.settingsHeroBackground.value = typeof data.content?.heroBackground === "string" ? data.content.heroBackground : "";
   const heroSlides = Array.isArray(data.content?.heroSlides)
     ? data.content.heroSlides
     : Array.isArray(data.content?.heroMedia)
@@ -749,6 +988,79 @@ async function loadUsers() {
   renderUsersTable();
 }
 
+function requestStatusLabel(status) {
+  return t(`requestStatus${status === "in_progress" ? "InProgress" : status[0].toUpperCase() + status.slice(1)}`);
+}
+
+function renderRequests() {
+  if (!els.requestsList) return;
+  els.requestsList.textContent = "";
+  els.requestsEmpty.classList.toggle("hidden", state.requests.length > 0);
+  els.requestsBadge.classList.toggle("hidden", state.requestCounts.actionable < 1);
+  els.requestsBadge.textContent = String(state.requestCounts.actionable || 0);
+  for (const request of state.requests) {
+    const card = document.createElement("article");
+    card.className = `request-card status-${request.status}`;
+    const heading = document.createElement("div");
+    heading.className = "request-card-heading";
+    const title = document.createElement("h3");
+    title.textContent = `${request.name} · ${request.business}`;
+    const status = document.createElement("span");
+    status.className = `status-pill ${request.status === "new" ? "inactive" : "active"}`;
+    status.textContent = requestStatusLabel(request.status);
+    heading.append(title, status);
+    const meta = document.createElement("p");
+    meta.className = "request-meta";
+    meta.textContent = `${request.service} · ${new Date(request.createdAt * 1000).toLocaleString(state.lang === "ar" ? "ar" : "en")}`;
+    const message = document.createElement("p");
+    message.className = "request-message";
+    message.textContent = request.message;
+    const actions = document.createElement("div");
+    actions.className = "request-actions";
+    const actionSpecs = [];
+    if (!request.readAt) actionSpecs.push(["read", t("markRead")]);
+    if (request.status === "new") actionSpecs.push(["in_progress", t("moveInProgress")]);
+    if (request.status === "in_progress") actionSpecs.push(["resolved", t("markResolved")]);
+    if (request.status === "resolved") actionSpecs.push(["archived", t("archiveRequest")]);
+    for (const [statusValue, label] of actionSpecs) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "secondary-btn compact-btn";
+      button.textContent = label;
+      button.addEventListener("click", () => updateRequest(request, statusValue === "read" ? null : statusValue, statusValue === "read"));
+      actions.append(button);
+    }
+    card.append(heading, meta, message, actions);
+    els.requestsList.append(card);
+  }
+}
+
+async function loadRequests() {
+  const data = await apiFetch("/api/requests");
+  state.requests = data.requests || [];
+  state.requestCounts = data.counts || { new: 0, actionable: 0 };
+  renderRequests();
+}
+
+async function updateRequest(request, status, read) {
+  const key = `request-${request.id}`;
+  if (state.pending.has(key)) return;
+  setPending(key, true);
+  try {
+    await apiFetch("/api/requests", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: request.id, ...(status ? { status } : {}), ...(read ? { read: true } : {}) }),
+    });
+    await loadRequests();
+    showStatus(t("settingsSaved"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    setPending(key, false);
+  }
+}
+
 async function bootstrapSession() {
   clearMessages();
   try {
@@ -760,7 +1072,7 @@ async function bootstrapSession() {
     els.passwordWarning.classList.toggle("hidden", !state.passwordChangeRecommended);
     els.passwordWarning.textContent = state.passwordChangeRecommended ? t("warningChangePassword") : "";
     showStatus(`${t("welcome")} ${session.user.name}`);
-    await Promise.all([loadSettings(), loadUsers()]);
+    await Promise.all([loadSettings(), loadUsers(), loadRequests()]);
     switchTab("settings");
   } catch (error) {
     state.currentUser = null;
@@ -772,6 +1084,7 @@ async function bootstrapSession() {
       els.loginUsername.focus();
       return;
     }
+
     showAlert(error.message);
   }
 }
@@ -810,6 +1123,8 @@ async function handleLogout() {
     await apiFetch("/api/logout", { method: "POST" });
     state.users = [];
     state.settings = null;
+    state.requests = [];
+    state.requestCounts = { new: 0, actionable: 0 };
     state.stores = [];
     state.storesLoaded = false;
     closeStoreUsers();
@@ -848,7 +1163,19 @@ async function handleSaveSettings(event) {
       setPending("settings", false, submit);
       return;
     }
+    let showcases;
+    try {
+      const advancedShowcases = JSON.parse(els.settingsShowcases.value || "{}");
+      showcases = normalizeShowcases(advancedShowcases);
+    } catch {
+      showAlert(t("invalidContent"));
+      setPending("settings", false, submit);
+      return;
+    }
     content.heroSlides = heroSlides;
+    content.showcases = showcases;
+    const uploadedHeroBackground = await readImageAsDataUrl(els.settingsHeroBackgroundFile.files[0]);
+    content.heroBackground = uploadedHeroBackground || els.settingsHeroBackground.value.trim();
     const payload = {
       whatsappNumber: els.settingsWhatsapp.value.trim(),
       downloadUrl: els.settingsDownload.value.trim(),
@@ -862,7 +1189,11 @@ async function handleSaveSettings(event) {
     els.settingsWhatsapp.value = data.whatsappNumber;
     els.settingsDownload.value = data.downloadUrl;
     els.settingsContent.value = JSON.stringify(data.content || {}, null, 2);
+    state.showcases = normalizeShowcases(data.content?.showcases);
+    renderShowcaseEditor();
     els.settingsHeroSlides.value = JSON.stringify(data.content?.heroSlides || [], null, 2);
+    els.settingsHeroBackground.value = data.content?.heroBackground || "";
+    els.settingsHeroBackgroundFile.value = "";
     showStatus(t("settingsSaved"));
   } catch (error) {
     showAlert(error.message);
@@ -1010,6 +1341,10 @@ function initForms() {
   els.storesRefresh.addEventListener("click", () => {
     clearMessages();
     loadStores().catch((error) => showAlert(error.message));
+  });
+  els.requestsRefresh.addEventListener("click", () => {
+    clearMessages();
+    loadRequests().catch((error) => showAlert(error.message));
   });
   els.addUserForm.addEventListener("submit", handleAddUser);
   els.passwordForm.addEventListener("submit", handlePasswordChange);

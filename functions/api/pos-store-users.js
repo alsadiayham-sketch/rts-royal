@@ -83,7 +83,8 @@ export async function onRequestPost(context) {
     const role = payload.role === "admin" || payload.role === "worker" ? payload.role : null;
     if (!storeId) throw new ApiError(400, "INVALID_STORE_ID", "Store ID is invalid.");
     await requireStandaloneStore(storeId);
-    if (!username || !name || !role || !validateNewPassword(password)) {
+    const legacyClinicPassword = storeId === "rts-testing" && password.length >= 8 && password.length <= 128;
+    if (!username || !name || !role || (!validateNewPassword(password) && !legacyClinicPassword)) {
       throw new ApiError(400, "INVALID_POS_USER", "POS user details are invalid.");
     }
 

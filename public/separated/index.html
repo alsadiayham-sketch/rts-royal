@@ -7,10 +7,11 @@
   <meta name="theme-color" content="#140b22">
   <link rel="icon" href="/assets/rts-mark.svg?v=2" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/rts-mark.svg?v=2">
-  <link rel="stylesheet" href="/separated/separated.css?v=3">
+  <link rel="stylesheet" href="/separated/separated.css?v=4">
   <title>RTS — where code becomes power</title>
 </head>
 <body>
+  <div class="load-progress" data-load-progress aria-hidden="true"><span></span></div>
   <div class="cursor-orb" aria-hidden="true"></div>
   <canvas class="starfield" aria-hidden="true"></canvas>
   <div class="scanlines" aria-hidden="true"></div>
@@ -22,9 +23,8 @@
       <span>RTS<small>ROYAL TECHNOLOGY SOLUTIONS</small></span>
     </a>
     <nav id="site-nav" aria-label="Primary navigation" data-i18n-aria-label="navLabel">
-      <a href="#capabilities" data-i18n="navCapabilities">Capabilities</a>
-      <a href="#management" data-i18n="navManagement">RTS Management</a>
-      <a href="#customers" data-i18n="navCustomers">Customers</a>
+      <a href="#services" data-i18n="navServices">Services</a>
+      <a href="#services" data-i18n="navProducts">RTS Products</a>
       <a href="#contact" data-i18n="navContact">Contact</a>
     </nav>
     <a class="nav-action" href="#contact"><span data-i18n="navCta">Start a conversation</span><b>↗</b></a>
@@ -40,14 +40,14 @@
 
   <main id="main">
     <section class="hero" id="top">
+      <div class="hero-backdrop" data-hero-backdrop aria-hidden="true"></div>
       <div class="hero-grid"></div>
       <div class="hero-copy reveal">
         <p class="eyebrow"><span class="eyebrow-dot"></span> <span data-i18n="heroEyebrow">Royal Technology Solutions · 2026</span></p>
         <h1 data-i18n="heroTitle">Where <em>code</em><br>becomes <strong>power.</strong></h1>
-        <p class="hero-lede" data-i18n="heroLede">We design digital systems that make ambitious businesses feel lighter, faster, and ready for what comes next.</p>
         <div class="hero-actions">
           <a class="button button-primary" href="#contact"><span data-i18n="heroPrimary">Build with RTS</span> <span>↗</span></a>
-          <a class="button button-quiet" href="#management"><span data-i18n="heroSecondary">See the system</span> <span>↓</span></a>
+          <a class="button button-quiet" href="#services"><span data-i18n="heroSecondary">Explore services</span> <span>↓</span></a>
         </div>
         <div class="hero-proof">
           <span data-i18n="proofSystems">Focused systems</span><i></i><span data-i18n="proofSupport">Human support</span><i></i><span data-i18n="proofScale">Built to scale</span>
@@ -65,69 +65,98 @@
         <div class="floating-card card-live"><span class="mini-bars"><i></i><i></i><i></i><i></i></span><b>LIVE</b><small data-i18n="systemsInMotion">systems in motion</small></div>
         <div class="hero-ray ray-one"></div><div class="hero-ray ray-two"></div>
       </div>
-      <a class="scroll-cue" href="#manifesto"><span data-i18n="scrollToEnter">Scroll to enter</span><i></i></a>
+      <a class="scroll-cue" href="#services"><span data-i18n="scrollToEnter">Scroll to enter</span><i></i></a>
     </section>
 
-    <section class="manifesto section-shell" id="manifesto">
-      <div class="manifesto-number">01 <span>/</span> 05</div>
-      <div class="manifesto-copy reveal">
-        <p class="eyebrow" data-i18n="manifestoEyebrow">A clearer way forward</p>
-        <h2 data-i18n="manifestoTitle">Technology should feel like an advantage, not another thing to manage.</h2>
-        <p data-i18n="manifestoText">RTS brings strategy, design, engineering, and operations into one focused rhythm—so every screen, sale, and decision moves in the same direction.</p>
-      </div>
-      <div class="manifesto-visual reveal reveal-delay">
-        <div class="signal-line"></div>
-        <div class="manifesto-orb"></div>
-        <span class="orbit-label label-a">strategy</span><span class="orbit-label label-b">design</span><span class="orbit-label label-c">systems</span>
-      </div>
-    </section>
-
-    <section class="capabilities section-shell" id="capabilities">
+    <section class="services section-shell" id="services">
       <div class="section-heading reveal">
-        <p class="eyebrow" data-i18n="capabilitiesEyebrow">02 / Capabilities</p>
-        <h2 data-i18n="capabilitiesTitle">Small enough to care.<br><em>Serious enough to deliver.</em></h2>
+        <p class="eyebrow" data-i18n="servicesEyebrow">01 / Services</p>
+        <h2 data-i18n="servicesTitle">Build the right<br><em>digital advantage.</em></h2>
       </div>
-      <div class="capability-grid">
-        <article class="capability-card card-wide reveal">
-          <div class="card-index">01</div><span class="card-icon">✦</span>
-          <h3 data-i18n="digitalProductsTitle">Digital products</h3><p data-i18n="digitalProductsText">Websites and applications that give your ideas a clear, confident place to live.</p><a href="#contact"><span data-i18n="explore">Explore</span> <span>↗</span></a>
-          <div class="card-visual visual-product"><i></i><i></i><i></i></div>
-        </article>
-        <article class="capability-card reveal reveal-delay">
-          <div class="card-index">02</div><span class="card-icon">⌁</span>
-          <h3 data-i18n="businessSystemsTitle">Business systems</h3><p data-i18n="businessSystemsText">Connected tools for the work behind the work—less friction, more visibility.</p><a href="#management"><span data-i18n="explore">Explore</span> <span>↗</span></a>
-          <div class="card-visual visual-system"><b>RTS</b><span>FLOW</span></div>
-        </article>
-        <article class="capability-card reveal reveal-delay-2">
-          <div class="card-index">03</div><span class="card-icon">◌</span>
-          <h3 data-i18n="technicalDirectionTitle">Technical direction</h3><p data-i18n="technicalDirectionText">A practical path from a rough idea to a system your team can rely on.</p><a href="#contact"><span data-i18n="explore">Explore</span> <span>↗</span></a>
-          <div class="card-visual visual-direction"><i></i><i></i><i></i><i></i></div>
-        </article>
+      <div class="service-grid service-grid-four">
+        <a class="service-card service-feature reveal" href="#websites-showcase" data-service-link="websites">
+          <span class="service-index">01</span>
+          <div class="service-card-copy">
+            <h3 data-i18n="websitesTitle">Websites</h3>
+            <p data-i18n="websitesText">Clear, responsive websites that give your brand a confident place to meet the world.</p>
+            <span class="service-link"><span data-i18n="viewWork">View websites</span> ↘</span>
+          </div>
+          <div class="service-card-mark" aria-hidden="true">WEB</div>
+        </a>
+        <a class="service-card reveal reveal-delay" href="#applications-showcase" data-service-link="applications">
+          <span class="service-index">02</span>
+          <div class="service-card-copy">
+            <h3 data-i18n="applicationsTitle">Applications</h3>
+            <p data-i18n="applicationsText">Desktop, iOS, and Android applications shaped around the way your team works.</p>
+            <span class="service-link"><span data-i18n="viewWork">View applications</span> ↘</span>
+          </div>
+          <div class="service-card-mark" aria-hidden="true">APP</div>
+        </a>
+        <a class="service-card reveal reveal-delay-2" href="#business-showcase">
+          <span class="service-index">03</span>
+          <div class="service-card-copy">
+            <h3 data-i18n="businessProductTitle">RTS Business</h3>
+            <p data-i18n="businessProductText">A focused Windows workspace for sales, inventory, invoices, and reporting.</p>
+            <span class="service-link"><span data-i18n="viewWork">View product</span> ↘</span>
+          </div>
+          <div class="service-card-mark" aria-hidden="true">POS</div>
+        </a>
+        <a class="service-card reveal reveal-delay-2" href="#clinic-showcase">
+          <span class="service-index">04</span>
+          <div class="service-card-copy">
+            <h3 data-i18n="clinicProductTitle">RTS Clinic</h3>
+            <p data-i18n="clinicProductText">A calmer Windows workspace for patient files, appointments, sessions, and billing.</p>
+            <span class="service-link"><span data-i18n="viewWork">View product</span> ↘</span>
+          </div>
+          <div class="service-card-mark" aria-hidden="true">CLINIC</div>
+        </a>
       </div>
     </section>
 
-    <section class="management section-shell" id="management">
-      <div class="section-heading management-heading reveal">
-        <p class="eyebrow" data-i18n="managementEyebrow">03 / RTS Management</p>
-        <h2 data-i18n="managementTitle">One operational view.<br><em>Every move in focus.</em></h2>
-        <p data-i18n="managementText">RTS Management brings sales, reports, inventory, and configuration into a single calm workspace for teams that need to move with confidence.</p>
+    <section class="showcase-section section-shell" id="websites-showcase" data-showcase="websites">
+      <div class="showcase-heading reveal">
+        <p class="eyebrow" data-i18n="websitesEyebrow">Websites</p>
+        <h2 data-i18n="websitesShowcaseTitle">Websites that make<br><em>the first step feel easy.</em></h2>
+        <p data-i18n="websitesShowcaseText">Explore selected RTS website work, then tell us what your next digital front door needs to do.</p>
+        <a class="service-link showcase-cta" href="#contact" data-service-link="websites"><span data-i18n="contactAbout">Contact us about a website</span> ↗</a>
       </div>
-      <div class="management-showcase">
-        <figure class="management-main reveal">
-          <div class="image-chrome"><span>RTS MANAGEMENT</span><i></i><i></i><i></i></div>
-          <img src="/assets/separated/management-sales.png" alt="RTS Management sales workspace showing products and invoice panel" loading="lazy">
-          <figcaption><b data-i18n="salesCaption">Sales, without the noise.</b><span>01 / 03</span></figcaption>
-        </figure>
-        <div class="management-side">
-          <figure class="management-small reveal reveal-delay"><img src="/assets/separated/management-reports.png" alt="RTS Management reports dashboard" loading="lazy"><figcaption><b data-i18n="reportsCaption">Know the shape of the day.</b><span>02</span></figcaption></figure>
-          <figure class="management-small reveal reveal-delay-2"><img src="/assets/separated/management-settings.png" alt="RTS Management settings and features panel" loading="lazy"><figcaption><b data-i18n="settingsCaption">Configure your edge.</b><span>03</span></figcaption></figure>
-        </div>
-      </div>
+      <div class="showcase-carousel reveal" data-carousel="websites"></div>
     </section>
+
+    <section class="showcase-section section-shell" id="applications-showcase" data-showcase="applications">
+      <div class="showcase-heading reveal">
+        <p class="eyebrow" data-i18n="applicationsEyebrow">Applications</p>
+        <h2 data-i18n="applicationsShowcaseTitle">Tools with a screen<br><em>for every important move.</em></h2>
+        <p data-i18n="applicationsShowcaseText">Desktop, iOS, and Android experiences built around the moments your team and customers repeat every day.</p>
+        <a class="service-link showcase-cta" href="#contact" data-service-link="applications"><span data-i18n="contactAbout">Contact us about an application</span> ↗</a>
+      </div>
+      <div class="showcase-carousel reveal" data-carousel="applications"></div>
+    </section>
+
+    <section class="showcase-section section-shell" id="business-showcase" data-showcase="business">
+      <div class="showcase-heading reveal">
+        <p class="eyebrow" data-i18n="businessEyebrow">RTS Business</p>
+        <h2 data-i18n="businessShowcaseTitle">The business view,<br><em>fully in focus.</em></h2>
+        <p data-i18n="businessShowcaseText">See the full RTS Business workspace across sales, checkout, and settings.</p>
+        <a class="service-link showcase-cta" href="/download-business/"><span data-i18n="downloadBusiness">Download RTS Business</span> ↗</a>
+      </div>
+      <div class="showcase-carousel showcase-carousel-wide reveal" data-carousel="business"></div>
+    </section>
+
+    <section class="showcase-section section-shell" id="clinic-showcase" data-showcase="clinic">
+      <div class="showcase-heading reveal">
+        <p class="eyebrow" data-i18n="clinicEyebrow">RTS Clinic</p>
+        <h2 data-i18n="clinicShowcaseTitle">A calmer workspace<br><em>for the clinic day.</em></h2>
+        <p data-i18n="clinicShowcaseText">Browse the RTS Clinic screens and keep the next patient, note, and operational detail visible.</p>
+        <a class="service-link showcase-cta" href="/download-clinic/"><span data-i18n="downloadClinic">Download RTS Clinic</span> ↗</a>
+      </div>
+      <div class="showcase-carousel showcase-carousel-wide reveal" data-carousel="clinic"></div>
+    </section>
+
 
     <section class="customers section-shell" id="customers">
       <div class="customer-heading reveal">
-        <p class="eyebrow" data-i18n="customersEyebrow">04 / Customers</p>
+        <p class="eyebrow" data-i18n="customersEyebrow">03 / Customers</p>
         <h2 data-i18n="customersTitle">Built around the way<br><em>real teams work.</em></h2>
       </div>
       <div class="customer-content">
@@ -147,7 +176,7 @@
         <span class="ceo-coordinate">31.95° N<br>35.93° E</span>
       </div>
       <div class="ceo-copy reveal reveal-delay">
-        <p class="eyebrow" data-i18n="ceoEyebrow">05 / A message from leadership</p>
+        <p class="eyebrow" data-i18n="ceoEyebrow">04 / A message from leadership</p>
         <blockquote data-i18n="ceoQuote">“The best technology does not ask people to change who they are. It gives their best work more room to happen.”</blockquote>
         <div class="ceo-signature"><b>Ahmad Dawabsheh</b><span>Chief Executive Officer · RTS</span></div>
       </div>
@@ -162,7 +191,8 @@
       </div>
       <form class="contact-form reveal reveal-delay" id="contact-form">
         <label><span data-i18n="formName">Name</span><input name="name" autocomplete="name" required></label>
-        <label><span data-i18n="formCompany">Company</span><input name="company" autocomplete="organization"></label>
+        <label><span data-i18n="formCompany">Company</span><input name="business" autocomplete="organization" required></label>
+        <label class="full"><span data-i18n="formService">What do you need?</span><select name="service" required><option value="" data-i18n="chooseService">Choose a service</option><option value="digital-products" data-i18n="serviceDigitalProducts">Digital product</option><option value="rts-business" data-i18n="serviceBusiness">RTS Business</option><option value="rts-clinic" data-i18n="serviceClinic">RTS Clinic</option><option value="other" data-i18n="serviceOther">Something else</option></select></label>
         <label class="full"><span data-i18n="formMessage">What are you building?</span><textarea name="message" rows="4" required></textarea></label>
         <button class="button button-primary full" type="submit"><span data-i18n="formSubmit">Open WhatsApp</span> <span>↗</span></button>
         <p class="form-status full" role="status" aria-live="polite"></p>
@@ -175,6 +205,6 @@
     <p data-i18n="footerTagline">where code becomes power</p>
     <span>© <span id="year">2026</span> RTS</span>
   </footer>
-  <script src="/separated/separated.js?v=2"></script>
+  <script src="/separated/separated.js?v=3"></script>
 </body>
 </html>

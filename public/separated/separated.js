@@ -1,7 +1,9 @@
 (() => {
   const body = document.body;
   const root = document.documentElement;
+  root.classList.add("js");
   const cursor = document.querySelector(".cursor-orb");
+  const loadProgress = document.querySelector("[data-load-progress]");
   const nav = document.querySelector(".nav-shell");
   const menu = document.querySelector(".menu-button");
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -11,9 +13,9 @@
     en: {
       navLabel: "Primary navigation",
       displayPreferences: "Display preferences",
-      navCapabilities: "Capabilities",
+      navServices: "Services",
+      navProducts: "RTS Products",
       navManagement: "RTS Management",
-      navCustomers: "Customers",
       navContact: "Contact",
       navCta: "Start a conversation",
       menu: "Menu",
@@ -21,9 +23,8 @@
       themeDark: "Dark mode",
       heroEyebrow: "Royal Technology Solutions · 2026",
       heroTitle: "Where <em>code</em><br>becomes <strong>power.</strong>",
-      heroLede: "We design digital systems that make ambitious businesses feel lighter, faster, and ready for what comes next.",
       heroPrimary: "Build with RTS",
-      heroSecondary: "See the system",
+      heroSecondary: "Explore services",
       proofSystems: "Focused systems",
       proofSupport: "Human support",
       proofScale: "Built to scale",
@@ -31,13 +32,41 @@
       operationalClarity: "operational clarity",
       systemsInMotion: "systems in motion",
       scrollToEnter: "Scroll to enter",
-      manifestoEyebrow: "A clearer way forward",
-      manifestoTitle: "Technology should feel like an advantage, not another thing to manage.",
-      manifestoText: "RTS brings strategy, design, engineering, and operations into one focused rhythm—so every screen, sale, and decision moves in the same direction.",
+      servicesEyebrow: "01 / Services",
+      servicesTitle: "Build the right<br><em>digital advantage.</em>",
+      startProject: "Start a project",
+      websitesTitle: "Websites",
+      websitesText: "Clear, responsive websites that give your brand a confident place to meet the world.",
+      applicationsTitle: "Applications",
+      applicationsText: "Desktop, iOS, and Android applications shaped around the way your team works.",
+      viewWork: "View work",
+      contactAbout: "Contact us",
+      websitesEyebrow: "Websites",
+      websitesShowcaseTitle: "Websites that make<br><em>the first step feel easy.</em>",
+      websitesShowcaseText: "Explore selected RTS website work, then tell us what your next digital front door needs to do.",
+      applicationsEyebrow: "Applications",
+      applicationsShowcaseTitle: "Tools with a screen<br><em>for every important move.</em>",
+      applicationsShowcaseText: "Desktop, iOS, and Android experiences built around the moments your team and customers repeat every day.",
+      businessEyebrow: "RTS Business",
+      businessShowcaseTitle: "The business view,<br><em>fully in focus.</em>",
+      businessShowcaseText: "See the full RTS Business workspace across sales, checkout, and settings.",
+      clinicEyebrow: "RTS Clinic",
+      clinicShowcaseTitle: "A calmer workspace<br><em>for the clinic day.</em>",
+      clinicShowcaseText: "Browse the RTS Clinic screens and keep the next patient, note, and operational detail visible.",
+      downloadBusiness: "Download RTS Business",
+      downloadClinic: "Download RTS Clinic",
+      carouselPrevious: "Previous image",
+      carouselNext: "Next image",
+      carouselEmpty: "Add screenshots from the admin panel to show this work here.",
+      openProduct: "Open product page",
+      businessProductTitle: "RTS Business",
+      businessProductText: "A focused Windows workspace for sales, inventory, invoices, and reporting.",
+      clinicProductTitle: "RTS Clinic",
+      clinicProductText: "A calmer Windows workspace for patient files, appointments, sessions, and billing.",
       capabilitiesEyebrow: "02 / Capabilities",
       capabilitiesTitle: "Small enough to care.<br><em>Serious enough to deliver.</em>",
       digitalProductsTitle: "Digital products",
-      digitalProductsText: "Websites and applications that give your ideas a clear, confident place to live.",
+      digitalProductsText: "Websites, Android, iOS, and desktop applications shaped around the way your team works.",
       businessSystemsTitle: "Business systems",
       businessSystemsText: "Connected tools for the work behind the work—less friction, more visibility.",
       technicalDirectionTitle: "Technical direction",
@@ -64,6 +93,12 @@
       contactDirectLink: "Message RTS on WhatsApp ↗",
       formName: "Name",
       formCompany: "Company",
+      formService: "What do you need?",
+      chooseService: "Choose a service",
+      serviceDigitalProducts: "Digital product",
+      serviceBusiness: "RTS Business",
+      serviceClinic: "RTS Clinic",
+      serviceOther: "Something else",
       formMessage: "What are you building?",
       formSubmit: "Open WhatsApp",
       footerTagline: "where code becomes power",
@@ -85,9 +120,9 @@
     ar: {
       navLabel: "التنقل الرئيسي",
       displayPreferences: "إعدادات العرض",
-      navCapabilities: "الخدمات",
+      navServices: "الخدمات",
+      navProducts: "منتجات RTS",
       navManagement: "نظام RTS Management",
-      navCustomers: "عملاؤنا",
       navContact: "تواصل معنا",
       navCta: "ابدأ محادثة",
       menu: "القائمة",
@@ -95,9 +130,8 @@
       themeDark: "الوضع الداكن",
       heroEyebrow: "رويال للحلول التكنولوجية · 2026",
       heroTitle: "حيث يتحول <em>الكود</em><br>إلى <strong>قوة.</strong>",
-      heroLede: "نصمم أنظمة رقمية تجعل الأعمال الطموحة أخف وأسرع وأكثر استعداداً للخطوة القادمة.",
       heroPrimary: "ابنِ مع RTS",
-      heroSecondary: "شاهد النظام",
+      heroSecondary: "اكتشف الخدمات",
       proofSystems: "أنظمة مركزة",
       proofSupport: "دعم إنساني",
       proofScale: "جاهزة للتوسع",
@@ -105,13 +139,41 @@
       operationalClarity: "وضوح تشغيلي",
       systemsInMotion: "أنظمة تتحرك",
       scrollToEnter: "مرر للدخول",
-      manifestoEyebrow: "طريق أوضح إلى الأمام",
-      manifestoTitle: "يجب أن تكون التكنولوجيا ميزة، لا عبئاً جديداً عليك إدارته.",
-      manifestoText: "تجمع RTS الاستراتيجية والتصميم والهندسة والعمليات في إيقاع واحد، حتى تتحرك كل شاشة وكل عملية بيع وكل قرار بالاتجاه نفسه.",
+      servicesEyebrow: "01 / خدماتنا",
+      servicesTitle: "ابنِ ميزتك<br><em>الرقمية الصحيحة.</em>",
+      startProject: "ابدأ مشروعاً",
+      websitesTitle: "مواقع إلكترونية",
+      websitesText: "مواقع واضحة ومتجاوبة تمنح علامتك مكاناً واثقاً للقاء العالم.",
+      applicationsTitle: "تطبيقات",
+      applicationsText: "تطبيقات سطح مكتب وiOS وAndroid مصممة حول طريقة عمل فريقك.",
+      viewWork: "شاهد الأعمال",
+      contactAbout: "تواصل معنا",
+      websitesEyebrow: "مواقع إلكترونية",
+      websitesShowcaseTitle: "مواقع تجعل<br><em>الخطوة الأولى أسهل.</em>",
+      websitesShowcaseText: "استكشف بعض أعمال RTS على الويب، ثم أخبرنا بما يحتاجه حضورك الرقمي القادم.",
+      applicationsEyebrow: "تطبيقات",
+      applicationsShowcaseTitle: "أدوات لها شاشة<br><em>لكل حركة مهمة.</em>",
+      applicationsShowcaseText: "تجارب سطح مكتب وiOS وAndroid مبنية حول اللحظات التي يكررها فريقك وعملاؤك كل يوم.",
+      businessEyebrow: "RTS Business",
+      businessShowcaseTitle: "رؤية العمل،<br><em>بكل تفاصيلها.</em>",
+      businessShowcaseText: "شاهد مساحة RTS Business كاملة بين المبيعات والدفع والإعدادات.",
+      clinicEyebrow: "RTS Clinic",
+      clinicShowcaseTitle: "مساحة عمل أهدأ<br><em>ليوم العيادة.</em>",
+      clinicShowcaseText: "تصفح شاشات RTS Clinic وأبقِ المريض والملاحظة والتفصيل التشغيلي التالي واضحاً.",
+      downloadBusiness: "تنزيل RTS Business",
+      downloadClinic: "تنزيل RTS Clinic",
+      carouselPrevious: "الصورة السابقة",
+      carouselNext: "الصورة التالية",
+      carouselEmpty: "أضف لقطات الشاشة من لوحة الإدارة لتظهر الأعمال هنا.",
+      openProduct: "افتح صفحة المنتج",
+      businessProductTitle: "RTS Business",
+      businessProductText: "مساحة عمل Windows مركزة للمبيعات والمخزون والفواتير والتقارير.",
+      clinicProductTitle: "RTS Clinic",
+      clinicProductText: "مساحة عمل هادئة لملفات المرضى والمواعيد والجلسات والفوترة.",
       capabilitiesEyebrow: "02 / خدماتنا",
       capabilitiesTitle: "صغير بما يكفي ليهتم.<br><em>وجاد بما يكفي لينجز.</em>",
       digitalProductsTitle: "منتجات رقمية",
-      digitalProductsText: "مواقع وتطبيقات تمنح أفكارك مكاناً واضحاً وواثقاً لتعيش وتنمو.",
+      digitalProductsText: "مواقع وتطبيقات Android وiOS وDesktop مصممة حول طريقة عمل فريقك.",
       businessSystemsTitle: "أنظمة أعمال",
       businessSystemsText: "أدوات مترابطة للعمل خلف الكواليس، باحتكاك أقل ورؤية أكبر.",
       technicalDirectionTitle: "توجيه تقني",
@@ -138,6 +200,12 @@
       contactDirectLink: "راسل RTS عبر واتساب ↗",
       formName: "الاسم",
       formCompany: "الشركة",
+      formService: "ما الذي تحتاجه؟",
+      chooseService: "اختر الخدمة",
+      serviceDigitalProducts: "منتج رقمي",
+      serviceBusiness: "RTS Business",
+      serviceClinic: "RTS Clinic",
+      serviceOther: "شيء آخر",
       formMessage: "ماذا تبني؟",
       formSubmit: "افتح واتساب",
       footerTagline: "حيث يتحول الكود إلى قوة",
@@ -203,6 +271,7 @@
   applyLanguage(language);
   languageToggle?.addEventListener("click", () => {
     applyLanguage(language === "ar" ? "en" : "ar");
+    renderShowcases(window.__rtsShowcases);
     setWhatsAppLinks();
   });
   themeToggle?.addEventListener("click", () => applyTheme(root.dataset.theme === "light" ? "dark" : "light"));
@@ -214,7 +283,9 @@
     root.style.setProperty("--mouse-x", `${event.clientX}px`);
     root.style.setProperty("--mouse-y", `${event.clientY}px`);
   };
-  if (cursor && !prefersReducedMotion.matches) window.addEventListener("pointermove", moveCursor, { passive: true });
+  const saveData = Boolean(navigator.connection?.saveData || navigator.connection?.effectiveType === "2g");
+  const canAnimate = !prefersReducedMotion.matches && !saveData && window.matchMedia("(pointer: fine)").matches;
+  if (cursor && canAnimate) window.addEventListener("pointermove", moveCursor, { passive: true });
 
   menu?.addEventListener("click", () => {
     const expanded = menu.getAttribute("aria-expanded") === "true";
@@ -226,8 +297,34 @@
     menu?.setAttribute("aria-expanded", "false");
   }));
 
+  let scrollTicking = false;
+  const updateHeader = () => {
+    nav?.classList.remove("is-hidden");
+    scrollTicking = false;
+  };
+  window.addEventListener("scroll", () => {
+    if (!scrollTicking) {
+      window.requestAnimationFrame(updateHeader);
+      scrollTicking = true;
+    }
+  }, { passive: true });
+
+  const sectionLinks = Array.from(nav?.querySelectorAll("a[href^='#']") || []);
+  const trackedSections = sectionLinks
+    .map((link) => document.querySelector(link.getAttribute("href")))
+    .filter(Boolean);
+  if ("IntersectionObserver" in window) {
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        sectionLinks.forEach((link) => link.classList.toggle("is-active", link.getAttribute("href") === `#${entry.target.id}`));
+      });
+    }, { rootMargin: "-35% 0px -55% 0px", threshold: 0 });
+    trackedSections.forEach((section) => sectionObserver.observe(section));
+  }
+
   const revealItems = document.querySelectorAll(".reveal");
-  if ("IntersectionObserver" in window && !prefersReducedMotion.matches) {
+  if ("IntersectionObserver" in window && canAnimate) {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -243,7 +340,7 @@
 
   const canvas = document.querySelector(".starfield");
   const context = canvas?.getContext("2d");
-  if (canvas && context && !prefersReducedMotion.matches) {
+  if (canvas && context && canAnimate && window.innerWidth > 900) {
     let width = 0;
     let height = 0;
     let animationFrame = 0;
@@ -256,7 +353,7 @@
       canvas.height = Math.floor(height * ratio);
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
       particles.length = 0;
-      const count = Math.min(110, Math.max(42, Math.round(width * height / 18000)));
+      const count = Math.min(72, Math.max(30, Math.round(width * height / 26000)));
       for (let index = 0; index < count; index += 1) {
         particles.push({
           x: Math.random() * width,
@@ -304,7 +401,108 @@
 
   const form = document.querySelector("#contact-form");
   const status = form?.querySelector(".form-status");
+  document.querySelectorAll("[data-service-link]").forEach((link) => {
+    link.addEventListener("click", () => {
+      const service = form?.querySelector('[name="service"]');
+      if (service) service.value = link.dataset.serviceLink || "";
+    });
+  });
   const whatsappLinks = document.querySelectorAll("[data-whatsapp-link]");
+  const defaultShowcases = {
+    websites: [
+      { url: "/assets/hero-royal.svg", alt: "RTS website visual" },
+      { url: "/assets/og.png", alt: "RTS website identity visual" }
+    ],
+    applications: [
+      { url: "/assets/separated/management-sales.png", alt: "RTS application sales screen" },
+      { url: "/assets/separated/management-reports.png", alt: "RTS application reports screen" },
+      { url: "/assets/separated/management-settings.png", alt: "RTS application settings screen" }
+    ],
+    business: [
+      { url: "/assets/pos-sales.png", alt: "RTS Business sales screen" },
+      { url: "/assets/pos-checkout.png", alt: "RTS Business checkout screen" },
+      { url: "/assets/pos-settings.png", alt: "RTS Business settings screen" }
+    ],
+    clinic: [
+      { url: "/assets/separated/management-sales.png", alt: "RTS Clinic workspace preview" },
+      { url: "/assets/separated/management-reports.png", alt: "RTS Clinic reporting preview" },
+      { url: "/assets/separated/management-settings.png", alt: "RTS Clinic settings preview" }
+    ]
+  };
+  const normalizeShowcases = (value) => {
+    const result = {};
+    Object.keys(defaultShowcases).forEach((key) => {
+      const entries = Array.isArray(value?.[key]) ? value[key] : defaultShowcases[key];
+      result[key] = entries
+        .filter((item) => item && typeof item.url === "string" && item.url.trim())
+        .slice(0, 12)
+        .map((item) => ({
+          url: item.url.trim(),
+          alt: typeof item.alt === "string" && item.alt.trim() ? item.alt.trim() : `${key} showcase`
+        }));
+    });
+    return result;
+  };
+  const renderShowcases = (value) => {
+    const showcases = normalizeShowcases(value);
+    window.__rtsShowcases = showcases;
+    document.querySelectorAll("[data-carousel]").forEach((carousel) => {
+      const key = carousel.dataset.carousel;
+      const slides = showcases[key] || [];
+      carousel.replaceChildren();
+      if (!slides.length) {
+        const empty = document.createElement("p");
+        empty.className = "showcase-empty";
+        empty.textContent = translations[language].carouselEmpty;
+        carousel.append(empty);
+        return;
+      }
+      let activeIndex = 0;
+      const image = document.createElement("img");
+      image.className = "showcase-image";
+      image.loading = "lazy";
+      image.decoding = "async";
+      image.alt = slides[0].alt;
+      const chrome = document.createElement("div");
+      chrome.className = "showcase-chrome";
+      const label = document.createElement("span");
+      label.textContent = `${key.toUpperCase()} / ${String(activeIndex + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}`;
+      const previous = document.createElement("button");
+      previous.type = "button";
+      previous.className = "showcase-arrow showcase-previous";
+      previous.setAttribute("aria-label", translations[language].carouselPrevious);
+      previous.textContent = "←";
+      const next = document.createElement("button");
+      next.type = "button";
+      next.className = "showcase-arrow showcase-next";
+      next.setAttribute("aria-label", translations[language].carouselNext);
+      next.textContent = "→";
+      const dots = document.createElement("div");
+      dots.className = "showcase-dots";
+      const update = (index) => {
+        activeIndex = (index + slides.length) % slides.length;
+        const slide = slides[activeIndex];
+        image.src = slide.url;
+        image.alt = slide.alt;
+        label.textContent = `${key.toUpperCase()} / ${String(activeIndex + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}`;
+        dots.querySelectorAll("button").forEach((dot, dotIndex) => dot.classList.toggle("is-active", dotIndex === activeIndex));
+      };
+      slides.forEach((slide, index) => {
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "showcase-dot";
+        dot.setAttribute("aria-label", `${index + 1} / ${slides.length}`);
+        dot.addEventListener("click", () => update(index));
+        dots.append(dot);
+      });
+      previous.addEventListener("click", () => update(activeIndex - 1));
+      next.addEventListener("click", () => update(activeIndex + 1));
+      chrome.append(label, previous, next);
+      carousel.append(image, chrome, dots);
+      update(0);
+    });
+  };
+  renderShowcases(defaultShowcases);
   let whatsappNumber = "";
   const setWhatsAppLinks = () => {
     if (!whatsappNumber) return;
@@ -318,6 +516,12 @@
     .then((response) => response.ok ? response.json() : Promise.reject(new Error("settings unavailable")))
     .then((settings) => {
       if (typeof settings.whatsappNumber === "string") whatsappNumber = settings.whatsappNumber.replace(/\D/g, "");
+      const heroBackground = settings.content?.heroBackground;
+      const backdrop = document.querySelector("[data-hero-backdrop]");
+      if (backdrop && typeof heroBackground === "string" && heroBackground.trim()) {
+        backdrop.style.backgroundImage = `url("${heroBackground.replace(/"/g, "%22")}")`;
+      }
+      renderShowcases(settings.content?.showcases);
       setWhatsAppLinks();
     })
     .catch(() => {
@@ -326,15 +530,48 @@
   form?.addEventListener("submit", (event) => {
     event.preventDefault();
     const data = new FormData(form);
+    const requestPayload = {
+      name: String(data.get("name") || "").trim(),
+      service: String(data.get("service") || "").trim(),
+      business: String(data.get("business") || "").trim(),
+      message: String(data.get("message") || "").trim(),
+      language,
+    };
     if (!whatsappNumber) {
       if (status) status.textContent = translations[language].whatsappUnavailable;
       return;
     }
-    if (status) status.textContent = translations[language].whatsappReady;
-    const intro = language === "ar" ? "مرحباً RTS، اسمي" : "Hello RTS, my name is";
-    const from = language === "ar" ? " من شركة " : " from ";
-    const message = `${intro} ${data.get("name") || (language === "ar" ? "..." : "there")}${data.get("company") ? `${from}${data.get("company")}` : ""}.\n\n${data.get("message") || ""}`;
-    window.location.assign(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`);
+    if (status) status.textContent = language === "ar" ? "يتم حفظ طلبك..." : "Saving your request...";
+    fetch("/api/requests", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestPayload),
+    })
+      .then((response) => response.ok ? response.json() : response.json().then((payload) => Promise.reject(new Error(payload?.error?.message || "Request could not be saved."))))
+      .then(() => {
+        if (status) status.textContent = translations[language].whatsappReady;
+        const intro = language === "ar" ? "مرحباً RTS، اسمي" : "Hello RTS, my name is";
+        const from = language === "ar" ? " من شركة " : " from ";
+        const serviceLabel = requestPayload.service ? `\n\nService: ${requestPayload.service}` : "";
+        const message = `${intro} ${requestPayload.name}${requestPayload.business ? `${from}${requestPayload.business}` : ""}.${serviceLabel}\n\n${requestPayload.message}`;
+        window.location.assign(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`);
+      })
+      .catch((error) => {
+        if (status) status.textContent = language === "ar"
+          ? "تعذر حفظ الطلب. يرجى المحاولة مرة أخرى."
+          : error.message || "We could not save your request. Please try again.";
+      });
   });
   document.querySelector("#year").textContent = String(new Date().getFullYear());
+  const finishLoading = () => window.requestAnimationFrame(() => loadProgress?.classList.add("is-complete"));
+  const imageReady = Array.from(document.images).map((image) => image.complete
+    ? Promise.resolve()
+    : new Promise((resolve) => {
+      image.addEventListener("load", resolve, { once: true });
+      image.addEventListener("error", resolve, { once: true });
+    }));
+  Promise.race([
+    Promise.allSettled(imageReady),
+    new Promise((resolve) => window.setTimeout(resolve, 1200))
+  ]).then(finishLoading);
 })();

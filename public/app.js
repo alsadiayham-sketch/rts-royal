@@ -547,6 +547,10 @@ const subpageCopy = {
   download: {
     ar: { title: "RTS | تنزيل RTS Business", back: "العودة للموقع", tag: "RTS · WINDOWS", heading: "تنزيل RTS Business.", installerH: "RTS Business لنظام Windows", installer: "هوية RTS Business وواجهة تشغيل أكثر وضوحاً للمبيعات والمخزون والفواتير.", download: "تنزيل RTS Business لـ Windows", beforeH: "قبل المتابعة", before: "هذا التنزيل مخصص لـ Windows فقط. إذا حظر Windows الملف أو ظهرت لك رسالة أمان، تواصل مع الدعم قبل المتابعة. لا نوصي بتعطيل حماية Windows.", return: "العودة إلى RTS", privacy: "الخصوصية", retry: "إعادة المحاولة" },
     en: { title: "RTS | Download RTS Business", back: "Back to site", tag: "RTS · WINDOWS", heading: "Download RTS Business.", installerH: "RTS Business for Windows", installer: "The RTS Business identity and a clearer workspace for sales, inventory, invoices, and operations.", download: "Download RTS Business for Windows", beforeH: "Before you continue", before: "This download is for Windows only. If Windows blocks the file or shows a security message, contact support before proceeding. We do not recommend disabling Windows protection.", return: "Back to RTS", privacy: "Privacy", retry: "Try again" }
+  },
+  downloadClinic: {
+    ar: { title: "RTS | تنزيل RTS Clinic", back: "العودة للموقع" },
+    en: { title: "RTS | Download RTS Clinic", back: "Back to site" }
   }
 };
 
@@ -1107,7 +1111,7 @@ if (isMainPage) {
     language === "ar" ? url.searchParams.set("lang", "en") : url.searchParams.delete("lang");
     window.location.assign(url);
   });
-  if (document.body.dataset.page === "download") {
+  if (["download", "download-clinic"].includes(document.body.dataset.page)) {
     byId("settings-retry")?.addEventListener("click", loadSettings);
     loadSettings();
   }

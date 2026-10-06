@@ -42,6 +42,9 @@ function isSafeMediaUrl(value) {
   if (typeof value !== "string" || !value.trim()) return false;
   const url = value.trim();
   if (url.startsWith("/") && !url.startsWith("//")) return true;
+  if (url.startsWith("data:image/")) {
+    return /^data:image\/(?:png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(url) && url.length <= 900000;
+  }
   try {
     return new URL(url).protocol === "https:";
   } catch {
@@ -49,10 +52,47 @@ function isSafeMediaUrl(value) {
   }
 }
 
+function normalizeShowcases(content) {
+  if (!Object.hasOwn(content, "showcases")) return content;
+  if (!content.showcases || typeof content.showcases !== "object" || Array.isArray(content.showcases)) {
+    throw new ApiError(400, "INVALID_SHOWCASES", "Showcase galleries must be an object.");
+  }
+  const categories = ["websites", "applications", "business", "clinic"];
+  const showcases = {};
+  for (const category of categories) {
+    const entries = content.showcases[category];
+    if (entries === undefined) continue;
+    if (!Array.isArray(entries) || entries.length > 12) {
+      throw new ApiError(400, "INVALID_SHOWCASE_ITEMS", "Each showcase gallery must contain at most 12 items.");
+    }
+    showcases[category] = entries.map((item) => {
+      if (!item || typeof item !== "object" || Array.isArray(item) || !isSafeMediaUrl(item.url)) {
+        throw new ApiError(400, "INVALID_SHOWCASE_ITEM", "Showcase items must use safe image URLs.");
+      }
+      return {
+        url: item.url.trim(),
+        ...(typeof item.alt === "string" && item.alt.trim() ? { alt: item.alt.trim().slice(0, 160) } : {}),
+      };
+    });
+  }
+  return { ...content, showcases };
+}
+
 function normalizeHeroSlides(content) {
   if (!Object.hasOwn(content, "heroSlides")) return content;
   if (!Array.isArray(content.heroSlides) || content.heroSlides.length > 8) {
     throw new ApiError(400, "INVALID_HERO_SLIDES", "Hero slides must contain at most 8 items.");
+  }
+
+  function normalizeHeroBackground(content) {
+    if (!Object.hasOwn(content, "heroBackground")) return content;
+    if (content.heroBackground === "" || content.heroBackground === null) {
+      return { ...content, heroBackground: "" };
+    }
+    if (!isSafeMediaUrl(content.heroBackground)) {
+      throw new ApiError(400, "INVALID_HERO_BACKGROUND", "Hero background must use a safe image URL.");
+    }
+    return { ...content, heroBackground: content.heroBackground.trim() };
   }
   const heroSlides = content.heroSlides.map((slide) => {
     if (!slide || typeof slide !== "object" || Array.isArray(slide)) {
@@ -73,7 +113,7 @@ function normalizeHeroSlides(content) {
         : {}),
     };
   });
-  return { ...content, heroSlides };
+  return normalizeHeroBackground({ ...content, heroSlides });
 }
 
 export async function onRequestGet(context) {
@@ -116,14 +156,14 @@ export async function onRequestPut(context) {
       : current.downloadUrl;
     const nextContent = Object.hasOwn(payload, "content")
       ? payload.content && typeof payload.content === "object" && !Array.isArray(payload.content)
-        ? JSON.stringify(normalizeHeroSlides(payload.content))
+        ? JSON.stringify(normalizeShowcases(normalizeHeroBackground(normalizeHeroSlides(payload.content))))
         : null
       : JSON.stringify(current.content || {});
 
     if (!nextDownloadUrl || !isAllowedDownloadUrl(nextDownloadUrl)) {
       throw new ApiError(400, "INVALID_DOWNLOAD_URL", "Download URL is not allowed.");
     }
-    if (!nextContent || nextContent.length > 12000) {
+    if (!nextContent || nextContent.length > 950000) {
       throw new ApiError(400, "INVALID_CONTENT", "Site content is invalid or too large.");
     }
 
