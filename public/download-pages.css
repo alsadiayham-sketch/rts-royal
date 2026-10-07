@@ -34,10 +34,10 @@ body.download-page[data-theme="light"] {
 }
 .download-shell { width: min(1180px, calc(100% - 2rem)); margin: 0 auto; }
 .download-nav {
-  position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between;
-  min-height: 76px; gap: 1rem; border-bottom: 1px solid var(--download-line);
+  position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--download-line);
   background: color-mix(in srgb, var(--download-bg) 90%, transparent); backdrop-filter: blur(18px);
 }
+.download-nav-inner { display: flex; align-items: center; justify-content: space-between; min-height: 76px; gap: 1rem; }
 .download-brand { display: inline-flex; align-items: center; gap: .7rem; color: inherit; text-decoration: none; font-weight: 800; letter-spacing: -.03em; }
 .download-brand img { width: 40px; height: 40px; object-fit: contain; }
 .download-nav-actions { display: flex; align-items: center; gap: .5rem; }

@@ -28,7 +28,13 @@ const sectorData = {
   }
 };
 
-let language = new URLSearchParams(window.location.search).get("lang") === "en" ? "en" : "ar";
+const requestedLanguage = new URLSearchParams(window.location.search).get("lang");
+const savedLanguage = localStorage.getItem("rts-separated-language") || localStorage.getItem("rts-variant-language");
+let language = requestedLanguage === "en" || requestedLanguage === "ar"
+  ? requestedLanguage
+  : savedLanguage === "en" || savedLanguage === "ar"
+    ? savedLanguage
+    : ((navigator.language || "").toLowerCase().startsWith("ar") ? "ar" : "en");
 let activeSector = "market";
 let basket = [];
 let whatsappNumber = "";
