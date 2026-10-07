@@ -409,25 +409,10 @@
   });
   const whatsappLinks = document.querySelectorAll("[data-whatsapp-link]");
   const defaultShowcases = {
-    websites: [
-      { url: "/assets/hero-royal.svg", alt: "RTS website visual" },
-      { url: "/assets/og.png", alt: "RTS website identity visual" }
-    ],
-    applications: [
-      { url: "/assets/separated/management-sales.png", alt: "RTS application sales screen" },
-      { url: "/assets/separated/management-reports.png", alt: "RTS application reports screen" },
-      { url: "/assets/separated/management-settings.png", alt: "RTS application settings screen" }
-    ],
-    business: [
-      { url: "/assets/pos-sales.png", alt: "RTS Business sales screen" },
-      { url: "/assets/pos-checkout.png", alt: "RTS Business checkout screen" },
-      { url: "/assets/pos-settings.png", alt: "RTS Business settings screen" }
-    ],
-    clinic: [
-      { url: "/assets/separated/management-sales.png", alt: "RTS Clinic workspace preview" },
-      { url: "/assets/separated/management-reports.png", alt: "RTS Clinic reporting preview" },
-      { url: "/assets/separated/management-settings.png", alt: "RTS Clinic settings preview" }
-    ]
+    websites: [],
+    applications: [],
+    business: [],
+    clinic: []
   };
   const normalizeShowcases = (value) => {
     const result = {};
