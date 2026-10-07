@@ -1,5 +1,6 @@
 import { requireAuthenticatedUser } from "../_lib/auth.js";
 import { DEFAULT_DOWNLOAD_URL } from "../_lib/constants.js";
+import { MAX_SETTINGS_JSON_BYTES } from "../_lib/constants.js";
 import {
   ApiError,
   jsonResponse,
@@ -136,7 +137,7 @@ export async function onRequestPut(context) {
       windowSeconds: 300,
     });
 
-    const payload = await parseJsonBody(request, ["whatsappNumber", "downloadUrl"]);
+    const payload = await parseJsonBody(request, ["whatsappNumber", "downloadUrl", "content"], MAX_SETTINGS_JSON_BYTES);
     if (!Object.hasOwn(payload, "whatsappNumber") && !Object.hasOwn(payload, "downloadUrl") && !Object.hasOwn(payload, "content")) {
       throw new ApiError(400, "EMPTY_UPDATE", "At least one field is required.");
     }
@@ -163,7 +164,7 @@ export async function onRequestPut(context) {
     if (!nextDownloadUrl || !isAllowedDownloadUrl(nextDownloadUrl)) {
       throw new ApiError(400, "INVALID_DOWNLOAD_URL", "Download URL is not allowed.");
     }
-    if (!nextContent || nextContent.length > 950000) {
+    if (!nextContent || nextContent.length > 7500000) {
       throw new ApiError(400, "INVALID_CONTENT", "Site content is invalid or too large.");
     }
 

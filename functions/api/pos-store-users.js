@@ -12,6 +12,7 @@ import { normalizeStoreId, normalizeStoreName } from "../_lib/pos-store-validati
 import { enforceRateLimit } from "../_lib/rate-limit.js";
 import { normalizeUsername, validateNewPassword } from "../_lib/validation.js";
 import { assertUserStatusChangeAllowed } from "../_lib/user-rules.js";
+import { createStoredPosPassword } from "../_lib/pos-password.js";
 
 const REGISTRY_PATH = "projects/_global/settings/pos_stores";
 
@@ -104,12 +105,21 @@ export async function onRequestPost(context) {
     const existing = index >= 0 ? users[index] : null;
     const nextUser = {
       username,
-      password: password || existing?.password || "",
       name,
       displayName: name,
       role,
       active: existing?.active !== false,
     };
+    if (password) {
+      Object.assign(nextUser, await createStoredPosPassword(password));
+    } else if (existing) {
+      Object.assign(nextUser, existing);
+      nextUser.username = username;
+      nextUser.name = name;
+      nextUser.displayName = name;
+      nextUser.role = role;
+      nextUser.active = existing.active !== false;
+    }
     if (index >= 0) users[index] = nextUser;
     else users.push(nextUser);
     await setFirestoreDocument(usersPath(storeId), { users });

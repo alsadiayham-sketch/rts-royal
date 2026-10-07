@@ -1,5 +1,6 @@
-import { getFirestoreDocument } from "../_lib/firestore.js";
+import { getFirestoreDocument, setFirestoreDocument } from "../_lib/firestore.js";
 import { hmacSha256Hex } from "../_lib/crypto.js";
+import { verifyStoredPosPassword } from "../_lib/pos-password.js";
 import {
   ApiError,
   jsonResponse,
@@ -63,8 +64,19 @@ export async function onRequestPost(context) {
     const user = (Array.isArray(usersDocument?.users) ? usersDocument.users : []).find(
       (candidate) => candidate.username === username
     );
-    if (!user || user.active === false || user.password !== password) {
+    const verification = user
+      ? await verifyStoredPosPassword(user, password)
+      : { verified: false, migratedUser: null };
+    if (!user || user.active === false || !verification.verified) {
       throw new ApiError(401, "AUTH_FAILED", "Invalid tenant, username, or password.");
+    }
+    if (verification.migratedUser) {
+      const users = Array.isArray(usersDocument?.users) ? usersDocument.users : [];
+      const index = users.findIndex((candidate) => candidate.username === username);
+      if (index >= 0) {
+        users[index] = verification.migratedUser;
+        await setFirestoreDocument(usersPath(storeId), { users });
+      }
     }
 
     const role = user.role === "admin" ? "admin" : "worker";

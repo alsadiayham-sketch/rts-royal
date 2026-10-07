@@ -22,6 +22,7 @@ import {
 } from "../_lib/pos-store-validation.js";
 import { enforceRateLimit } from "../_lib/rate-limit.js";
 import { normalizeUsername, validateNewPassword } from "../_lib/validation.js";
+import { createStoredPosPassword } from "../_lib/pos-password.js";
 
 const REGISTRY_PATH = "projects/_global/settings/pos_stores";
 
@@ -126,7 +127,7 @@ export async function onRequestPost(context) {
         users: [
           {
             username: adminUsername,
-            password: adminPassword,
+            ...(await createStoredPosPassword(adminPassword)),
             name: adminName,
             displayName: adminName,
             role: "admin",

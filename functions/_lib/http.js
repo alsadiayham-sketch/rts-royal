@@ -86,9 +86,9 @@ export function requireJsonContentType(request) {
   }
 }
 
-export async function parseJsonBody(request, allowedFields) {
+export async function parseJsonBody(request, allowedFields, maxBytes = MAX_JSON_BYTES) {
   const bodyBytes = await request.arrayBuffer();
-  if (bodyBytes.byteLength > MAX_JSON_BYTES) {
+  if (bodyBytes.byteLength > maxBytes) {
     throw new ApiError(413, "PAYLOAD_TOO_LARGE", "JSON payload too large.");
   }
 

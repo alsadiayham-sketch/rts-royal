@@ -20,6 +20,7 @@ import {
   normalizeWarrantyMonths,
 } from "../_lib/pos-store-validation.js";
 import { normalizeUsername, validateNewPassword } from "../_lib/validation.js";
+import { createStoredPosPassword } from "../_lib/pos-password.js";
 
 const REGISTRY_PATH = "projects/_global/settings/pos_stores";
 
@@ -120,7 +121,7 @@ export async function onRequestPost(context) {
 
     const users = [{
       username: adminUsername,
-      password: adminPassword,
+      ...(await createStoredPosPassword(adminPassword)),
       name: adminName,
       displayName: adminName,
       role: "admin",
@@ -138,7 +139,7 @@ export async function onRequestPost(context) {
       usernames.add(username);
       users.push({
         username,
-        password,
+        ...(await createStoredPosPassword(password)),
         name: userName,
         displayName: userName,
         role,

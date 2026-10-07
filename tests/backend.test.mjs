@@ -10,6 +10,7 @@ import {
 } from "../functions/_lib/validation.js";
 import { jsonResponse, requireTrustedMutationRequest } from "../functions/_lib/http.js";
 import { createPasswordRecord, verifyPassword } from "../functions/_lib/crypto.js";
+import { createStoredPosPassword, verifyStoredPosPassword } from "../functions/_lib/pos-password.js";
 import { assertUserStatusChangeAllowed } from "../functions/_lib/user-rules.js";
 import { createRateLimitKey } from "../functions/_lib/rate-limit.js";
 import {
@@ -108,6 +109,21 @@ test("password hashing verifies correctly and accepts legacy weak input for logi
   assert.equal(record.iterations, 100000);
   assert.equal(await verifyPassword(weakLegacy, record), true);
   assert.equal(await verifyPassword("test-wrong-password", record), false);
+});
+
+test("tenant password records hash new users and migrate legacy users", async () => {
+  const record = await createStoredPosPassword("admin123");
+  assert.equal(typeof record.passwordSalt, "string");
+  assert.equal(typeof record.passwordHash, "string");
+  assert.equal(await verifyStoredPosPassword(record, "admin123").then((result) => result.verified), true);
+  assert.equal(await verifyStoredPosPassword(record, "wrong-password").then((result) => result.verified), false);
+
+  const legacyUser = { username: "admin", password: "admin123", role: "admin", active: true };
+  const migrated = await verifyStoredPosPassword(legacyUser, "admin123");
+  assert.equal(migrated.verified, true);
+  assert.equal(migrated.migratedUser.password, undefined);
+  assert.equal(typeof migrated.migratedUser.passwordHash, "string");
+  assert.equal(typeof migrated.migratedUser.passwordSalt, "string");
 });
 
 test("deactivation rules prevent self and last admin deactivation", () => {

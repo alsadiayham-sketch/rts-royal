@@ -1,6 +1,7 @@
 export const SESSION_COOKIE_NAME = "__Host-rts_session";
 export const SESSION_TTL_SECONDS = 60 * 60 * 8;
 export const MAX_JSON_BYTES = 8 * 1024;
+export const MAX_SETTINGS_JSON_BYTES = 8 * 1024 * 1024;
 export const PASSWORD_ITERATIONS = 100000;
 export const PASSWORD_DERIVED_BITS = 256;
 
