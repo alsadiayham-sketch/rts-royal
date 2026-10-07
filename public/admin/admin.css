@@ -643,6 +643,32 @@ th {
   margin-top: 0;
 }
 
+.clinic-form {
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid #b9dce7;
+  border-radius: 0.9rem;
+  background: #eef8fb;
+}
+
+.clinic-form h3 {
+  margin-top: 0;
+}
+
+.clinic-user-fieldset {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #c9e2e9;
+  border-radius: 0.75rem;
+  background: #fff;
+}
+
+.clinic-user-fieldset legend {
+  padding-inline: 0.4rem;
+  color: var(--accent);
+  font-weight: 700;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

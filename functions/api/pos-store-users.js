@@ -23,7 +23,7 @@ async function requireStandaloneStore(storeId) {
   const stores = Array.isArray(registry?.stores) ? registry.stores : [];
   const store = stores.find((item) => item.id === storeId);
   if (!store) throw new ApiError(404, "STORE_NOT_FOUND", "Store not found.");
-  if (store.type !== "firestore") {
+  if (store.type !== "firestore" && store.type !== "clinic" && store.id !== "rts-testing") {
     throw new ApiError(409, "LINKED_STORE_USERS", "Linked-store users are managed by the website project.");
   }
   return store;

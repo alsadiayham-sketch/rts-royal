@@ -15,6 +15,7 @@ const I18N = {
     loginButton: "دخول",
     tabSettings: "إعدادات العمل",
     tabStores: "متاجر RTS Business",
+    tabClinics: "عيادات RTS Clinic",
     tabRequests: "الطلبات",
     tabUsers: "المشرفون",
     tabPassword: "كلمة المرور الخاصة بي",
@@ -85,6 +86,8 @@ const I18N = {
     adminsTableCaption: "قائمة المشرفين",
     storesIntro: "إنشاء المتاجر وإدارة مدة الترخيص من لوحة RTS المركزية.",
     refreshStores: "تحديث القائمة",
+    clinicsIntro: "إنشاء عيادات RTS Clinic وإدارة الترخيص وحسابات الدخول الأولية.",
+    refreshClinics: "تحديث القائمة",
     addStoreTitle: "إضافة متجر جديد",
     storeIdLabel: "معرّف المتجر",
     storeIdHelp: "إنجليزي صغير وأرقام وشرطات فقط. لا يمكن تغييره لاحقاً.",
@@ -106,6 +109,17 @@ const I18N = {
     warrantyStatusLabel: "حالة الترخيص",
     noStores: "لا توجد متاجر مسجلة بعد.",
     storeCreated: "تم إنشاء المتجر وأصبح جاهزاً لتسجيل الدخول.",
+    addClinicTitle: "إضافة عيادة جديدة",
+    clinicIdLabel: "معرّف العيادة",
+    clinicIdHelp: "أحرف إنجليزية صغيرة وأرقام وشرطات فقط.",
+    clinicNameLabel: "اسم العيادة",
+    clinicAdminTitle: "حساب مدير العيادة",
+    clinicEmployeeTitle: "حساب موظف العيادة",
+    clinicPasswordLabel: "كلمة مرور العيادة",
+    createClinic: "إنشاء العيادة",
+    clinicsTableCaption: "قائمة عيادات RTS Clinic",
+    noClinics: "لا توجد عيادات مسجلة بعد.",
+    clinicCreated: "تم إنشاء العيادة وحساباتها بنجاح.",
     licenceActive: "نشط",
     licenceExpired: "منتهي",
     licenceDisabled: "معطل",
@@ -163,6 +177,7 @@ const I18N = {
     loginButton: "Sign In",
     tabSettings: "Business Settings",
     tabStores: "RTS Business Stores",
+    tabClinics: "RTS Clinics",
     tabRequests: "Requests",
     tabUsers: "Admins",
     tabPassword: "My Password",
@@ -233,6 +248,8 @@ const I18N = {
     adminsTableCaption: "Admins list",
     storesIntro: "Create stores and manage licence periods from the central RTS administration panel.",
     refreshStores: "Refresh List",
+    clinicsIntro: "Create RTS Clinic tenants and manage their licence and initial sign-in accounts.",
+    refreshClinics: "Refresh List",
     addStoreTitle: "Add New Store",
     storeIdLabel: "Store ID",
     storeIdHelp: "Lowercase English letters, numbers, and hyphens only. It cannot be changed later.",
@@ -254,6 +271,17 @@ const I18N = {
     warrantyStatusLabel: "Licence Status",
     noStores: "No stores are registered yet.",
     storeCreated: "The store was created and is ready for sign-in.",
+    addClinicTitle: "Add Clinic",
+    clinicIdLabel: "Clinic ID",
+    clinicIdHelp: "Lowercase English letters, numbers, and hyphens only.",
+    clinicNameLabel: "Clinic Name",
+    clinicAdminTitle: "Clinic Admin Account",
+    clinicEmployeeTitle: "Clinic Staff Account",
+    clinicPasswordLabel: "Clinic Password",
+    createClinic: "Create Clinic",
+    clinicsTableCaption: "RTS Clinic list",
+    noClinics: "No clinics are registered yet.",
+    clinicCreated: "Clinic and initial accounts created successfully.",
     licenceActive: "Active",
     licenceExpired: "Expired",
     licenceDisabled: "Disabled",
@@ -310,6 +338,8 @@ let state = {
   requestCounts: { new: 0, actionable: 0 },
   stores: [],
   storesLoaded: false,
+  clinics: [],
+  clinicsLoaded: false,
   currentStore: null,
   storeUsers: [],
   pending: new Set(),
@@ -342,12 +372,17 @@ const els = {
   storeBackend: document.getElementById("store-backend"),
   storeSubmit: document.getElementById("store-submit"),
   storesRefresh: document.getElementById("stores-refresh"),
+  clinicForm: document.getElementById("clinic-form"),
+  clinicSubmit: document.getElementById("clinic-submit"),
+  clinicsRefresh: document.getElementById("clinics-refresh"),
   requestsRefresh: document.getElementById("requests-refresh"),
   requestsList: document.getElementById("requests-list"),
   requestsEmpty: document.getElementById("requests-empty"),
   requestsBadge: document.getElementById("requests-badge"),
   storesTbody: document.getElementById("stores-tbody"),
   storesEmpty: document.getElementById("stores-empty"),
+  clinicsTbody: document.getElementById("clinics-tbody"),
+  clinicsEmpty: document.getElementById("clinics-empty"),
   storeUsersPanel: document.getElementById("store-users-panel"),
   storeUsersTitle: document.getElementById("store-users-title"),
   storeUsersContext: document.getElementById("store-users-context"),
@@ -1032,6 +1067,125 @@ async function updateStoreLicence(store, action) {
   }
 }
 
+function renderClinicsTable() {
+  if (!els.clinicsTbody) return;
+  els.clinicsTbody.textContent = "";
+  els.clinicsEmpty.classList.toggle("hidden", state.clinics.length !== 0);
+  const now = Date.now();
+  for (const clinic of state.clinics) {
+    const row = document.createElement("tr");
+    const nameCell = document.createElement("td");
+    nameCell.textContent = clinic.name;
+    const idCell = document.createElement("td");
+    idCell.dir = "ltr";
+    idCell.textContent = clinic.id;
+
+    const warrantyCell = document.createElement("td");
+    const active = clinic.warrantyEnd && new Date(clinic.warrantyEnd).getTime() > now;
+    const warrantyPill = document.createElement("span");
+    warrantyPill.className = `status-pill ${active ? "active" : "inactive"}`;
+    warrantyPill.textContent = `${active ? t("licenceActive") : t("licenceExpired")} · ${formatLicenceDate(clinic.warrantyEnd)}`;
+    warrantyCell.append(warrantyPill);
+
+    const actionsCell = document.createElement("td");
+    const actions = document.createElement("div");
+    actions.className = "row-actions";
+    const users = document.createElement("button");
+    users.type = "button";
+    users.className = "secondary-btn compact-btn";
+    users.textContent = t("manageStoreUsers");
+    users.addEventListener("click", () => openStoreUsers({ ...clinic, backend: "clinic" }));
+    actions.append(users);
+
+    const extend = document.createElement("button");
+    extend.type = "button";
+    extend.className = "secondary-btn compact-btn";
+    extend.textContent = t("extendLicence");
+    extend.addEventListener("click", () => updateClinicLicence(clinic, "extend"));
+    actions.append(extend);
+    if (active) {
+      const disable = document.createElement("button");
+      disable.type = "button";
+      disable.className = "secondary-btn compact-btn danger-btn";
+      disable.textContent = t("disableStore");
+      disable.addEventListener("click", () => updateClinicLicence(clinic, "disable"));
+      actions.append(disable);
+    }
+    actionsCell.append(actions);
+    row.append(nameCell, idCell, warrantyCell, actionsCell);
+    els.clinicsTbody.append(row);
+  }
+}
+
+async function loadClinics() {
+  const data = await apiFetch("/api/clinics");
+  state.clinics = data.clinics || [];
+  state.clinicsLoaded = true;
+  renderClinicsTable();
+}
+
+async function handleCreateClinic(event) {
+  event.preventDefault();
+  clearMessages();
+  if (state.pending.has("create-clinic")) return;
+  const payload = Object.fromEntries(new FormData(els.clinicForm).entries());
+  payload.warrantyMonths = Number(payload.warrantyMonths);
+  setPending("create-clinic", true, els.clinicSubmit);
+  try {
+    await apiFetch("/api/clinics", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    els.clinicForm.reset();
+    document.getElementById("clinic-warranty").value = "12";
+    clearSensitiveInputs();
+    await loadClinics();
+    showStatus(t("clinicCreated"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    setPending("create-clinic", false, els.clinicSubmit);
+  }
+}
+
+async function updateClinicLicence(clinic, action) {
+  clearMessages();
+  const key = `clinic-${action}-${clinic.id}`;
+  if (state.pending.has(key)) return;
+  let warrantyMonths;
+  if (action === "extend") {
+    const value = window.prompt(t("warrantyPrompt"), "12");
+    if (value === null) return;
+    warrantyMonths = Number(value);
+    if (!Number.isInteger(warrantyMonths) || warrantyMonths < 1 || warrantyMonths > 60) {
+      showAlert(state.lang === "ar" ? "أدخل عدداً من 1 إلى 60 شهراً." : "Enter a period from 1 to 60 months.");
+      return;
+    }
+  } else if (!window.confirm(t("confirmDisableStore"))) {
+    return;
+  }
+
+  state.pending.add(key);
+  try {
+    await apiFetch("/api/clinics", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: clinic.id,
+        action,
+        ...(action === "extend" ? { warrantyMonths } : {}),
+      }),
+    });
+    await loadClinics();
+    showStatus(t("licenceUpdated"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    state.pending.delete(key);
+  }
+}
+
 function clearMessages() {
   els.globalStatus.textContent = "";
   els.globalAlert.textContent = "";
@@ -1071,6 +1225,7 @@ function updateLanguageUi() {
   els.passwordWarning.classList.toggle("hidden", !state.passwordChangeRecommended);
   renderUsersTable();
   renderStoresTable();
+  renderClinicsTable();
   renderStoreUsersTable();
   renderContentEditor();
   renderShowcaseEditor();
@@ -1174,6 +1329,9 @@ function switchTab(name) {
   } else if (name === "stores") {
     document.getElementById("store-id").focus();
     if (!state.storesLoaded) loadStores().catch((error) => showAlert(error.message));
+  } else if (name === "clinics") {
+    document.getElementById("clinic-id").focus();
+    if (!state.clinicsLoaded) loadClinics().catch((error) => showAlert(error.message));
   } else if (name === "requests") {
     loadRequests().catch((error) => showAlert(error.message));
   } else if (name === "password") {
@@ -1189,6 +1347,8 @@ function clearSensitiveInputs() {
   document.getElementById("new-password").value = "";
   document.getElementById("new-password-confirm").value = "";
   document.getElementById("store-admin-password").value = "";
+  document.getElementById("clinic-admin-password").value = "";
+  document.getElementById("clinic-employee-password").value = "";
   for (const button of document.querySelectorAll(".toggle-password")) {
     document.getElementById(button.dataset.target).type = "password";
     button.textContent = t("showPassword");
@@ -1398,6 +1558,8 @@ async function handleLogout() {
     state.requestCounts = { new: 0, actionable: 0 };
     state.stores = [];
     state.storesLoaded = false;
+    state.clinics = [];
+    state.clinicsLoaded = false;
     closeStoreUsers();
     clearSensitiveInputs();
     await bootstrapSession();
@@ -1611,12 +1773,17 @@ function initForms() {
   els.settingsForm.addEventListener("submit", handleSaveSettings);
   els.heroSlideAdd.addEventListener("click", addHeroSlide);
   els.storeForm.addEventListener("submit", handleCreateStore);
+  els.clinicForm.addEventListener("submit", handleCreateClinic);
   els.storeUserForm.addEventListener("submit", handleStoreUserSave);
   els.storeUsersClose.addEventListener("click", closeStoreUsers);
   els.storeBackend.addEventListener("change", syncStoreBackendFields);
   els.storesRefresh.addEventListener("click", () => {
     clearMessages();
     loadStores().catch((error) => showAlert(error.message));
+  });
+  els.clinicsRefresh.addEventListener("click", () => {
+    clearMessages();
+    loadClinics().catch((error) => showAlert(error.message));
   });
   els.requestsRefresh.addEventListener("click", () => {
     clearMessages();

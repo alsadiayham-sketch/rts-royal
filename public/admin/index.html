@@ -62,6 +62,7 @@
           <nav class="sidebar" aria-label="Admin sections">
             <button class="tab-btn active" type="button" data-tab="settings" data-i18n="tabSettings">إعدادات العمل</button>
             <button class="tab-btn" type="button" data-tab="stores" data-i18n="tabStores">متاجر RTS Business</button>
+            <button class="tab-btn" type="button" data-tab="clinics" data-i18n="tabClinics">عيادات RTS Clinic</button>
             <button class="tab-btn tab-btn-with-badge" type="button" data-tab="requests"><span data-i18n="tabRequests">الطلبات</span><b id="requests-badge" class="tab-badge hidden">0</b></button>
             <button class="tab-btn" type="button" data-tab="users" data-i18n="tabUsers">المشرفون</button>
             <button class="tab-btn" type="button" data-tab="password" data-i18n="tabPassword">كلمة المرور الخاصة بي</button>
@@ -129,6 +130,89 @@
                 </div>
                 <button id="settings-submit" class="primary-btn" type="submit" data-i18n="saveSettings">حفظ الإعدادات</button>
               </form>
+            </section>
+
+            <section id="tab-clinics" class="tab-panel hidden">
+              <div class="section-heading">
+                <div>
+                  <h2 data-i18n="tabClinics">عيادات RTS Clinic</h2>
+                  <p data-i18n="clinicsIntro">إنشاء عيادات RTS Clinic وإدارة الترخيص وحسابات الدخول الأولية.</p>
+                </div>
+                <button id="clinics-refresh" class="secondary-btn" type="button" data-i18n="refreshClinics">تحديث القائمة</button>
+              </div>
+
+              <form id="clinic-form" class="clinic-form" novalidate>
+                <h3 data-i18n="addClinicTitle">إضافة عيادة جديدة</h3>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="clinic-id" data-i18n="clinicIdLabel">معرّف العيادة</label>
+                    <input id="clinic-id" name="id" type="text" dir="ltr" maxlength="32" pattern="[a-z0-9-]+" placeholder="rts-amman" required />
+                    <small data-i18n="clinicIdHelp">أحرف إنجليزية صغيرة وأرقام وشرطات فقط.</small>
+                  </div>
+                  <div class="field">
+                    <label for="clinic-name" data-i18n="clinicNameLabel">اسم العيادة</label>
+                    <input id="clinic-name" name="name" type="text" maxlength="80" required />
+                  </div>
+                  <div class="field">
+                    <label for="clinic-warranty" data-i18n="warrantyLabel">مدة الترخيص بالأشهر</label>
+                    <input id="clinic-warranty" name="warrantyMonths" type="number" min="1" max="60" value="12" required />
+                  </div>
+                </div>
+
+                <fieldset class="clinic-user-fieldset">
+                  <legend data-i18n="clinicAdminTitle">حساب مدير العيادة</legend>
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="clinic-admin-username" data-i18n="usernameLabel">اسم المستخدم</label>
+                      <input id="clinic-admin-username" name="adminUsername" type="text" dir="ltr" maxlength="32" required />
+                    </div>
+                    <div class="field">
+                      <label for="clinic-admin-name" data-i18n="nameLabel">الاسم المعروض</label>
+                      <input id="clinic-admin-name" name="adminName" type="text" maxlength="80" required />
+                    </div>
+                    <div class="field field-full">
+                      <label for="clinic-admin-password" data-i18n="clinicPasswordLabel">كلمة مرور المدير</label>
+                      <input id="clinic-admin-password" name="adminPassword" type="password" minlength="12" maxlength="128" autocomplete="new-password" required />
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset class="clinic-user-fieldset">
+                  <legend data-i18n="clinicEmployeeTitle">حساب موظف العيادة</legend>
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="clinic-employee-username" data-i18n="usernameLabel">اسم المستخدم</label>
+                      <input id="clinic-employee-username" name="employeeUsername" type="text" dir="ltr" maxlength="32" required />
+                    </div>
+                    <div class="field">
+                      <label for="clinic-employee-name" data-i18n="nameLabel">الاسم المعروض</label>
+                      <input id="clinic-employee-name" name="employeeName" type="text" maxlength="80" required />
+                    </div>
+                    <div class="field field-full">
+                      <label for="clinic-employee-password" data-i18n="clinicPasswordLabel">كلمة مرور الموظف</label>
+                      <input id="clinic-employee-password" name="employeePassword" type="password" minlength="12" maxlength="128" autocomplete="new-password" required />
+                    </div>
+                  </div>
+                </fieldset>
+
+                <button id="clinic-submit" class="primary-btn" type="submit" data-i18n="createClinic">إنشاء العيادة</button>
+              </form>
+
+              <div class="table-wrap clinic-table-wrap">
+                <table>
+                  <caption class="sr-only" data-i18n="clinicsTableCaption">قائمة عيادات RTS Clinic</caption>
+                  <thead>
+                    <tr>
+                      <th data-i18n="clinicNameLabel">اسم العيادة</th>
+                      <th data-i18n="clinicIdLabel">المعرّف</th>
+                      <th data-i18n="warrantyStatusLabel">حالة الترخيص</th>
+                      <th data-i18n="actionsLabel">إجراءات</th>
+                    </tr>
+                  </thead>
+                  <tbody id="clinics-tbody"></tbody>
+                </table>
+              </div>
+              <p id="clinics-empty" class="empty-state hidden" data-i18n="noClinics">لا توجد عيادات مسجلة بعد.</p>
             </section>
 
             <section id="tab-requests" class="tab-panel hidden">

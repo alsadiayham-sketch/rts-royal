@@ -35,7 +35,9 @@ function usersPath(storeId) {
 
 async function loadStores() {
   const registry = await getFirestoreDocument(REGISTRY_PATH);
-  const stores = Array.isArray(registry?.stores) ? registry.stores : [];
+  const stores = (Array.isArray(registry?.stores) ? registry.stores : []).filter(
+    (store) => store.type !== "clinic"
+  );
   return Promise.all(
     stores.map(async (store) => {
       const licence = await getFirestoreDocument(licencePath(store.id));
