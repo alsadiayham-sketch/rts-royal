@@ -11,6 +11,7 @@ import {
 import { normalizeStoreId, normalizeStoreName } from "../_lib/pos-store-validation.js";
 import { enforceRateLimit } from "../_lib/rate-limit.js";
 import { normalizeUsername, validateNewPassword } from "../_lib/validation.js";
+import { assertUserStatusChangeAllowed } from "../_lib/user-rules.js";
 
 const REGISTRY_PATH = "projects/_global/settings/pos_stores";
 
@@ -53,6 +54,10 @@ function publicUser(user) {
   };
 }
 
+function validateRole(role) {
+  return role === "admin" || role === "worker" ? role : null;
+}
+
 export async function onRequestGet(context) {
   return withApiGuard(context, async ({ request }) => {
     await requireAuthenticatedUser(context, false);
@@ -80,23 +85,30 @@ export async function onRequestPost(context) {
     const username = normalizeUsername(payload.username);
     const name = normalizeStoreName(payload.name);
     const password = typeof payload.password === "string" ? payload.password : "";
-    const role = payload.role === "admin" || payload.role === "worker" ? payload.role : null;
+    const role = validateRole(payload.role);
     if (!storeId) throw new ApiError(400, "INVALID_STORE_ID", "Store ID is invalid.");
     await requireStandaloneStore(storeId);
     const legacyClinicPassword = storeId === "rts-testing" && password.length >= 8 && password.length <= 128;
-    if (!username || !name || !role || (!validateNewPassword(password) && !legacyClinicPassword)) {
+    if (!username || !name || !role) {
       throw new ApiError(400, "INVALID_POS_USER", "POS user details are invalid.");
     }
 
     const users = await getUsers(storeId);
     const index = users.findIndex((user) => user.username === username);
+    if (index < 0 && (!validateNewPassword(password) && !legacyClinicPassword)) {
+      throw new ApiError(400, "INVALID_POS_USER", "A password is required for a new user.");
+    }
+    if (index >= 0 && password && !validateNewPassword(password) && !legacyClinicPassword) {
+      throw new ApiError(400, "INVALID_POS_USER", "The password is invalid.");
+    }
+    const existing = index >= 0 ? users[index] : null;
     const nextUser = {
       username,
-      password,
+      password: password || existing?.password || "",
       name,
       displayName: name,
       role,
-      active: true,
+      active: existing?.active !== false,
     };
     if (index >= 0) users[index] = nextUser;
     else users.push(nextUser);
@@ -109,7 +121,7 @@ export async function onRequestPatch(context) {
   return withApiGuard(context, async ({ request }) => {
     requireTrustedMutationRequest(request);
     requireJsonContentType(request);
-    await requireStoreAdmin(context, "pos_store_users_status");
+    const actor = await requireStoreAdmin(context, "pos_store_users_status");
     const payload = await parseJsonBody(request, ["storeId", "username", "active"]);
     const storeId = normalizeStoreId(payload.storeId);
     const username = normalizeUsername(payload.username);
@@ -121,15 +133,45 @@ export async function onRequestPatch(context) {
     const users = await getUsers(storeId);
     const target = users.find((user) => user.username === username);
     if (!target) throw new ApiError(404, "POS_USER_NOT_FOUND", "POS user not found.");
-    if (
-      payload.active === false &&
-      target.role === "admin" &&
-      users.filter((user) => user.role === "admin" && user.active !== false).length <= 1
-    ) {
-      throw new ApiError(409, "LAST_POS_ADMIN_FORBIDDEN", "The last active POS admin cannot be disabled.");
-    }
+    assertUserStatusChangeAllowed({
+      actorUsername: actor.username,
+      targetUsername: username,
+      nextActive: payload.active,
+      targetCurrentlyActive: target.active !== false,
+      activeAdminCount: users.filter((user) => user.role === "admin" && user.active !== false).length,
+    });
     target.active = payload.active;
     await setFirestoreDocument(usersPath(storeId), { users });
     return jsonResponse({ ok: true, user: publicUser(target) });
+  });
+}
+
+export async function onRequestDelete(context) {
+  return withApiGuard(context, async ({ request }) => {
+    requireTrustedMutationRequest(request);
+    requireJsonContentType(request);
+    const actor = await requireStoreAdmin(context, "pos_store_users_delete");
+    const payload = await parseJsonBody(request, ["storeId", "username"]);
+    const storeId = normalizeStoreId(payload.storeId);
+    const username = normalizeUsername(payload.username);
+    if (!storeId || !username) {
+      throw new ApiError(400, "INVALID_POS_USER", "POS user details are invalid.");
+    }
+    await requireStandaloneStore(storeId);
+
+    const users = await getUsers(storeId);
+    const index = users.findIndex((user) => user.username === username);
+    if (index < 0) return jsonResponse({ ok: true });
+    const target = users[index];
+    if (actor.username === username) {
+      throw new ApiError(400, "SELF_DELETE_FORBIDDEN", "You cannot delete your own account.");
+    }
+    if (target.role === "admin" && target.active !== false &&
+        users.filter((user) => user.role === "admin" && user.active !== false).length <= 1) {
+      throw new ApiError(409, "LAST_POS_ADMIN_FORBIDDEN", "The last active POS admin cannot be deleted.");
+    }
+    users.splice(index, 1);
+    await setFirestoreDocument(usersPath(storeId), { users });
+    return jsonResponse({ ok: true });
   });
 }

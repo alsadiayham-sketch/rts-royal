@@ -39,7 +39,7 @@ export async function onRequestPost(context) {
     const username = normalizeUsername(payload.username);
     const password = typeof payload.password === "string" ? payload.password : "";
     if (!storeId || !username || !password) {
-      throw new ApiError(401, "AUTH_FAILED", "Invalid clinic username or password.");
+      throw new ApiError(401, "AUTH_FAILED", "Invalid tenant, username, or password.");
     }
 
     await enforceRateLimit(context, {
@@ -51,12 +51,12 @@ export async function onRequestPost(context) {
 
     const registry = await getFirestoreDocument(REGISTRY_PATH);
     const store = (Array.isArray(registry?.stores) ? registry.stores : []).find((item) => item.id === storeId);
-    if (!store) throw new ApiError(401, "AUTH_FAILED", "Invalid clinic username or password.");
+    if (!store) throw new ApiError(401, "AUTH_FAILED", "Invalid tenant, username, or password.");
 
     const licence = await getFirestoreDocument(licencePath(storeId));
     const warrantyEnd = licence?.warrantyEnd ? new Date(licence.warrantyEnd) : null;
     if (!warrantyEnd || Number.isNaN(warrantyEnd.getTime()) || warrantyEnd.getTime() <= Date.now()) {
-      throw new ApiError(403, "CLINIC_LICENCE_EXPIRED", "This clinic licence is inactive.");
+      throw new ApiError(403, "LICENCE_EXPIRED", "This tenant licence is inactive.");
     }
 
     const usersDocument = await getFirestoreDocument(usersPath(storeId));
@@ -64,7 +64,7 @@ export async function onRequestPost(context) {
       (candidate) => candidate.username === username
     );
     if (!user || user.active === false || user.password !== password) {
-      throw new ApiError(401, "AUTH_FAILED", "Invalid clinic username or password.");
+      throw new ApiError(401, "AUTH_FAILED", "Invalid tenant, username, or password.");
     }
 
     const role = user.role === "admin" ? "admin" : "worker";

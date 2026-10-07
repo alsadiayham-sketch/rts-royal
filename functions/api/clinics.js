@@ -88,6 +88,7 @@ export async function onRequestPost(context) {
       "adminUsername",
       "adminName",
       "adminPassword",
+      "initialUsers",
       "employeeUsername",
       "employeeName",
       "employeePassword",
@@ -97,21 +98,52 @@ export async function onRequestPost(context) {
     const name = normalizeStoreName(payload.name);
     const warrantyMonths = normalizeWarrantyMonths(payload.warrantyMonths);
     const adminUsername = normalizeUsername(payload.adminUsername);
-    const employeeUsername = normalizeUsername(payload.employeeUsername);
     const adminName = normalizeStoreName(payload.adminName);
-    const employeeName = normalizeStoreName(payload.employeeName);
     const adminPassword = typeof payload.adminPassword === "string" ? payload.adminPassword : "";
-    const employeePassword = typeof payload.employeePassword === "string" ? payload.employeePassword : "";
-
-    if (
-      !id ||
-      !name ||
-      !warrantyMonths ||
-      !validateClinicUser(adminUsername, adminName, adminPassword) ||
-      !validateClinicUser(employeeUsername, employeeName, employeePassword) ||
-      adminUsername === employeeUsername
-    ) {
+    if (!id || !name || !warrantyMonths || !validateClinicUser(adminUsername, adminName, adminPassword)) {
       throw new ApiError(400, "INVALID_CLINIC", "Clinic details or initial users are invalid.");
+    }
+
+    const suppliedUsers = Array.isArray(payload.initialUsers)
+      ? payload.initialUsers
+      : payload.employeeUsername || payload.employeeName || payload.employeePassword
+        ? [{
+            username: payload.employeeUsername,
+            name: payload.employeeName,
+            password: payload.employeePassword,
+            role: "worker",
+          }]
+        : [];
+    if (suppliedUsers.length > 20) {
+      throw new ApiError(400, "INVALID_CLINIC_USERS", "A clinic can start with at most 20 users.");
+    }
+
+    const users = [{
+      username: adminUsername,
+      password: adminPassword,
+      name: adminName,
+      displayName: adminName,
+      role: "admin",
+      active: true,
+    }];
+    const usernames = new Set([adminUsername]);
+    for (const candidate of suppliedUsers) {
+      const username = normalizeUsername(candidate?.username);
+      const userName = normalizeStoreName(candidate?.name);
+      const password = typeof candidate?.password === "string" ? candidate.password : "";
+      const role = candidate?.role === "admin" || candidate?.role === "worker" ? candidate.role : "worker";
+      if (!validateClinicUser(username, userName, password) || usernames.has(username)) {
+        throw new ApiError(400, "INVALID_CLINIC_USERS", "Initial clinic users are invalid or duplicated.");
+      }
+      usernames.add(username);
+      users.push({
+        username,
+        password,
+        name: userName,
+        displayName: userName,
+        role,
+        active: true,
+      });
     }
 
     const registry = await getFirestoreDocument(REGISTRY_PATH);
@@ -129,24 +161,7 @@ export async function onRequestPost(context) {
       dataBackend: "firestore",
     });
     await setFirestoreDocument(usersPath(id), {
-      users: [
-        {
-          username: adminUsername,
-          password: adminPassword,
-          name: adminName,
-          displayName: adminName,
-          role: "admin",
-          active: true,
-        },
-        {
-          username: employeeUsername,
-          password: employeePassword,
-          name: employeeName,
-          displayName: employeeName,
-          role: "worker",
-          active: true,
-        },
-      ],
+      users,
     });
 
     stores.push({

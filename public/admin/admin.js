@@ -114,7 +114,10 @@ const I18N = {
     clinicIdHelp: "أحرف إنجليزية صغيرة وأرقام وشرطات فقط.",
     clinicNameLabel: "اسم العيادة",
     clinicAdminTitle: "حساب مدير العيادة",
-    clinicEmployeeTitle: "حساب موظف العيادة",
+    clinicUsersTitle: "حسابات موظفي العيادة (اختياري)",
+    clinicUsersHelp: "يمكنك إنشاء العيادة بمدير فقط، أو إضافة عدة موظفين ومديرين الآن. يمكن تعديلهم لاحقاً.",
+    addClinicUser: "إضافة مستخدم",
+    removeClinicUser: "حذف المستخدم",
     clinicPasswordLabel: "كلمة مرور العيادة",
     createClinic: "إنشاء العيادة",
     clinicsTableCaption: "قائمة عيادات RTS Clinic",
@@ -137,6 +140,9 @@ const I18N = {
     roleAdmin: "مدير",
     saveStoreUser: "حفظ المستخدم",
     storeUserSaved: "تم حفظ مستخدم المتجر.",
+    storeUserDeleted: "تم حذف مستخدم المتجر.",
+    editStoreUser: "تعديل",
+    deleteStoreUser: "حذف",
     storeUsersContext: "إدارة حسابات",
     confirmStoreUserDeactivate: "تعطيل هذا المستخدم؟ لن يتمكن من تسجيل الدخول إلى RTS Business.",
     active: "نشط",
@@ -276,7 +282,10 @@ const I18N = {
     clinicIdHelp: "Lowercase English letters, numbers, and hyphens only.",
     clinicNameLabel: "Clinic Name",
     clinicAdminTitle: "Clinic Admin Account",
-    clinicEmployeeTitle: "Clinic Staff Account",
+    clinicUsersTitle: "Clinic staff accounts (optional)",
+    clinicUsersHelp: "Create the clinic with an administrator only, or add multiple staff and managers now. You can edit them later.",
+    addClinicUser: "Add user",
+    removeClinicUser: "Remove user",
     clinicPasswordLabel: "Clinic Password",
     createClinic: "Create Clinic",
     clinicsTableCaption: "RTS Clinic list",
@@ -299,6 +308,9 @@ const I18N = {
     roleAdmin: "Manager",
     saveStoreUser: "Save User",
     storeUserSaved: "Store user saved.",
+    storeUserDeleted: "Store user deleted.",
+    editStoreUser: "Edit",
+    deleteStoreUser: "Delete",
     storeUsersContext: "Managing accounts for",
     confirmStoreUserDeactivate: "Deactivate this user? They will no longer be able to sign in to RTS Business.",
     active: "Active",
@@ -342,6 +354,8 @@ let state = {
   clinicsLoaded: false,
   currentStore: null,
   storeUsers: [],
+  editingStoreUsername: "",
+  clinicInitialUsers: [],
   pending: new Set(),
 };
 
@@ -374,6 +388,8 @@ const els = {
   storesRefresh: document.getElementById("stores-refresh"),
   clinicForm: document.getElementById("clinic-form"),
   clinicSubmit: document.getElementById("clinic-submit"),
+  clinicInitialUsers: document.getElementById("clinic-initial-users"),
+  clinicAddUser: document.getElementById("clinic-add-user"),
   clinicsRefresh: document.getElementById("clinics-refresh"),
   requestsRefresh: document.getElementById("requests-refresh"),
   requestsList: document.getElementById("requests-list"),
@@ -790,6 +806,42 @@ function moveHeroSlide(index, direction) {
   renderHeroSlidesEditor();
 }
 
+function renderClinicInitialUsers() {
+  if (!els.clinicInitialUsers) return;
+  els.clinicInitialUsers.textContent = "";
+  state.clinicInitialUsers.forEach((user, index) => {
+    const row = document.createElement("div");
+    row.className = "clinic-initial-user form-grid";
+    row.innerHTML = `
+      <div class="field"><label>${t("usernameLabel")}</label><input data-user-field="username" type="text" dir="ltr" maxlength="32" required /></div>
+      <div class="field"><label>${t("nameLabel")}</label><input data-user-field="name" type="text" maxlength="80" required /></div>
+      <div class="field"><label>${t("roleLabel")}</label><select data-user-field="role"><option value="worker">${t("roleWorker")}</option><option value="admin">${t("roleAdmin")}</option></select></div>
+      <div class="field"><label>${t("newPasswordLabel")}</label><input data-user-field="password" type="password" minlength="12" maxlength="128" autocomplete="new-password" required /></div>
+      <button class="secondary-btn compact-btn danger-btn" type="button" data-remove-clinic-user>${t("removeClinicUser")}</button>
+    `;
+    row.querySelector('[data-user-field="username"]').value = user.username || "";
+    row.querySelector('[data-user-field="name"]').value = user.name || "";
+    row.querySelector('[data-user-field="role"]').value = user.role || "worker";
+    row.querySelector('[data-user-field="password"]').value = user.password || "";
+    row.querySelectorAll("[data-user-field]").forEach((input) => {
+      const update = () => { user[input.dataset.userField] = input.value; };
+      input.addEventListener("input", update);
+      input.addEventListener("change", update);
+    });
+    row.querySelector("[data-remove-clinic-user]").addEventListener("click", () => {
+      state.clinicInitialUsers.splice(index, 1);
+      renderClinicInitialUsers();
+    });
+    els.clinicInitialUsers.append(row);
+  });
+}
+
+function addClinicInitialUser() {
+  if (state.clinicInitialUsers.length >= 20) return;
+  state.clinicInitialUsers.push({ username: "", name: "", role: "worker", password: "" });
+  renderClinicInitialUsers();
+}
+
 function renderStoreUsersTable() {
   els.storeUsersTbody.textContent = "";
   for (const user of state.storeUsers) {
@@ -807,14 +859,37 @@ function renderStoreUsersTable() {
     status.textContent = user.active ? t("active") : t("inactive");
     statusCell.append(status);
     const actionCell = document.createElement("td");
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "secondary-btn compact-btn";
+    edit.textContent = t("editStoreUser");
+    edit.addEventListener("click", () => beginEditStoreUser(user));
+    actionCell.append(edit);
     const toggle = document.createElement("button");
     toggle.type = "button";
     toggle.className = "secondary-btn compact-btn";
     toggle.textContent = user.active ? t("deactivate") : t("activate");
     toggle.addEventListener("click", () => toggleStoreUser(user));
     actionCell.append(toggle);
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "secondary-btn compact-btn danger-btn";
+    remove.textContent = t("deleteStoreUser");
+    remove.addEventListener("click", () => deleteStoreUser(user));
+    actionCell.append(remove);
     row.append(usernameCell, nameCell, roleCell, statusCell, actionCell);
     els.storeUsersTbody.append(row);
+  }
+
+  function beginEditStoreUser(user) {
+    state.editingStoreUsername = user.username;
+    els.storeUserForm.elements.username.value = user.username;
+    els.storeUserForm.elements.username.readOnly = true;
+    els.storeUserForm.elements.name.value = user.name;
+    els.storeUserForm.elements.role.value = user.role;
+    els.storeUserForm.elements.password.value = "";
+    els.storeUserForm.elements.password.required = false;
+    els.storeUserForm.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 }
 
@@ -845,7 +920,10 @@ async function openStoreUsers(store) {
 function closeStoreUsers() {
   state.currentStore = null;
   state.storeUsers = [];
+  state.editingStoreUsername = "";
   els.storeUserForm.reset();
+  els.storeUserForm.elements.username.readOnly = false;
+  els.storeUserForm.elements.password.required = true;
   els.storeUsersPanel.classList.add("hidden");
 }
 
@@ -881,6 +959,9 @@ async function handleStoreUserSave(event) {
       body: JSON.stringify(payload),
     });
     els.storeUserForm.reset();
+    els.storeUserForm.elements.username.readOnly = false;
+    els.storeUserForm.elements.password.required = true;
+    state.editingStoreUsername = "";
     await loadStoreUsers();
     showStatus(t("storeUserSaved"));
   } catch (error) {
@@ -888,6 +969,27 @@ async function handleStoreUserSave(event) {
   } finally {
     setPending("store-user-save", false, submit);
     document.getElementById("store-user-password").value = "";
+  }
+
+  async function deleteStoreUser(user) {
+    clearMessages();
+    if (!state.currentStore || !window.confirm(`${t("deleteStoreUser")}?`)) return;
+    const key = `store-user-delete-${user.username}`;
+    if (state.pending.has(key)) return;
+    state.pending.add(key);
+    try {
+      await apiFetch("/api/pos-store-users", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storeId: state.currentStore.id, username: user.username }),
+      });
+      await loadStoreUsers();
+      showStatus(t("storeUserDeleted"));
+    } catch (error) {
+      showAlert(error.message);
+    } finally {
+      state.pending.delete(key);
+    }
   }
 }
 
@@ -1130,6 +1232,10 @@ async function handleCreateClinic(event) {
   if (state.pending.has("create-clinic")) return;
   const payload = Object.fromEntries(new FormData(els.clinicForm).entries());
   payload.warrantyMonths = Number(payload.warrantyMonths);
+  payload.initialUsers = state.clinicInitialUsers.map((user) => ({ ...user }));
+  delete payload.employeeUsername;
+  delete payload.employeeName;
+  delete payload.employeePassword;
   setPending("create-clinic", true, els.clinicSubmit);
   try {
     await apiFetch("/api/clinics", {
@@ -1139,6 +1245,8 @@ async function handleCreateClinic(event) {
     });
     els.clinicForm.reset();
     document.getElementById("clinic-warranty").value = "12";
+    state.clinicInitialUsers = [];
+    renderClinicInitialUsers();
     clearSensitiveInputs();
     await loadClinics();
     showStatus(t("clinicCreated"));
@@ -1230,6 +1338,7 @@ function updateLanguageUi() {
   renderContentEditor();
   renderShowcaseEditor();
   renderHeroSlidesEditor();
+  renderClinicInitialUsers();
   if (state.currentStore) {
     els.storeUsersTitle.textContent = `${t("manageStoreUsers")} · ${state.currentStore.name}`;
     els.storeUsersContext.textContent = `${t("storeUsersContext")} ${state.currentStore.id}`;
@@ -1774,6 +1883,7 @@ function initForms() {
   els.heroSlideAdd.addEventListener("click", addHeroSlide);
   els.storeForm.addEventListener("submit", handleCreateStore);
   els.clinicForm.addEventListener("submit", handleCreateClinic);
+  els.clinicAddUser.addEventListener("click", addClinicInitialUser);
   els.storeUserForm.addEventListener("submit", handleStoreUserSave);
   els.storeUsersClose.addEventListener("click", closeStoreUsers);
   els.storeBackend.addEventListener("change", syncStoreBackendFields);

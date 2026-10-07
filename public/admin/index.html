@@ -178,21 +178,10 @@
                 </fieldset>
 
                 <fieldset class="clinic-user-fieldset">
-                  <legend data-i18n="clinicEmployeeTitle">حساب موظف العيادة</legend>
-                  <div class="form-grid">
-                    <div class="field">
-                      <label for="clinic-employee-username" data-i18n="usernameLabel">اسم المستخدم</label>
-                      <input id="clinic-employee-username" name="employeeUsername" type="text" dir="ltr" maxlength="32" required />
-                    </div>
-                    <div class="field">
-                      <label for="clinic-employee-name" data-i18n="nameLabel">الاسم المعروض</label>
-                      <input id="clinic-employee-name" name="employeeName" type="text" maxlength="80" required />
-                    </div>
-                    <div class="field field-full">
-                      <label for="clinic-employee-password" data-i18n="clinicPasswordLabel">كلمة مرور الموظف</label>
-                      <input id="clinic-employee-password" name="employeePassword" type="password" minlength="12" maxlength="128" autocomplete="new-password" required />
-                    </div>
-                  </div>
+                  <legend data-i18n="clinicUsersTitle">حسابات موظفي العيادة (اختياري)</legend>
+                  <p class="backend-note" data-i18n="clinicUsersHelp">يمكنك إنشاء العيادة بمدير فقط، أو إضافة عدة موظفين ومديرين الآن. يمكن تعديلهم لاحقاً.</p>
+                  <div id="clinic-initial-users" class="clinic-initial-users"></div>
+                  <button id="clinic-add-user" class="secondary-btn compact-btn" type="button" data-i18n="addClinicUser">إضافة مستخدم</button>
                 </fieldset>
 
                 <button id="clinic-submit" class="primary-btn" type="submit" data-i18n="createClinic">إنشاء العيادة</button>

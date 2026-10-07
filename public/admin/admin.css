@@ -669,6 +669,23 @@ th {
   font-weight: 700;
 }
 
+.clinic-initial-users {
+  display: grid;
+  gap: 0.9rem;
+  margin-bottom: 0.9rem;
+}
+
+.clinic-initial-user {
+  align-items: end;
+  padding: 0.9rem;
+  border: 1px solid var(--border);
+  background: var(--surface-muted, #f7fafb);
+}
+
+.clinic-initial-user .danger-btn {
+  justify-self: start;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
