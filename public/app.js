@@ -948,7 +948,6 @@ async function loadSettings() {
     if (!response.ok) throw new Error("Settings unavailable");
     const settings = await response.json();
     applySiteContent(settings.content);
-    if (downloadLink && !isAllowedDownloadUrl(settings.downloadUrl)) throw new Error("Invalid download URL");
     if (typeof settings.whatsappNumber !== "string" || !PHONE_DIGITS_REGEX.test(settings.whatsappNumber)) throw new Error("Invalid contact number");
     if (downloadLink) {
       downloadLink.href = "/download/rts-business";
