@@ -630,6 +630,11 @@ a:focus-visible {
   display: none !important;
 }
 
+.status-message:empty,
+.alert-message:empty {
+  display: none;
+}
+
 .table-wrap {
   overflow-x: auto;
   border: 1px solid var(--border);

@@ -482,6 +482,9 @@ let state = {
   pending: new Set(),
 };
 
+let statusTimer = null;
+let alertTimer = null;
+
 const els = {
   html: document.documentElement,
   loginPanel: document.getElementById("login-panel"),
@@ -1444,22 +1447,42 @@ async function updateClinicLicence(clinic, action) {
 }
 
 function clearMessages() {
+  if (statusTimer) {
+    clearTimeout(statusTimer);
+    statusTimer = null;
+  }
+  if (alertTimer) {
+    clearTimeout(alertTimer);
+    alertTimer = null;
+  }
   els.globalStatus.textContent = "";
   els.globalAlert.textContent = "";
   els.globalStatus.classList.add("hidden");
   els.globalAlert.classList.add("hidden");
 }
 
-function showStatus(message) {
+function showStatus(message, duration = 4000) {
   if (!message) return;
   els.globalStatus.textContent = message;
   els.globalStatus.classList.remove("hidden");
+  if (statusTimer) clearTimeout(statusTimer);
+  statusTimer = setTimeout(() => {
+    els.globalStatus.textContent = "";
+    els.globalStatus.classList.add("hidden");
+    statusTimer = null;
+  }, duration);
 }
 
-function showAlert(message) {
+function showAlert(message, duration = 7000) {
   if (!message) return;
   els.globalAlert.textContent = message;
   els.globalAlert.classList.remove("hidden");
+  if (alertTimer) clearTimeout(alertTimer);
+  alertTimer = setTimeout(() => {
+    els.globalAlert.textContent = "";
+    els.globalAlert.classList.add("hidden");
+    alertTimer = null;
+  }, duration);
 }
 
 function updateLanguageUi() {
@@ -1586,22 +1609,22 @@ function switchTab(name) {
   }
 
   if (name === "settings") {
-    els.settingsWhatsapp.focus();
+    els.settingsWhatsapp?.focus();
   } else if (name === "users") {
-    document.getElementById("add-username").focus();
+    document.getElementById("add-username")?.focus();
   } else if (name === "stores") {
-    document.getElementById("store-id").focus();
+    document.getElementById("store-id")?.focus();
     if (!state.storesLoaded) loadStores().catch((error) => showAlert(error.message));
   } else if (name === "clinics") {
-    document.getElementById("clinic-id").focus();
+    document.getElementById("clinic-id")?.focus();
     if (!state.clinicsLoaded) loadClinics().catch((error) => showAlert(error.message));
   } else if (name === "requests") {
     loadRequests().catch((error) => showAlert(error.message));
   } else if (name === "credits") {
-    els.creditSearch.focus();
+    els.creditSearch?.focus();
     if (!state.creditsLoaded) loadCredits().catch((error) => showAlert(error.message));
   } else if (name === "password") {
-    document.getElementById("current-password").focus();
+    document.getElementById("current-password")?.focus();
   }
 }
 
@@ -1995,30 +2018,30 @@ async function handleCreditAllocation(event) {
   } finally {
     setPending("credit-allocation", false, document.getElementById("allocation-submit"));
   }
+}
 
-  async function handleCreditUsage(event) {
-    event.preventDefault();
-    clearMessages();
-    if (state.pending.has("credit-usage")) return;
-    setPending("credit-usage", true, document.getElementById("usage-submit"));
-    try {
-      const payload = Object.fromEntries(new FormData(els.creditUsageForm).entries());
-      payload.entryType = "usage";
-      payload.messageAmount = Number(payload.messageAmount || 0);
-      payload.moneyAmountNis = "0";
-      await apiFetch("/api/credits", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      els.creditUsageForm.reset();
-      await loadCredits();
-      showStatus(t("usageRecorded"));
-    } catch (error) {
-      showAlert(error.message);
-    } finally {
-      setPending("credit-usage", false, document.getElementById("usage-submit"));
-    }
+async function handleCreditUsage(event) {
+  event.preventDefault();
+  clearMessages();
+  if (state.pending.has("credit-usage")) return;
+  setPending("credit-usage", true, document.getElementById("usage-submit"));
+  try {
+    const payload = Object.fromEntries(new FormData(els.creditUsageForm).entries());
+    payload.entryType = "usage";
+    payload.messageAmount = Number(payload.messageAmount || 0);
+    payload.moneyAmountNis = "0";
+    await apiFetch("/api/credits", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    els.creditUsageForm.reset();
+    await loadCredits();
+    showStatus(t("usageRecorded"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    setPending("credit-usage", false, document.getElementById("usage-submit"));
   }
 }
 
@@ -2348,8 +2371,8 @@ function initForms() {
   els.logoutBtn.addEventListener("click", handleLogout);
 }
 
-initForms();
 initTabs();
+initForms();
 initLanguageToggle();
 wirePasswordToggleButtons();
 syncStoreBackendFields();
