@@ -1,13 +1,17 @@
 const I18N = {
   ar: {
+    sessionLoading: "جارٍ استعادة جلسة العمل...",
     dir: "rtl",
     skipLink: "تخطي إلى المحتوى",
     phoneHelp: "أدخل رمز الدولة ورقم الهاتف. يسري التغيير على وسائل التواصل في الموقع.",
     sectionsLabel: "أقسام الإدارة",
     appTitle: "لوحة إدارة RTS",
-    appSubtitle: "إدارة العمل ومتاجر RTS Business والمشرفين",
+    appSubtitle: "مساحة عمليات RTS المركزية",
     backToWebsite: "العودة إلى الموقع",
     loginTitle: "تسجيل الدخول",
+    loginIntro: "وصول آمن لإدارة محتوى RTS والعملاء والتراخيص.",
+    loginWelcome: "مرحباً بعودتك",
+    loginHelp: "سجّل الدخول للمتابعة إلى مساحة العمليات.",
     usernameLabel: "اسم المستخدم",
     passwordLabel: "كلمة المرور",
     showPassword: "إظهار",
@@ -20,6 +24,19 @@ const I18N = {
     tabCredits: "الأرصدة",
     tabUsers: "المشرفون",
     tabPassword: "كلمة المرور الخاصة بي",
+    tabOverview: "نظرة عامة",
+    settingsIntro: "إدارة معلومات الموقع والمحتوى ووسائط العرض العامة.",
+    adminsIntro: "إدارة حسابات الوصول إلى مساحة عمليات RTS.",
+    passwordIntro: "حدّث كلمة المرور الخاصة بحسابك الحالي.",
+    navWorkspace: "مساحة العمل",
+    navOperations: "العمليات",
+    navAccess: "الوصول",
+    overviewEyebrow: "لوحة العمليات",
+    overviewIntro: "ملخص حي من البيانات التي تم تحميلها في هذه الجلسة.",
+    overviewAdmins: "المشرفون النشطون",
+    overviewRequests: "الطلبات التي تحتاج إجراء",
+    overviewStores: "متاجر تم تحميلها",
+    overviewClinics: "عيادات تم تحميلها",
     logoutButton: "تسجيل الخروج",
     whatsappLabel: "رقم واتساب",
     downloadLabel: "رابط تحميل برنامج POS",
@@ -226,14 +243,18 @@ const I18N = {
     unexpectedError: "حدث خطأ غير متوقع.",
   },
   en: {
+    sessionLoading: "Restoring your workspace...",
     dir: "ltr",
     skipLink: "Skip to content",
     phoneHelp: "Include the country code. Changes apply to the website's contact options.",
     sectionsLabel: "Admin sections",
     appTitle: "RTS Admin Panel",
-    appSubtitle: "Manage business settings, RTS Business stores, and administrators",
+    appSubtitle: "RTS central operations workspace",
     backToWebsite: "Back to Website",
     loginTitle: "Sign In",
+    loginIntro: "Secure access to RTS content, customers, and licence operations.",
+    loginWelcome: "Welcome back",
+    loginHelp: "Sign in to continue to the operations workspace.",
     usernameLabel: "Username",
     passwordLabel: "Password",
     showPassword: "Show",
@@ -246,6 +267,19 @@ const I18N = {
     tabCredits: "Credits",
     tabUsers: "Admins",
     tabPassword: "My Password",
+    tabOverview: "Overview",
+    settingsIntro: "Manage website information, public content, and presentation media.",
+    adminsIntro: "Manage access accounts for the RTS operations workspace.",
+    passwordIntro: "Update the password for your current account.",
+    navWorkspace: "Workspace",
+    navOperations: "Operations",
+    navAccess: "Access",
+    overviewEyebrow: "Operations dashboard",
+    overviewIntro: "A live summary of data loaded in this session.",
+    overviewAdmins: "Active admins",
+    overviewRequests: "Requests needing action",
+    overviewStores: "Loaded stores",
+    overviewClinics: "Loaded clinics",
     logoutButton: "Logout",
     whatsappLabel: "WhatsApp Number",
     downloadLabel: "POS Download URL",
@@ -453,16 +487,38 @@ const I18N = {
   },
 };
 
+const PREFERENCES_KEY = "rts-admin-preferences";
+function readPreferences() {
+  try {
+    const value = JSON.parse(localStorage.getItem(PREFERENCES_KEY) || "{}");
+    return {
+      lang: value.lang === "en" ? "en" : "ar",
+      section: ["overview", "settings", "stores", "clinics", "requests", "credits", "users", "password"].includes(value.section) ? value.section : "overview",
+    };
+  } catch {
+    return { lang: "ar", section: "overview" };
+  }
+}
+function savePreferences() {
+  try {
+    localStorage.setItem(PREFERENCES_KEY, JSON.stringify({ lang: state.lang, section: state.currentSection }));
+  } catch {}
+}
+const preferences = readPreferences();
 let state = {
-  lang: "ar",
+  lang: preferences.lang,
+  currentSection: preferences.section,
   currentUser: null,
   passwordChangeRecommended: false,
   users: [],
+  usersLoaded: false,
   settings: null,
+  settingsLoaded: false,
   homepageContent: { ceoName: "", ceoMessage: "", feedbacks: [] },
   heroSlides: [],
   showcases: { websites: [], applications: [], business: [], clinic: [] },
   requests: [],
+  requestsLoaded: false,
   requestCounts: { new: 0, actionable: 0 },
   credits: {
     settings: { defaultMessageBalance: 500, customerPriceNis: 0.2, platformCostNis: 0.1 },
@@ -480,10 +536,10 @@ let state = {
   editingStoreUsername: "",
   clinicInitialUsers: [],
   pending: new Set(),
+  loading: {},
 };
 
 let statusTimer = null;
-let alertTimer = null;
 
 const els = {
   html: document.documentElement,
@@ -512,12 +568,15 @@ const els = {
   storeBackend: document.getElementById("store-backend"),
   storeSubmit: document.getElementById("store-submit"),
   storesRefresh: document.getElementById("stores-refresh"),
+  storesSearch: document.getElementById("stores-search"),
   clinicForm: document.getElementById("clinic-form"),
   clinicSubmit: document.getElementById("clinic-submit"),
   clinicInitialUsers: document.getElementById("clinic-initial-users"),
   clinicAddUser: document.getElementById("clinic-add-user"),
   clinicsRefresh: document.getElementById("clinics-refresh"),
+  clinicsSearch: document.getElementById("clinics-search"),
   requestsRefresh: document.getElementById("requests-refresh"),
+  requestsSearch: document.getElementById("requests-search"),
   requestsList: document.getElementById("requests-list"),
   requestsEmpty: document.getElementById("requests-empty"),
   requestsBadge: document.getElementById("requests-badge"),
@@ -558,9 +617,14 @@ const els = {
   storeUserForm: document.getElementById("store-user-form"),
   storeUsersClose: document.getElementById("store-users-close"),
   usersTbody: document.getElementById("users-tbody"),
+  usersSearch: document.getElementById("users-search"),
   addUserForm: document.getElementById("add-user-form"),
   passwordForm: document.getElementById("password-form"),
   langToggle: document.getElementById("lang-toggle"),
+  mobileNavToggle: document.getElementById("mobile-nav-toggle"),
+  adminNavigation: document.getElementById("admin-navigation"),
+  currentUser: document.getElementById("current-user"),
+  overviewMetrics: document.getElementById("overview-metrics"),
   tabButtons: Array.from(document.querySelectorAll(".tab-btn")),
 };
 
@@ -1123,25 +1187,26 @@ async function handleStoreUserSave(event) {
     document.getElementById("store-user-password").value = "";
   }
 
-  async function deleteStoreUser(user) {
-    clearMessages();
-    if (!state.currentStore || !window.confirm(`${t("deleteStoreUser")}?`)) return;
-    const key = `store-user-delete-${user.username}`;
-    if (state.pending.has(key)) return;
-    state.pending.add(key);
-    try {
-      await apiFetch("/api/pos-store-users", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ storeId: state.currentStore.id, username: user.username }),
-      });
-      await loadStoreUsers();
-      showStatus(t("storeUserDeleted"));
-    } catch (error) {
-      showAlert(error.message);
-    } finally {
-      state.pending.delete(key);
-    }
+}
+
+async function deleteStoreUser(user) {
+  clearMessages();
+  if (!state.currentStore || !window.confirm(`${t("deleteStoreUser")}?`)) return;
+  const key = `store-user-delete-${user.username}`;
+  if (state.pending.has(key)) return;
+  state.pending.add(key);
+  try {
+    await apiFetch("/api/pos-store-users", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ storeId: state.currentStore.id, username: user.username }),
+    });
+    await loadStoreUsers();
+    showStatus(t("storeUserDeleted"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    state.pending.delete(key);
   }
 }
 
@@ -1173,9 +1238,11 @@ async function toggleStoreUser(user) {
 function renderStoresTable() {
   if (!els.storesTbody) return;
   els.storesTbody.textContent = "";
-  els.storesEmpty.classList.toggle("hidden", state.stores.length !== 0);
+  const query = els.storesSearch?.value.trim().toLocaleLowerCase() || "";
+  const stores = state.stores.filter((item) => `${item.id} ${item.name} ${item.backend}`.toLocaleLowerCase().includes(query));
+  els.storesEmpty.classList.toggle("hidden", stores.length !== 0);
   const now = Date.now();
-  for (const store of state.stores) {
+  for (const store of stores) {
     const row = document.createElement("tr");
     const nameCell = document.createElement("td");
     nameCell.textContent = store.name;
@@ -1242,10 +1309,16 @@ function syncStoreBackendFields() {
 }
 
 async function loadStores() {
-  const data = await apiFetch("/api/pos-stores");
-  state.stores = data.stores || [];
-  state.storesLoaded = true;
-  renderStoresTable();
+  setDatasetLoading("stores", true);
+  try {
+    const data = await apiFetch("/api/pos-stores");
+    state.stores = data.stores || [];
+    state.storesLoaded = true;
+    renderStoresTable();
+    renderOverview();
+  } finally {
+    setDatasetLoading("stores", false);
+  }
 }
 
 async function handleCreateStore(event) {
@@ -1276,6 +1349,7 @@ async function handleCreateStore(event) {
     syncStoreBackendFields();
     clearSensitiveInputs();
     await loadStores();
+    els.storeForm.closest("details")?.removeAttribute("open");
     showStatus(t("storeCreated"));
   } catch (error) {
     showAlert(error.message);
@@ -1324,9 +1398,11 @@ async function updateStoreLicence(store, action) {
 function renderClinicsTable() {
   if (!els.clinicsTbody) return;
   els.clinicsTbody.textContent = "";
-  els.clinicsEmpty.classList.toggle("hidden", state.clinics.length !== 0);
+  const query = els.clinicsSearch?.value.trim().toLocaleLowerCase() || "";
+  const clinics = state.clinics.filter((item) => `${item.id} ${item.name}`.toLocaleLowerCase().includes(query));
+  els.clinicsEmpty.classList.toggle("hidden", clinics.length !== 0);
   const now = Date.now();
-  for (const clinic of state.clinics) {
+  for (const clinic of clinics) {
     const row = document.createElement("tr");
     const nameCell = document.createElement("td");
     nameCell.textContent = clinic.name;
@@ -1372,10 +1448,16 @@ function renderClinicsTable() {
 }
 
 async function loadClinics() {
-  const data = await apiFetch("/api/clinics");
-  state.clinics = data.clinics || [];
-  state.clinicsLoaded = true;
-  renderClinicsTable();
+  setDatasetLoading("clinics", true);
+  try {
+    const data = await apiFetch("/api/clinics");
+    state.clinics = data.clinics || [];
+    state.clinicsLoaded = true;
+    renderClinicsTable();
+    renderOverview();
+  } finally {
+    setDatasetLoading("clinics", false);
+  }
 }
 
 async function handleCreateClinic(event) {
@@ -1401,6 +1483,7 @@ async function handleCreateClinic(event) {
     renderClinicInitialUsers();
     clearSensitiveInputs();
     await loadClinics();
+    els.clinicForm.closest("details")?.removeAttribute("open");
     showStatus(t("clinicCreated"));
   } catch (error) {
     showAlert(error.message);
@@ -1451,10 +1534,6 @@ function clearMessages() {
     clearTimeout(statusTimer);
     statusTimer = null;
   }
-  if (alertTimer) {
-    clearTimeout(alertTimer);
-    alertTimer = null;
-  }
   els.globalStatus.textContent = "";
   els.globalAlert.textContent = "";
   els.globalStatus.classList.add("hidden");
@@ -1473,16 +1552,22 @@ function showStatus(message, duration = 4000) {
   }, duration);
 }
 
-function showAlert(message, duration = 7000) {
+function showAlert(message) {
   if (!message) return;
-  els.globalAlert.textContent = message;
-  els.globalAlert.classList.remove("hidden");
-  if (alertTimer) clearTimeout(alertTimer);
-  alertTimer = setTimeout(() => {
+  els.globalAlert.textContent = "";
+  const text = document.createElement("span");
+  text.textContent = message;
+  const dismiss = document.createElement("button");
+  dismiss.type = "button";
+  dismiss.className = "alert-dismiss";
+  dismiss.setAttribute("aria-label", state.lang === "ar" ? "إغلاق التنبيه" : "Dismiss alert");
+  dismiss.textContent = "×";
+  dismiss.addEventListener("click", () => {
     els.globalAlert.textContent = "";
     els.globalAlert.classList.add("hidden");
-    alertTimer = null;
-  }, duration);
+  });
+  els.globalAlert.append(text, dismiss);
+  els.globalAlert.classList.remove("hidden");
 }
 
 function updateLanguageUi() {
@@ -1501,6 +1586,10 @@ function updateLanguageUi() {
   }
 
   els.langToggle.textContent = state.lang === "ar" ? "English" : "العربية";
+  els.mobileNavToggle?.setAttribute("aria-label", t("navWorkspace"));
+  if (state.currentUser) {
+    els.currentUser.textContent = `${t("welcome")} ${state.currentUser.name}`;
+  }
   for (const button of document.querySelectorAll(".toggle-password")) {
     const input = document.getElementById(button.dataset.target);
     button.textContent = input.type === "password" ? t("showPassword") : t("hidePassword");
@@ -1516,6 +1605,7 @@ function updateLanguageUi() {
   renderHeroSlidesEditor();
   renderClinicInitialUsers();
   renderCredits();
+  renderOverview();
   if (state.currentStore) {
     els.storeUsersTitle.textContent = `${t("manageStoreUsers")} · ${state.currentStore.name}`;
     els.storeUsersContext.textContent = `${t("storeUsersContext")} ${state.currentStore.id}`;
@@ -1601,22 +1691,30 @@ function setPending(key, active, button) {
 }
 
 function switchTab(name) {
+  state.currentSection = name;
+  savePreferences();
   for (const btn of els.tabButtons) {
     btn.classList.toggle("active", btn.dataset.tab === name);
+    btn.setAttribute("aria-current", btn.dataset.tab === name ? "page" : "false");
   }
   for (const panel of document.querySelectorAll(".tab-panel")) {
     panel.classList.toggle("hidden", panel.id !== `tab-${name}`);
   }
 
-  if (name === "settings") {
-    els.settingsWhatsapp?.focus();
+  if (name === "overview") {
+    renderOverview();
+  } else if (name === "settings") {
+    if (!state.settings) {
+      setSettingsFormEnabled(false);
+      loadSettings().catch((error) => showAlert(error.message));
+    } else {
+      els.settingsWhatsapp?.focus();
+    }
   } else if (name === "users") {
     document.getElementById("add-username")?.focus();
   } else if (name === "stores") {
-    document.getElementById("store-id")?.focus();
     if (!state.storesLoaded) loadStores().catch((error) => showAlert(error.message));
   } else if (name === "clinics") {
-    document.getElementById("clinic-id")?.focus();
     if (!state.clinicsLoaded) loadClinics().catch((error) => showAlert(error.message));
   } else if (name === "requests") {
     loadRequests().catch((error) => showAlert(error.message));
@@ -1626,6 +1724,41 @@ function switchTab(name) {
   } else if (name === "password") {
     document.getElementById("current-password")?.focus();
   }
+
+}
+
+function renderOverview() {
+  if (!els.overviewMetrics) return;
+  const metrics = [
+    [t("overviewAdmins"), state.usersLoaded ? state.users.filter((user) => user.active).length : "—"],
+    [t("overviewRequests"), state.requestsLoaded ? state.requestCounts.actionable || 0 : "—"],
+    [t("overviewStores"), state.storesLoaded ? state.stores.length : "—"],
+    [t("overviewClinics"), state.clinicsLoaded ? state.clinics.length : "—"],
+  ];
+  els.overviewMetrics.textContent = "";
+  for (const [label, value] of metrics) {
+    const card = document.createElement("article");
+    card.className = "metric-card";
+    const title = document.createElement("span");
+    title.textContent = label;
+    const amount = document.createElement("strong");
+    amount.textContent = String(value);
+    card.append(title, amount);
+    els.overviewMetrics.append(card);
+  }
+
+}
+
+function setDatasetLoading(name, active) {
+  state.loading[name] = active;
+  document.getElementById(`tab-${name}`)?.setAttribute("aria-busy", String(active));
+}
+
+function setSettingsFormEnabled(enabled) {
+  for (const control of els.settingsForm?.elements || []) {
+    control.disabled = !enabled;
+  }
+  els.settingsForm?.setAttribute("aria-busy", String(!enabled));
 }
 
 function clearSensitiveInputs() {
@@ -1652,7 +1785,8 @@ function clearSensitiveInputs() {
 function renderUsersTable() {
   if (!els.usersTbody) return;
   els.usersTbody.textContent = "";
-  for (const user of state.users) {
+  const query = els.usersSearch?.value.trim().toLocaleLowerCase() || "";
+  for (const user of state.users.filter((item) => `${item.username} ${item.name}`.toLocaleLowerCase().includes(query))) {
     const row = document.createElement("tr");
 
     const usernameCell = document.createElement("td");
@@ -1689,28 +1823,43 @@ function renderUsersTable() {
 }
 
 async function loadSettings() {
-  const data = await apiFetch("/api/settings");
-  state.settings = data;
-  state.showcases = normalizeShowcases(data.content?.showcases);
-  state.homepageContent = normalizeHomepageContent(data.content);
-  els.settingsWhatsapp.value = data.whatsappNumber ?? "";
-  els.settingsDownload.value = data.downloadUrl ?? "";
-  renderContentEditor();
-  renderShowcaseEditor();
-  els.settingsHeroBackground.value = typeof data.content?.heroBackground === "string" ? data.content.heroBackground : "";
-  const heroSlides = Array.isArray(data.content?.heroSlides)
-    ? data.content.heroSlides
-    : Array.isArray(data.content?.heroMedia)
-      ? data.content.heroMedia
-      : [];
-  state.heroSlides = normalizeHeroSlides(heroSlides);
-  renderHeroSlidesEditor();
+  setDatasetLoading("settings", true);
+  if (!state.settings) setSettingsFormEnabled(false);
+  try {
+    const data = await apiFetch("/api/settings");
+    state.settings = data;
+    state.settingsLoaded = true;
+    state.showcases = normalizeShowcases(data.content?.showcases);
+    state.homepageContent = normalizeHomepageContent(data.content);
+    els.settingsWhatsapp.value = data.whatsappNumber ?? "";
+    els.settingsDownload.value = data.downloadUrl ?? "";
+    renderContentEditor();
+    renderShowcaseEditor();
+    els.settingsHeroBackground.value = typeof data.content?.heroBackground === "string" ? data.content.heroBackground : "";
+    const heroSlides = Array.isArray(data.content?.heroSlides)
+      ? data.content.heroSlides
+      : Array.isArray(data.content?.heroMedia)
+        ? data.content.heroMedia
+        : [];
+    state.heroSlides = normalizeHeroSlides(heroSlides);
+    renderHeroSlidesEditor();
+    setSettingsFormEnabled(true);
+  } finally {
+    setDatasetLoading("settings", false);
+  }
 }
 
 async function loadUsers() {
-  const data = await apiFetch("/api/users");
-  state.users = data.users || [];
-  renderUsersTable();
+  setDatasetLoading("users", true);
+  try {
+    const data = await apiFetch("/api/users");
+    state.users = data.users || [];
+    state.usersLoaded = true;
+    renderUsersTable();
+    renderOverview();
+  } finally {
+    setDatasetLoading("users", false);
+  }
 }
 
 function requestStatusLabel(status) {
@@ -1720,10 +1869,12 @@ function requestStatusLabel(status) {
 function renderRequests() {
   if (!els.requestsList) return;
   els.requestsList.textContent = "";
-  els.requestsEmpty.classList.toggle("hidden", state.requests.length > 0);
+  const query = els.requestsSearch?.value.trim().toLocaleLowerCase() || "";
+  const requests = state.requests.filter((item) => `${item.name} ${item.business} ${item.service} ${item.message}`.toLocaleLowerCase().includes(query));
+  els.requestsEmpty.classList.toggle("hidden", requests.length > 0);
   els.requestsBadge.classList.toggle("hidden", state.requestCounts.actionable < 1);
   els.requestsBadge.textContent = String(state.requestCounts.actionable || 0);
-  for (const request of state.requests) {
+  for (const request of requests) {
     const card = document.createElement("article");
     card.className = `request-card status-${request.status}`;
     const heading = document.createElement("div");
@@ -1761,10 +1912,17 @@ function renderRequests() {
 }
 
 async function loadRequests() {
-  const data = await apiFetch("/api/requests");
-  state.requests = data.requests || [];
-  state.requestCounts = data.counts || { new: 0, actionable: 0 };
-  renderRequests();
+  setDatasetLoading("requests", true);
+  try {
+    const data = await apiFetch("/api/requests");
+    state.requests = data.requests || [];
+    state.requestCounts = data.counts || { new: 0, actionable: 0 };
+    state.requestsLoaded = true;
+    renderRequests();
+    renderOverview();
+  } finally {
+    setDatasetLoading("requests", false);
+  }
 }
 
 async function updateRequest(request, status, read) {
@@ -2047,30 +2205,71 @@ async function handleCreditUsage(event) {
 
 async function bootstrapSession() {
   clearMessages();
+  setSettingsFormEnabled(false);
   try {
     const session = await apiFetch("/api/session");
+    document.getElementById("session-loading").classList.add("hidden");
     state.currentUser = session.user;
     state.passwordChangeRecommended = Boolean(session.passwordChangeRecommended);
     els.loginPanel.classList.add("hidden");
     els.appPanel.classList.remove("hidden");
+    els.currentUser.textContent = `${t("welcome")} ${session.user.name}`;
+    els.currentUser.classList.remove("hidden");
     els.passwordWarning.classList.toggle("hidden", !state.passwordChangeRecommended);
     els.passwordWarning.textContent = state.passwordChangeRecommended ? t("warningChangePassword") : "";
-    showStatus(`${t("welcome")} ${session.user.name}`);
-    await Promise.all([loadSettings(), loadUsers(), loadRequests()]);
-    switchTab("settings");
+    const results = await Promise.allSettled([loadSettings(), loadUsers(), loadRequests(), loadStores(), loadClinics()]);
+    const authFailure = results.find((result) => result.status === "rejected" && result.reason?.status === 401);
+    if (authFailure) {
+      resetAuthenticatedUi();
+      showAlert(t("sessionExpired"));
+      els.loginUsername.focus();
+      return;
+    }
+    const failed = results.find((result) => result.status === "rejected");
+    if (failed) showAlert(failed.reason?.message || t("serviceUnavailable"));
+    switchTab(state.currentSection);
   } catch (error) {
-    state.currentUser = null;
-    state.passwordChangeRecommended = false;
-    els.appPanel.classList.add("hidden");
-    els.loginPanel.classList.remove("hidden");
-    els.passwordWarning.classList.add("hidden");
+    resetAuthenticatedUi();
     if (error.status === 401) {
       els.loginUsername.focus();
       return;
     }
 
     showAlert(error.message);
+  } finally {
+    document.getElementById("session-loading").classList.add("hidden");
   }
+}
+
+function resetAuthenticatedUi() {
+  state.currentUser = null;
+  state.passwordChangeRecommended = false;
+  state.users = [];
+  state.usersLoaded = false;
+  state.settings = null;
+  state.settingsLoaded = false;
+  state.requests = [];
+  state.requestsLoaded = false;
+  state.requestCounts = { new: 0, actionable: 0 };
+  state.credits = {
+    settings: { defaultMessageBalance: 500, customerPriceNis: 0.2, platformCostNis: 0.1 },
+    organizations: [],
+    ledger: [],
+    analytics: null,
+  };
+  state.creditsLoaded = false;
+  state.stores = [];
+  state.storesLoaded = false;
+  state.clinics = [];
+  state.clinicsLoaded = false;
+  closeStoreUsers();
+  setSettingsFormEnabled(false);
+  els.appPanel.classList.add("hidden");
+  els.currentUser.textContent = "";
+  els.currentUser.classList.add("hidden");
+  els.loginPanel.classList.remove("hidden");
+  els.passwordWarning.classList.add("hidden");
+  renderOverview();
 }
 
 async function handleLogin(event) {
@@ -2105,24 +2304,8 @@ async function handleLogout() {
   setPending("logout", true, els.logoutBtn);
   try {
     await apiFetch("/api/logout", { method: "POST" });
-    state.users = [];
-    state.settings = null;
-    state.requests = [];
-    state.requestCounts = { new: 0, actionable: 0 };
-    state.credits = {
-      settings: { defaultMessageBalance: 500, customerPriceNis: 0.2, platformCostNis: 0.1 },
-      organizations: [],
-      ledger: [],
-      analytics: null,
-    };
-    state.creditsLoaded = false;
-    state.stores = [];
-    state.storesLoaded = false;
-    state.clinics = [];
-    state.clinicsLoaded = false;
-    closeStoreUsers();
+    resetAuthenticatedUi();
     clearSensitiveInputs();
-    await bootstrapSession();
     showStatus(t("loggedOut"));
   } catch (error) {
     showAlert(error.message);
@@ -2224,6 +2407,7 @@ async function handleAddUser(event) {
     els.addUserForm.reset();
     clearSensitiveInputs();
     await loadUsers();
+    els.addUserForm.closest("details")?.removeAttribute("open");
     showStatus(t("userAdded"));
   } catch (error) {
     showAlert(error.message);
@@ -2279,13 +2463,7 @@ async function handlePasswordChange(event) {
       body: JSON.stringify({ currentPassword, newPassword }),
     });
     clearSensitiveInputs();
-    state.currentUser = null;
-    state.passwordChangeRecommended = false;
-    state.users = [];
-    state.settings = null;
-    els.appPanel.classList.add("hidden");
-    els.loginPanel.classList.remove("hidden");
-    els.passwordWarning.classList.add("hidden");
+    resetAuthenticatedUi();
     showStatus(t("passwordChanged"));
     document.getElementById("login-username").focus();
   } catch (error) {
@@ -2315,15 +2493,39 @@ function wirePasswordToggleButtons() {
 function initTabs() {
   for (const btn of els.tabButtons) {
     btn.addEventListener("click", () => {
-      clearMessages();
+      closeMobileNavigation();
       switchTab(btn.dataset.tab);
     });
   }
 }
 
+function closeMobileNavigation({ restoreFocus = false } = {}) {
+  if (!els.appPanel?.classList.contains("nav-open")) return;
+  els.appPanel.classList.remove("nav-open");
+  els.mobileNavToggle?.setAttribute("aria-expanded", "false");
+  if (restoreFocus) els.mobileNavToggle?.focus();
+}
+
+function initMobileNavigation() {
+  if (!els.mobileNavToggle || !els.adminNavigation) return;
+  els.mobileNavToggle.setAttribute("aria-expanded", "false");
+  els.mobileNavToggle.setAttribute("aria-label", t("navWorkspace"));
+  els.mobileNavToggle.addEventListener("click", () => {
+    const open = els.appPanel.classList.toggle("nav-open");
+    els.mobileNavToggle.setAttribute("aria-expanded", String(open));
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && els.appPanel.classList.contains("nav-open")) {
+      event.preventDefault();
+      closeMobileNavigation({ restoreFocus: true });
+    }
+  });
+}
+
 function initLanguageToggle() {
   els.langToggle.addEventListener("click", () => {
     state.lang = state.lang === "ar" ? "en" : "ar";
+    savePreferences();
     updateLanguageUi();
   });
 }
@@ -2342,6 +2544,10 @@ function initForms() {
     clearMessages();
     loadStores().catch((error) => showAlert(error.message));
   });
+  els.storesSearch.addEventListener("input", renderStoresTable);
+  els.clinicsSearch.addEventListener("input", renderClinicsTable);
+  els.requestsSearch.addEventListener("input", renderRequests);
+  els.usersSearch.addEventListener("input", renderUsersTable);
   els.clinicsRefresh.addEventListener("click", () => {
     clearMessages();
     loadClinics().catch((error) => showAlert(error.message));
@@ -2371,10 +2577,15 @@ function initForms() {
   els.logoutBtn.addEventListener("click", handleLogout);
 }
 
-initTabs();
-initForms();
-initLanguageToggle();
-wirePasswordToggleButtons();
-syncStoreBackendFields();
-updateLanguageUi();
-bootstrapSession();
+function initAdmin() {
+  initTabs();
+  initForms();
+  initLanguageToggle();
+  initMobileNavigation();
+  wirePasswordToggleButtons();
+  syncStoreBackendFields();
+  updateLanguageUi();
+  return bootstrapSession();
+}
+
+initAdmin();

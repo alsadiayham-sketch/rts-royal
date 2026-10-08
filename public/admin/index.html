@@ -15,10 +15,11 @@
         <img src="/assets/rts-mark.svg" alt="" class="brand-mark" />
         <div>
           <p class="brand-title" data-i18n="appTitle">لوحة إدارة RTS</p>
-          <p class="brand-subtitle" data-i18n="appSubtitle">إدارة العمل ومتاجر RTS Business والمشرفين</p>
+          <p class="brand-subtitle" data-i18n="appSubtitle">مساحة عمليات RTS المركزية</p>
         </div>
       </div>
       <div class="top-actions">
+        <span id="current-user" class="current-user hidden" aria-live="polite"></span>
         <a class="top-link" href="/" data-i18n="backToWebsite">العودة إلى الموقع</a>
         <button id="lang-toggle" type="button" class="secondary-btn" aria-live="polite">
           English
@@ -31,9 +32,22 @@
       <div id="global-alert" class="alert-message hidden" role="alert" aria-live="assertive"></div>
       <section id="password-warning" class="warning-banner hidden" role="status" aria-live="polite"></section>
 
-      <section id="login-panel" class="panel login-panel">
-        <h1 data-i18n="loginTitle">تسجيل الدخول</h1>
-        <form id="login-form" novalidate>
+      <div id="session-loading" class="session-loading" role="status">
+        <img src="/assets/rts-mark.svg" alt="" width="40" height="40" />
+        <p data-i18n="sessionLoading">جارٍ استعادة جلسة العمل...</p>
+      </div>
+      <section id="login-panel" class="login-panel hidden">
+        <div class="login-intro">
+          <img src="/assets/rts-mark.svg" alt="" class="login-mark" />
+          <p class="eyebrow">RTS / ADMIN</p>
+          <h1 data-i18n="loginTitle">تسجيل الدخول</h1>
+          <p data-i18n="loginIntro">وصول آمن لإدارة محتوى RTS والعملاء والتراخيص.</p>
+        </div>
+        <form id="login-form" class="login-form" novalidate>
+          <div class="form-heading">
+            <h2 data-i18n="loginWelcome">مرحباً بعودتك</h2>
+            <p data-i18n="loginHelp">سجّل الدخول للمتابعة إلى مساحة العمليات.</p>
+          </div>
           <div class="field">
             <label for="login-username" data-i18n="usernameLabel">اسم المستخدم</label>
             <input id="login-username" name="username" type="text" autocomplete="username" required />
@@ -53,26 +67,49 @@
               </button>
             </div>
           </div>
-          <button id="login-submit" class="primary-btn" type="submit" data-i18n="loginButton">دخول</button>
+          <button id="login-submit" class="primary-btn full-btn" type="submit" data-i18n="loginButton">دخول</button>
         </form>
       </section>
 
       <section id="app-panel" class="hidden">
         <div class="app-shell">
-          <nav class="sidebar" aria-label="Admin sections">
-            <button class="tab-btn active" type="button" data-tab="settings" data-i18n="tabSettings">إعدادات العمل</button>
-            <button class="tab-btn" type="button" data-tab="stores" data-i18n="tabStores">متاجر RTS Business</button>
-            <button class="tab-btn" type="button" data-tab="clinics" data-i18n="tabClinics">عيادات RTS Clinic</button>
-            <button class="tab-btn tab-btn-with-badge" type="button" data-tab="requests"><span data-i18n="tabRequests">الطلبات</span><b id="requests-badge" class="tab-badge hidden">0</b></button>
-            <button class="tab-btn" type="button" data-tab="credits" data-i18n="tabCredits">الأرصدة</button>
-            <button class="tab-btn" type="button" data-tab="users" data-i18n="tabUsers">المشرفون</button>
-            <button class="tab-btn" type="button" data-tab="password" data-i18n="tabPassword">كلمة المرور الخاصة بي</button>
+          <button id="mobile-nav-toggle" class="secondary-btn mobile-nav-toggle" type="button" aria-controls="admin-navigation" aria-expanded="false">
+            <svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <span data-i18n="navWorkspace">مساحة العمل</span>
+          </button>
+          <nav id="admin-navigation" class="sidebar" aria-label="Admin sections">
+            <p class="nav-group-label" data-i18n="navWorkspace">مساحة العمل</p>
+            <button class="tab-btn active" type="button" data-tab="overview"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8v10H3zM9 21v-6h6v6"/></svg><span data-i18n="tabOverview">نظرة عامة</span></button>
+            <p class="nav-group-label" data-i18n="navOperations">العمليات</p>
+            <button class="tab-btn" type="button" data-tab="settings"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></svg><span data-i18n="tabSettings">إعدادات العمل</span></button>
+            <button class="tab-btn" type="button" data-tab="stores"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 10h18v11H3zM2 5h20l-2 5H4zM8 21v-6h8v6"/></svg><span data-i18n="tabStores">متاجر RTS Business</span></button>
+            <button class="tab-btn" type="button" data-tab="clinics"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 21V4h16v17M9 4V2h6v2M8 10h8m-4-4v8M8 21v-4h8v4"/></svg><span data-i18n="tabClinics">عيادات RTS Clinic</span></button>
+            <button class="tab-btn tab-btn-with-badge" type="button" data-tab="requests"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4h16v12H8l-4 4zM8 9h8m-8 3h5"/></svg><span data-i18n="tabRequests">الطلبات</span><b id="requests-badge" class="tab-badge hidden">0</b></button>
+            <button class="tab-btn" type="button" data-tab="credits"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 8.5c-.6-.6-1.5-1-3-1-1.6 0-2.8.7-2.8 1.9 0 3 5.8 1.2 5.8 4.2 0 1.2-1.1 2.1-3 2.1-1.4 0-2.6-.5-3.3-1.2M12 5.5v12"/></svg><span data-i18n="tabCredits">الأرصدة</span></button>
+            <p class="nav-group-label" data-i18n="navAccess">الوصول</p>
+            <button class="tab-btn" type="button" data-tab="users"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4 21c.8-4.1 3.5-6.2 8-6.2s7.2 2.1 8 6.2"/></svg><span data-i18n="tabUsers">المشرفون</span></button>
+            <button class="tab-btn" type="button" data-tab="password"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/></svg><span data-i18n="tabPassword">كلمة المرور الخاصة بي</span></button>
             <button id="logout-btn" class="secondary-btn logout-btn" type="button" data-i18n="logoutButton">تسجيل الخروج</button>
           </nav>
 
           <div class="content-area">
-            <section id="tab-settings" class="tab-panel">
-              <h2 data-i18n="tabSettings">إعدادات العمل</h2>
+            <section id="tab-overview" class="tab-panel">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow" data-i18n="overviewEyebrow">لوحة العمليات</p>
+                  <h1 data-i18n="tabOverview">نظرة عامة</h1>
+                  <p data-i18n="overviewIntro">ملخص حي من البيانات التي تم تحميلها في هذه الجلسة.</p>
+                </div>
+              </div>
+              <div id="overview-metrics" class="overview-grid" aria-live="polite"></div>
+            </section>
+            <section id="tab-settings" class="tab-panel hidden">
+              <div class="section-heading">
+                <div>
+                  <h2 data-i18n="tabSettings">إعدادات العمل</h2>
+                  <p data-i18n="settingsIntro">إدارة معلومات الموقع والمحتوى ووسائط العرض العامة.</p>
+                </div>
+              </div>
               <form id="settings-form" novalidate>
                 <div class="field">
                   <label for="settings-whatsapp" data-i18n="whatsappLabel">رقم واتساب</label>
@@ -139,9 +176,11 @@
                   <h2 data-i18n="tabClinics">عيادات RTS Clinic</h2>
                   <p data-i18n="clinicsIntro">إنشاء عيادات RTS Clinic وإدارة الترخيص وحسابات الدخول الأولية.</p>
                 </div>
-                <button id="clinics-refresh" class="secondary-btn" type="button" data-i18n="refreshClinics">تحديث القائمة</button>
+                <div class="section-actions"><label class="sr-only" for="clinics-search" data-i18n="tabClinics">عيادات RTS Clinic</label><input id="clinics-search" class="section-search" type="search" data-i18n-placeholder="searchLabel" /><button id="clinics-refresh" class="secondary-btn" type="button" data-i18n="refreshClinics">تحديث القائمة</button></div>
               </div>
 
+              <details class="creation-disclosure">
+                <summary data-i18n="addClinicTitle">إضافة عيادة جديدة</summary>
               <form id="clinic-form" class="clinic-form" novalidate>
                 <h3 data-i18n="addClinicTitle">إضافة عيادة جديدة</h3>
                 <div class="form-grid">
@@ -187,8 +226,9 @@
 
                 <button id="clinic-submit" class="primary-btn" type="submit" data-i18n="createClinic">إنشاء العيادة</button>
               </form>
+              </details>
 
-              <div class="table-wrap clinic-table-wrap">
+              <div class="table-wrap clinic-table-wrap" tabindex="0">
                 <table>
                   <caption class="sr-only" data-i18n="clinicsTableCaption">قائمة عيادات RTS Clinic</caption>
                   <thead>
@@ -211,7 +251,7 @@
                   <h2 data-i18n="tabRequests">الطلبات</h2>
                   <p data-i18n="requestsIntro">طلبات العملاء المحفوظة من نموذج الموقع.</p>
                 </div>
-                <button id="requests-refresh" class="secondary-btn" type="button" data-i18n="refreshRequests">تحديث الطلبات</button>
+                <div class="section-actions"><label class="sr-only" for="requests-search" data-i18n="tabRequests">الطلبات</label><input id="requests-search" class="section-search" type="search" data-i18n-placeholder="searchLabel" /><button id="requests-refresh" class="secondary-btn" type="button" data-i18n="refreshRequests">تحديث الطلبات</button></div>
               </div>
               <div id="requests-list" class="requests-list"></div>
               <p id="requests-empty" class="empty-state hidden" data-i18n="noRequests">لا توجد طلبات بعد.</p>
@@ -226,6 +266,8 @@
                 <button id="credits-refresh" class="secondary-btn" type="button" data-i18n="refreshCredits">تحديث الأرصدة</button>
               </div>
 
+              <details class="creation-disclosure">
+                <summary data-i18n="creditDefaultsTitle">إعدادات الرصيد الافتراضية</summary>
               <form id="credit-settings-form" class="credit-card" novalidate>
                 <h3 data-i18n="creditDefaultsTitle">إعدادات الرصيد الافتراضية</h3>
                 <div class="form-grid">
@@ -244,6 +286,7 @@
                 </div>
                 <button id="credit-settings-submit" class="primary-btn" type="submit" data-i18n="saveCreditSettings">حفظ إعدادات الرصيد</button>
               </form>
+              </details>
 
               <div class="credit-filters">
                 <div class="field">
@@ -271,6 +314,8 @@
 
               <div id="credit-analytics" class="metrics-grid" aria-live="polite"></div>
 
+              <details class="creation-disclosure">
+                <summary data-i18n="allocateCreditsTitle">تخصيص رصيد لمنظمة</summary>
               <form id="credit-allocation-form" class="credit-card" novalidate>
                 <h3 data-i18n="allocateCreditsTitle">تخصيص رصيد لمنظمة</h3>
                 <div class="form-grid">
@@ -308,7 +353,10 @@
                 </div>
                 <button id="allocation-submit" class="primary-btn" type="submit" data-i18n="allocateCreditsButton">تخصيص الرصيد</button>
               </form>
+              </details>
 
+              <details class="creation-disclosure">
+                <summary data-i18n="recordUsageTitle">تسجيل استهلاك رسائل</summary>
               <form id="credit-usage-form" class="credit-card" novalidate>
                 <h3 data-i18n="recordUsageTitle">تسجيل استهلاك رسائل</h3>
                 <div class="form-grid">
@@ -343,8 +391,9 @@
                 </div>
                 <button id="usage-submit" class="primary-btn" type="submit" data-i18n="recordUsageButton">تسجيل الاستهلاك</button>
               </form>
+              </details>
 
-              <div class="table-wrap">
+              <div class="table-wrap" tabindex="0">
                 <table>
                   <caption class="sr-only" data-i18n="organizationsTableCaption">قائمة أرصدة المنظمات</caption>
                   <thead>
@@ -365,13 +414,16 @@
               <div class="ledger-heading">
                 <h3 data-i18n="creditLedgerTitle">سجل التخصيصات والطلبات</h3>
                 <div class="ledger-filters">
+                  <label class="sr-only" for="credit-ledger-search" data-i18n="searchLabel">بحث</label>
                   <input id="credit-ledger-search" type="search" maxlength="80" data-i18n-placeholder="searchLabel" />
+                  <label class="sr-only" for="credit-ledger-entry-type" data-i18n="ledgerTypeLabel">النوع</label>
                   <select id="credit-ledger-entry-type">
                     <option value="" data-i18n="allLedgerTypes">كل أنواع السجل</option>
                     <option value="allocation" data-i18n="ledgerAllocation">تخصيص</option>
                     <option value="usage" data-i18n="ledgerUsage">استهلاك</option>
                     <option value="request" data-i18n="ledgerRequest">طلب</option>
                   </select>
+                  <label class="sr-only" for="credit-ledger-status" data-i18n="statusLabel">الحالة</label>
                   <select id="credit-ledger-status">
                     <option value="" data-i18n="allStatuses">كل الحالات</option>
                     <option value="requested" data-i18n="deliveryRequested">مطلوب</option>
@@ -386,7 +438,7 @@
                   </select>
                 </div>
               </div>
-              <div class="table-wrap">
+              <div class="table-wrap" tabindex="0">
                 <table>
                   <caption class="sr-only" data-i18n="creditLedgerTitle">سجل التخصيصات والطلبات</caption>
                   <thead>
@@ -412,9 +464,11 @@
                   <h2 data-i18n="tabStores">متاجر RTS Business</h2>
                   <p data-i18n="storesIntro">إنشاء المتاجر وإدارة مدة الترخيص من لوحة RTS المركزية.</p>
                 </div>
-                <button id="stores-refresh" class="secondary-btn" type="button" data-i18n="refreshStores">تحديث القائمة</button>
+                <div class="section-actions"><label class="sr-only" for="stores-search" data-i18n="tabStores">متاجر RTS Business</label><input id="stores-search" class="section-search" type="search" data-i18n-placeholder="searchLabel" /><button id="stores-refresh" class="secondary-btn" type="button" data-i18n="refreshStores">تحديث القائمة</button></div>
               </div>
 
+              <details class="creation-disclosure">
+                <summary data-i18n="addStoreTitle">إضافة متجر جديد</summary>
               <form id="store-form" class="store-form" novalidate>
                 <h3 data-i18n="addStoreTitle">إضافة متجر جديد</h3>
                 <div class="form-grid">
@@ -472,8 +526,9 @@
 
                 <button id="store-submit" class="primary-btn" type="submit" data-i18n="createStore">إنشاء المتجر</button>
               </form>
+              </details>
 
-              <div class="table-wrap store-table-wrap">
+              <div class="table-wrap store-table-wrap" tabindex="0">
                 <table>
                   <caption class="sr-only" data-i18n="storesTableCaption">قائمة متاجر RTS Business</caption>
                   <thead>
@@ -498,7 +553,7 @@
                   </div>
                   <button id="store-users-close" class="secondary-btn" type="button" data-i18n="closeStoreUsers">إغلاق</button>
                 </div>
-                <div class="table-wrap">
+                <div class="table-wrap" tabindex="0">
                   <table>
                     <caption class="sr-only" data-i18n="storeUsersCaption">مستخدمو متجر RTS Business</caption>
                     <thead>
@@ -542,8 +597,12 @@
             </section>
 
             <section id="tab-users" class="tab-panel hidden">
-              <h2 data-i18n="tabUsers">المشرفون</h2>
-              <div class="table-wrap">
+              <div class="section-heading">
+                <div><h2 data-i18n="tabUsers">المشرفون</h2><p data-i18n="adminsIntro">إدارة حسابات الوصول إلى مساحة عمليات RTS.</p></div>
+                <label class="sr-only" for="users-search" data-i18n="tabUsers">المشرفون</label>
+                <input id="users-search" class="section-search" type="search" data-i18n-placeholder="searchLabel" />
+              </div>
+              <div class="table-wrap" tabindex="0">
                 <table>
                   <caption class="sr-only" data-i18n="adminsTableCaption">قائمة المشرفين</caption>
                   <thead>
@@ -559,6 +618,8 @@
                 </table>
               </div>
 
+              <details class="creation-disclosure">
+                <summary data-i18n="addAdminTitle">إضافة مشرف</summary>
               <form id="add-user-form" class="stacked-form" novalidate>
                 <h3 data-i18n="addAdminTitle">إضافة مشرف</h3>
                 <div class="field">
@@ -606,10 +667,13 @@
                 </div>
                 <button id="add-user-submit" class="primary-btn" type="submit" data-i18n="addAdminButton">إضافة</button>
               </form>
+              </details>
             </section>
 
             <section id="tab-password" class="tab-panel hidden">
-              <h2 data-i18n="tabPassword">كلمة المرور الخاصة بي</h2>
+              <div class="section-heading">
+                <div><h2 data-i18n="tabPassword">كلمة المرور الخاصة بي</h2><p data-i18n="passwordIntro">حدّث كلمة المرور الخاصة بحسابك الحالي.</p></div>
+              </div>
               <form id="password-form" novalidate>
                 <div class="field">
                   <label for="current-password" data-i18n="currentPasswordLabel">كلمة المرور الحالية</label>

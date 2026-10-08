@@ -79,21 +79,21 @@ function normalizeShowcases(content) {
   return { ...content, showcases };
 }
 
+function normalizeHeroBackground(content) {
+  if (!Object.hasOwn(content, "heroBackground")) return content;
+  if (content.heroBackground === "" || content.heroBackground === null) {
+    return { ...content, heroBackground: "" };
+  }
+  if (!isSafeMediaUrl(content.heroBackground)) {
+    throw new ApiError(400, "INVALID_HERO_BACKGROUND", "Hero background must use a safe image URL.");
+  }
+  return { ...content, heroBackground: content.heroBackground.trim() };
+}
+
 function normalizeHeroSlides(content) {
   if (!Object.hasOwn(content, "heroSlides")) return content;
   if (!Array.isArray(content.heroSlides) || content.heroSlides.length > 8) {
     throw new ApiError(400, "INVALID_HERO_SLIDES", "Hero slides must contain at most 8 items.");
-  }
-
-  function normalizeHeroBackground(content) {
-    if (!Object.hasOwn(content, "heroBackground")) return content;
-    if (content.heroBackground === "" || content.heroBackground === null) {
-      return { ...content, heroBackground: "" };
-    }
-    if (!isSafeMediaUrl(content.heroBackground)) {
-      throw new ApiError(400, "INVALID_HERO_BACKGROUND", "Hero background must use a safe image URL.");
-    }
-    return { ...content, heroBackground: content.heroBackground.trim() };
   }
   const heroSlides = content.heroSlides.map((slide) => {
     if (!slide || typeof slide !== "object" || Array.isArray(slide)) {
@@ -114,7 +114,7 @@ function normalizeHeroSlides(content) {
         : {}),
     };
   });
-  return normalizeHeroBackground({ ...content, heroSlides });
+  return { ...content, heroSlides };
 }
 
 export async function onRequestGet(context) {
