@@ -9,7 +9,7 @@ import {
   requireTrustedMutationRequest,
   withApiGuard,
 } from "../_lib/http.js";
-import { enforceRateLimit, opportunisticCleanup } from "../_lib/rate-limit.js";
+import { enforceRateLimit } from "../_lib/rate-limit.js";
 import { canonicalizePhone, isAllowedDownloadUrl } from "../_lib/validation.js";
 
 async function getSettings(db) {
@@ -119,8 +119,9 @@ function normalizeHeroSlides(content) {
 
 export async function onRequestGet(context) {
   return withApiGuard(context, async ({ env }) => {
-    await opportunisticCleanup(env.DB, Math.floor(Date.now() / 1000));
-    return jsonResponse(await getSettings(env.DB));
+    return jsonResponse(await getSettings(env.DB), 200, {
+      "Cache-Control": "public, max-age=0, s-maxage=300, stale-while-revalidate=900",
+    });
   });
 }
 
@@ -180,7 +181,6 @@ export async function onRequestPut(context) {
       .bind(nextPhone, nextDownloadUrl, nextContent)
       .run();
 
-    await opportunisticCleanup(env.DB, Math.floor(Date.now() / 1000));
     return jsonResponse({
       whatsappNumber: nextPhone,
       downloadUrl: nextDownloadUrl,

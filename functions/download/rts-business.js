@@ -3,12 +3,20 @@ import { isAllowedDownloadUrl } from "../_lib/validation.js";
 
 export const DOWNLOAD_FILENAME = "RTS-Business-Setup.exe";
 
+let cachedDownloadUrl = "";
+let cachedDownloadUrlAt = 0;
+
 async function getDownloadUrl(env) {
+  if (cachedDownloadUrl && Date.now() - cachedDownloadUrlAt < 300000) {
+    return cachedDownloadUrl;
+  }
   const row = await env.DB.prepare("SELECT download_url FROM site_settings WHERE id = 1").first();
   const downloadUrl = row?.download_url || DEFAULT_DOWNLOAD_URL;
   if (!isAllowedDownloadUrl(downloadUrl)) {
     throw new Error("Configured installer URL is invalid.");
   }
+  cachedDownloadUrl = downloadUrl;
+  cachedDownloadUrlAt = Date.now();
   return downloadUrl;
 }
 
