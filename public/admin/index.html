@@ -64,6 +64,7 @@
             <button class="tab-btn" type="button" data-tab="stores" data-i18n="tabStores">متاجر RTS Business</button>
             <button class="tab-btn" type="button" data-tab="clinics" data-i18n="tabClinics">عيادات RTS Clinic</button>
             <button class="tab-btn tab-btn-with-badge" type="button" data-tab="requests"><span data-i18n="tabRequests">الطلبات</span><b id="requests-badge" class="tab-badge hidden">0</b></button>
+            <button class="tab-btn" type="button" data-tab="credits" data-i18n="tabCredits">الأرصدة</button>
             <button class="tab-btn" type="button" data-tab="users" data-i18n="tabUsers">المشرفون</button>
             <button class="tab-btn" type="button" data-tab="password" data-i18n="tabPassword">كلمة المرور الخاصة بي</button>
             <button id="logout-btn" class="secondary-btn logout-btn" type="button" data-i18n="logoutButton">تسجيل الخروج</button>
@@ -214,6 +215,195 @@
               </div>
               <div id="requests-list" class="requests-list"></div>
               <p id="requests-empty" class="empty-state hidden" data-i18n="noRequests">لا توجد طلبات بعد.</p>
+            </section>
+
+            <section id="tab-credits" class="tab-panel hidden">
+              <div class="section-heading">
+                <div>
+                  <h2 data-i18n="tabCredits">الأرصدة</h2>
+                  <p data-i18n="creditsIntro">إدارة أرصدة رسائل المنصة وأسعار الرسائل وتخصيص المال أو الرسائل للمنظمات.</p>
+                </div>
+                <button id="credits-refresh" class="secondary-btn" type="button" data-i18n="refreshCredits">تحديث الأرصدة</button>
+              </div>
+
+              <form id="credit-settings-form" class="credit-card" novalidate>
+                <h3 data-i18n="creditDefaultsTitle">إعدادات الرصيد الافتراضية</h3>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="credit-default-balance" data-i18n="defaultCreditBalanceLabel">رصيد الرسائل الافتراضي</label>
+                    <input id="credit-default-balance" name="defaultMessageBalance" type="number" min="0" max="10000000" value="500" required />
+                  </div>
+                  <div class="field">
+                    <label for="credit-customer-price" data-i18n="customerPriceLabel">سعر العميل لكل رسالة (₪)</label>
+                    <input id="credit-customer-price" name="customerPriceNis" type="number" min="0.01" step="0.01" value="0.20" required />
+                  </div>
+                  <div class="field">
+                    <label for="credit-platform-cost" data-i18n="platformCostLabel">تكلفة المنصة لكل رسالة (₪)</label>
+                    <input id="credit-platform-cost" name="platformCostNis" type="number" min="0.01" step="0.01" value="0.10" required />
+                  </div>
+                </div>
+                <button id="credit-settings-submit" class="primary-btn" type="submit" data-i18n="saveCreditSettings">حفظ إعدادات الرصيد</button>
+              </form>
+
+              <div class="credit-filters">
+                <div class="field">
+                  <label for="credit-search" data-i18n="searchLabel">بحث</label>
+                  <input id="credit-search" type="search" maxlength="80" />
+                </div>
+                <div class="field">
+                  <label for="credit-type-filter" data-i18n="organizationTypeLabel">نوع المنظمة</label>
+                  <select id="credit-type-filter">
+                    <option value="" data-i18n="allOrganizations">كل المنظمات</option>
+                    <option value="business" data-i18n="businessOrganizations">Business</option>
+                    <option value="clinic" data-i18n="clinicOrganizations">Clinic</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="credit-analytics-from" data-i18n="fromDateLabel">من تاريخ</label>
+                  <input id="credit-analytics-from" type="date" />
+                </div>
+                <div class="field">
+                  <label for="credit-analytics-to" data-i18n="toDateLabel">إلى تاريخ</label>
+                  <input id="credit-analytics-to" type="date" />
+                </div>
+                <button id="credit-filter-apply" class="secondary-btn" type="button" data-i18n="applyFilters">تطبيق الفلاتر</button>
+              </div>
+
+              <div id="credit-analytics" class="metrics-grid" aria-live="polite"></div>
+
+              <form id="credit-allocation-form" class="credit-card" novalidate>
+                <h3 data-i18n="allocateCreditsTitle">تخصيص رصيد لمنظمة</h3>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="allocation-org-type" data-i18n="organizationTypeLabel">نوع المنظمة</label>
+                    <select id="allocation-org-type" name="organizationType" required>
+                      <option value="business" data-i18n="businessOrganizations">Business</option>
+                      <option value="clinic" data-i18n="clinicOrganizations">Clinic</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="allocation-org-id" data-i18n="organizationLabel">المنظمة</label>
+                    <select id="allocation-org-id" name="organizationId" required></select>
+                  </div>
+                  <div class="field">
+                    <label for="allocation-money" data-i18n="moneyAllocationLabel">مبلغ مالي (₪)</label>
+                    <input id="allocation-money" name="moneyAmountNis" type="number" min="0" step="0.01" value="0" />
+                  </div>
+                  <div class="field">
+                    <label for="allocation-messages" data-i18n="messageAllocationLabel">عدد الرسائل</label>
+                    <input id="allocation-messages" name="messageAmount" type="number" min="0" max="10000000" step="1" value="0" />
+                  </div>
+                  <div class="field">
+                    <label for="allocation-customer-price" data-i18n="customerPriceLabel">سعر العميل لكل رسالة (₪)</label>
+                    <input id="allocation-customer-price" name="customerPriceNis" type="number" min="0.01" step="0.01" />
+                  </div>
+                  <div class="field">
+                    <label for="allocation-platform-cost" data-i18n="platformCostLabel">تكلفة المنصة لكل رسالة (₪)</label>
+                    <input id="allocation-platform-cost" name="platformCostNis" type="number" min="0.01" step="0.01" />
+                  </div>
+                  <div class="field field-full">
+                    <label for="allocation-note" data-i18n="noteLabel">ملاحظة تدقيق</label>
+                    <input id="allocation-note" name="note" type="text" maxlength="240" />
+                  </div>
+                </div>
+                <button id="allocation-submit" class="primary-btn" type="submit" data-i18n="allocateCreditsButton">تخصيص الرصيد</button>
+              </form>
+
+              <form id="credit-usage-form" class="credit-card" novalidate>
+                <h3 data-i18n="recordUsageTitle">تسجيل استهلاك رسائل</h3>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="usage-org-type" data-i18n="organizationTypeLabel">نوع المنظمة</label>
+                    <select id="usage-org-type" name="organizationType" required>
+                      <option value="business" data-i18n="businessOrganizations">Business</option>
+                      <option value="clinic" data-i18n="clinicOrganizations">Clinic</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="usage-org-id" data-i18n="organizationLabel">المنظمة</label>
+                    <select id="usage-org-id" name="organizationId" required></select>
+                  </div>
+                  <div class="field">
+                    <label for="usage-messages" data-i18n="consumedMessagesLabel">الرسائل المستهلكة</label>
+                    <input id="usage-messages" name="messageAmount" type="number" min="1" max="10000000" step="1" required />
+                  </div>
+                  <div class="field">
+                    <label for="usage-status" data-i18n="statusLabel">الحالة</label>
+                    <select id="usage-status" name="deliveryStatus">
+                      <option value="delivered" data-i18n="deliveryDelivered">تم التسليم</option>
+                      <option value="queued" data-i18n="deliveryQueued">في الانتظار</option>
+                      <option value="failed" data-i18n="deliveryFailed">فشل</option>
+                      <option value="cancelled" data-i18n="deliveryCancelled">ملغي</option>
+                    </select>
+                  </div>
+                  <div class="field field-full">
+                    <label for="usage-note" data-i18n="noteLabel">ملاحظة تدقيق</label>
+                    <input id="usage-note" name="note" type="text" maxlength="240" />
+                  </div>
+                </div>
+                <button id="usage-submit" class="primary-btn" type="submit" data-i18n="recordUsageButton">تسجيل الاستهلاك</button>
+              </form>
+
+              <div class="table-wrap">
+                <table>
+                  <caption class="sr-only" data-i18n="organizationsTableCaption">قائمة أرصدة المنظمات</caption>
+                  <thead>
+                    <tr>
+                      <th data-i18n="organizationLabel">المنظمة</th>
+                      <th data-i18n="organizationTypeLabel">النوع</th>
+                      <th data-i18n="creditBalanceLabel">رصيد الرسائل</th>
+                      <th data-i18n="moneyBalanceLabel">الرصيد المالي</th>
+                      <th data-i18n="customerPriceLabel">سعر العميل لكل رسالة (₪)</th>
+                      <th data-i18n="platformCostLabel">تكلفة المنصة لكل رسالة (₪)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="credit-org-tbody"></tbody>
+                </table>
+              </div>
+              <p id="credit-org-empty" class="empty-state hidden" data-i18n="noOrganizations">لا توجد منظمات مطابقة.</p>
+
+              <div class="ledger-heading">
+                <h3 data-i18n="creditLedgerTitle">سجل التخصيصات والطلبات</h3>
+                <div class="ledger-filters">
+                  <input id="credit-ledger-search" type="search" maxlength="80" data-i18n-placeholder="searchLabel" />
+                  <select id="credit-ledger-entry-type">
+                    <option value="" data-i18n="allLedgerTypes">كل أنواع السجل</option>
+                    <option value="allocation" data-i18n="ledgerAllocation">تخصيص</option>
+                    <option value="usage" data-i18n="ledgerUsage">استهلاك</option>
+                    <option value="request" data-i18n="ledgerRequest">طلب</option>
+                  </select>
+                  <select id="credit-ledger-status">
+                    <option value="" data-i18n="allStatuses">كل الحالات</option>
+                    <option value="requested" data-i18n="deliveryRequested">مطلوب</option>
+                    <option value="queued" data-i18n="deliveryQueued">في الانتظار</option>
+                    <option value="delivered" data-i18n="deliveryDelivered">تم التسليم</option>
+                    <option value="failed" data-i18n="deliveryFailed">فشل</option>
+                    <option value="cancelled" data-i18n="deliveryCancelled">ملغي</option>
+                    <option value="new" data-i18n="requestStatusNew">جديد</option>
+                    <option value="in_progress" data-i18n="requestStatusInProgress">قيد المعالجة</option>
+                    <option value="resolved" data-i18n="requestStatusResolved">مكتمل</option>
+                    <option value="archived" data-i18n="requestStatusArchived">مؤرشف</option>
+                  </select>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <caption class="sr-only" data-i18n="creditLedgerTitle">سجل التخصيصات والطلبات</caption>
+                  <thead>
+                    <tr>
+                      <th data-i18n="dateLabel">التاريخ</th>
+                      <th data-i18n="ledgerTypeLabel">النوع</th>
+                      <th data-i18n="organizationLabel">المنظمة</th>
+                      <th data-i18n="creditDeltaLabel">تغير الرسائل</th>
+                      <th data-i18n="moneyDeltaLabel">تغير المال</th>
+                      <th data-i18n="statusLabel">الحالة</th>
+                      <th data-i18n="noteLabel">ملاحظة تدقيق</th>
+                    </tr>
+                  </thead>
+                  <tbody id="credit-ledger-tbody"></tbody>
+                </table>
+              </div>
+              <p id="credit-ledger-empty" class="empty-state hidden" data-i18n="noLedgerRows">لا توجد سجلات مطابقة.</p>
             </section>
 
             <section id="tab-stores" class="tab-panel hidden">

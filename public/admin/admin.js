@@ -17,6 +17,7 @@ const I18N = {
     tabStores: "متاجر RTS Business",
     tabClinics: "عيادات RTS Clinic",
     tabRequests: "الطلبات",
+    tabCredits: "الأرصدة",
     tabUsers: "المشرفون",
     tabPassword: "كلمة المرور الخاصة بي",
     logoutButton: "تسجيل الخروج",
@@ -64,6 +65,63 @@ const I18N = {
     requestsIntro: "طلبات العملاء المحفوظة من نموذج الموقع.",
     refreshRequests: "تحديث الطلبات",
     noRequests: "لا توجد طلبات بعد.",
+    creditsIntro: "إدارة أرصدة رسائل المنصة وأسعار الرسائل وتخصيص المال أو الرسائل للمنظمات.",
+    refreshCredits: "تحديث الأرصدة",
+    creditDefaultsTitle: "إعدادات الرصيد الافتراضية",
+    defaultCreditBalanceLabel: "رصيد الرسائل الافتراضي",
+    customerPriceLabel: "سعر العميل لكل رسالة (₪)",
+    platformCostLabel: "تكلفة المنصة لكل رسالة (₪)",
+    saveCreditSettings: "حفظ إعدادات الرصيد",
+    searchLabel: "بحث",
+    organizationTypeLabel: "نوع المنظمة",
+    allOrganizations: "كل المنظمات",
+    businessOrganizations: "Business",
+    clinicOrganizations: "Clinic",
+    fromDateLabel: "من تاريخ",
+    toDateLabel: "إلى تاريخ",
+    applyFilters: "تطبيق الفلاتر",
+    allocateCreditsTitle: "تخصيص رصيد لمنظمة",
+    organizationLabel: "المنظمة",
+    moneyAllocationLabel: "مبلغ مالي (₪)",
+    messageAllocationLabel: "عدد الرسائل",
+    noteLabel: "ملاحظة تدقيق",
+    allocateCreditsButton: "تخصيص الرصيد",
+    recordUsageTitle: "تسجيل استهلاك رسائل",
+    consumedMessagesLabel: "الرسائل المستهلكة",
+    recordUsageButton: "تسجيل الاستهلاك",
+    organizationsTableCaption: "قائمة أرصدة المنظمات",
+    creditBalanceLabel: "رصيد الرسائل",
+    moneyBalanceLabel: "الرصيد المالي",
+    noOrganizations: "لا توجد منظمات مطابقة.",
+    creditLedgerTitle: "سجل التخصيصات والطلبات",
+    allLedgerTypes: "كل أنواع السجل",
+    ledgerAllocation: "تخصيص",
+    ledgerUsage: "استهلاك",
+    ledgerRequest: "طلب",
+    allStatuses: "كل الحالات",
+    deliveryRequested: "مطلوب",
+    deliveryQueued: "في الانتظار",
+    deliveryDelivered: "تم التسليم",
+    deliveryFailed: "فشل",
+    deliveryCancelled: "ملغي",
+    dateLabel: "التاريخ",
+    ledgerTypeLabel: "النوع",
+    creditDeltaLabel: "تغير الرسائل",
+    moneyDeltaLabel: "تغير المال",
+    noLedgerRows: "لا توجد سجلات مطابقة.",
+    consumedCreditsMetric: "الأرصدة المستهلكة",
+    grossRevenueMetric: "إجمالي الإيراد",
+    platformCostMetric: "تكلفة المنصة",
+    netProfitMetric: "صافي الربح",
+    remainingCreditsMetric: "الأرصدة المتبقية",
+    remainingMoneyMetric: "المال المتبقي",
+    allocatedCreditsMetric: "الأرصدة المخصصة",
+    allocatedMoneyMetric: "المال المخصص",
+    deliveryStatusMetric: "حالات التسليم",
+    requestStatusMetric: "حالات الطلبات",
+    creditSettingsSaved: "تم حفظ إعدادات الأرصدة.",
+    creditsAllocated: "تم تخصيص الرصيد.",
+    usageRecorded: "تم تسجيل الاستهلاك.",
     markRead: "تحديد كمقروء",
     moveInProgress: "بدء المعالجة",
     markResolved: "تحديد كمكتمل",
@@ -185,6 +243,7 @@ const I18N = {
     tabStores: "RTS Business Stores",
     tabClinics: "RTS Clinics",
     tabRequests: "Requests",
+    tabCredits: "Credits",
     tabUsers: "Admins",
     tabPassword: "My Password",
     logoutButton: "Logout",
@@ -232,6 +291,63 @@ const I18N = {
     requestsIntro: "Customer requests saved from the public website form.",
     refreshRequests: "Refresh requests",
     noRequests: "No requests yet.",
+    creditsIntro: "Manage platform message credit balances, message prices, and money/message allocations per organization.",
+    refreshCredits: "Refresh credits",
+    creditDefaultsTitle: "Default credit settings",
+    defaultCreditBalanceLabel: "Default message credit balance",
+    customerPriceLabel: "Customer price per message (₪)",
+    platformCostLabel: "Platform cost per message (₪)",
+    saveCreditSettings: "Save credit settings",
+    searchLabel: "Search",
+    organizationTypeLabel: "Organization type",
+    allOrganizations: "All organizations",
+    businessOrganizations: "Business",
+    clinicOrganizations: "Clinic",
+    fromDateLabel: "From date",
+    toDateLabel: "To date",
+    applyFilters: "Apply filters",
+    allocateCreditsTitle: "Allocate credit to organization",
+    organizationLabel: "Organization",
+    moneyAllocationLabel: "Money amount (₪)",
+    messageAllocationLabel: "Messages",
+    noteLabel: "Audit note",
+    allocateCreditsButton: "Allocate credit",
+    recordUsageTitle: "Record message usage",
+    consumedMessagesLabel: "Consumed messages",
+    recordUsageButton: "Record usage",
+    organizationsTableCaption: "Organization credit balances",
+    creditBalanceLabel: "Message balance",
+    moneyBalanceLabel: "Money balance",
+    noOrganizations: "No matching organizations.",
+    creditLedgerTitle: "Allocation and request ledger",
+    allLedgerTypes: "All ledger types",
+    ledgerAllocation: "Allocation",
+    ledgerUsage: "Usage",
+    ledgerRequest: "Request",
+    allStatuses: "All statuses",
+    deliveryRequested: "Requested",
+    deliveryQueued: "Queued",
+    deliveryDelivered: "Delivered",
+    deliveryFailed: "Failed",
+    deliveryCancelled: "Cancelled",
+    dateLabel: "Date",
+    ledgerTypeLabel: "Type",
+    creditDeltaLabel: "Message delta",
+    moneyDeltaLabel: "Money delta",
+    noLedgerRows: "No matching ledger rows.",
+    consumedCreditsMetric: "Consumed credits",
+    grossRevenueMetric: "Gross revenue",
+    platformCostMetric: "Platform cost",
+    netProfitMetric: "Net profit",
+    remainingCreditsMetric: "Remaining credits",
+    remainingMoneyMetric: "Remaining money",
+    allocatedCreditsMetric: "Allocated credits",
+    allocatedMoneyMetric: "Allocated money",
+    deliveryStatusMetric: "Delivery statuses",
+    requestStatusMetric: "Request statuses",
+    creditSettingsSaved: "Credit settings saved.",
+    creditsAllocated: "Credit allocated.",
+    usageRecorded: "Usage recorded.",
     markRead: "Mark read",
     moveInProgress: "Start work",
     markResolved: "Mark resolved",
@@ -348,6 +464,13 @@ let state = {
   showcases: { websites: [], applications: [], business: [], clinic: [] },
   requests: [],
   requestCounts: { new: 0, actionable: 0 },
+  credits: {
+    settings: { defaultMessageBalance: 500, customerPriceNis: 0.2, platformCostNis: 0.1 },
+    organizations: [],
+    ledger: [],
+    analytics: null,
+  },
+  creditsLoaded: false,
   stores: [],
   storesLoaded: false,
   clinics: [],
@@ -395,6 +518,32 @@ const els = {
   requestsList: document.getElementById("requests-list"),
   requestsEmpty: document.getElementById("requests-empty"),
   requestsBadge: document.getElementById("requests-badge"),
+  creditsRefresh: document.getElementById("credits-refresh"),
+  creditSettingsForm: document.getElementById("credit-settings-form"),
+  creditDefaultBalance: document.getElementById("credit-default-balance"),
+  creditCustomerPrice: document.getElementById("credit-customer-price"),
+  creditPlatformCost: document.getElementById("credit-platform-cost"),
+  creditSearch: document.getElementById("credit-search"),
+  creditTypeFilter: document.getElementById("credit-type-filter"),
+  creditAnalyticsFrom: document.getElementById("credit-analytics-from"),
+  creditAnalyticsTo: document.getElementById("credit-analytics-to"),
+  creditFilterApply: document.getElementById("credit-filter-apply"),
+  creditAnalytics: document.getElementById("credit-analytics"),
+  creditAllocationForm: document.getElementById("credit-allocation-form"),
+  allocationOrgType: document.getElementById("allocation-org-type"),
+  allocationOrgId: document.getElementById("allocation-org-id"),
+  allocationCustomerPrice: document.getElementById("allocation-customer-price"),
+  allocationPlatformCost: document.getElementById("allocation-platform-cost"),
+  creditUsageForm: document.getElementById("credit-usage-form"),
+  usageOrgType: document.getElementById("usage-org-type"),
+  usageOrgId: document.getElementById("usage-org-id"),
+  creditOrgTbody: document.getElementById("credit-org-tbody"),
+  creditOrgEmpty: document.getElementById("credit-org-empty"),
+  creditLedgerSearch: document.getElementById("credit-ledger-search"),
+  creditLedgerEntryType: document.getElementById("credit-ledger-entry-type"),
+  creditLedgerStatus: document.getElementById("credit-ledger-status"),
+  creditLedgerTbody: document.getElementById("credit-ledger-tbody"),
+  creditLedgerEmpty: document.getElementById("credit-ledger-empty"),
   storesTbody: document.getElementById("stores-tbody"),
   storesEmpty: document.getElementById("stores-empty"),
   clinicsTbody: document.getElementById("clinics-tbody"),
@@ -1323,6 +1472,10 @@ function updateLanguageUi() {
     const key = node.getAttribute("data-i18n");
     node.textContent = dict[key] || key;
   }
+  for (const node of document.querySelectorAll("[data-i18n-placeholder]")) {
+    const key = node.getAttribute("data-i18n-placeholder");
+    node.setAttribute("placeholder", dict[key] || key);
+  }
 
   els.langToggle.textContent = state.lang === "ar" ? "English" : "العربية";
   for (const button of document.querySelectorAll(".toggle-password")) {
@@ -1339,6 +1492,7 @@ function updateLanguageUi() {
   renderShowcaseEditor();
   renderHeroSlidesEditor();
   renderClinicInitialUsers();
+  renderCredits();
   if (state.currentStore) {
     els.storeUsersTitle.textContent = `${t("manageStoreUsers")} · ${state.currentStore.name}`;
     els.storeUsersContext.textContent = `${t("storeUsersContext")} ${state.currentStore.id}`;
@@ -1443,21 +1597,29 @@ function switchTab(name) {
     if (!state.clinicsLoaded) loadClinics().catch((error) => showAlert(error.message));
   } else if (name === "requests") {
     loadRequests().catch((error) => showAlert(error.message));
+  } else if (name === "credits") {
+    els.creditSearch.focus();
+    if (!state.creditsLoaded) loadCredits().catch((error) => showAlert(error.message));
   } else if (name === "password") {
     document.getElementById("current-password").focus();
   }
 }
 
 function clearSensitiveInputs() {
-  els.loginPassword.value = "";
-  document.getElementById("add-password").value = "";
-  document.getElementById("add-password-confirm").value = "";
-  document.getElementById("current-password").value = "";
-  document.getElementById("new-password").value = "";
-  document.getElementById("new-password-confirm").value = "";
-  document.getElementById("store-admin-password").value = "";
-  document.getElementById("clinic-admin-password").value = "";
-  document.getElementById("clinic-employee-password").value = "";
+  for (const id of [
+    "login-password",
+    "add-password",
+    "add-password-confirm",
+    "current-password",
+    "new-password",
+    "new-password-confirm",
+    "store-admin-password",
+    "clinic-admin-password",
+    "clinic-employee-password",
+  ]) {
+    const input = document.getElementById(id);
+    if (input) input.value = "";
+  }
   for (const button of document.querySelectorAll(".toggle-password")) {
     document.getElementById(button.dataset.target).type = "password";
     button.textContent = t("showPassword");
@@ -1601,6 +1763,265 @@ async function updateRequest(request, status, read) {
   }
 }
 
+function formatNumber(value) {
+  return new Intl.NumberFormat(state.lang === "ar" ? "ar" : "en").format(Number(value || 0));
+}
+
+function formatMoney(value) {
+  return new Intl.NumberFormat(state.lang === "ar" ? "ar-IL" : "en-IL", {
+    style: "currency",
+    currency: "ILS",
+  }).format(Number(value || 0));
+}
+
+function creditTypeLabel(type) {
+  return type === "clinic" ? t("clinicOrganizations") : t("businessOrganizations");
+}
+
+function ledgerTypeLabel(type) {
+  if (type === "usage") return t("ledgerUsage");
+  if (type === "request") return t("ledgerRequest");
+  return t("ledgerAllocation");
+}
+
+function statusText(status) {
+  if (!status) return "—";
+  if (status === "requested") return t("deliveryRequested");
+  if (status === "queued") return t("deliveryQueued");
+  if (status === "delivered") return t("deliveryDelivered");
+  if (status === "failed") return t("deliveryFailed");
+  if (status === "cancelled") return t("deliveryCancelled");
+  if (REQUEST_STATUSES.has(status)) return requestStatusLabel(status);
+  return status;
+}
+
+const REQUEST_STATUSES = new Set(["new", "in_progress", "resolved", "archived"]);
+const DELIVERY_STATUS_ORDER = ["requested", "queued", "delivered", "failed", "cancelled"];
+const REQUEST_STATUS_ORDER = ["new", "in_progress", "resolved", "archived"];
+
+function formatStatusCounts(counts = {}, statuses = []) {
+  const parts = statuses
+    .filter((status) => Number(counts[status] || 0) > 0)
+    .map((status) => `${statusText(status)}: ${formatNumber(counts[status])}`);
+  return parts.length ? parts.join(" · ") : "—";
+}
+
+function readCreditFilters() {
+  const params = new URLSearchParams();
+  for (const [key, input] of [
+    ["search", els.creditSearch],
+    ["type", els.creditTypeFilter],
+    ["from", els.creditAnalyticsFrom],
+    ["to", els.creditAnalyticsTo],
+    ["entryType", els.creditLedgerEntryType],
+    ["status", els.creditLedgerStatus],
+  ]) {
+    const value = input?.value?.trim();
+    if (value) params.set(key, value);
+  }
+  const ledgerSearch = els.creditLedgerSearch?.value?.trim();
+  if (ledgerSearch) params.set("ledgerSearch", ledgerSearch);
+  return params;
+}
+
+function fillCreditSettings(settings) {
+  if (!settings) return;
+  els.creditDefaultBalance.value = String(settings.defaultMessageBalance ?? 500);
+  els.creditCustomerPrice.value = Number(settings.customerPriceNis ?? 0.2).toFixed(2);
+  els.creditPlatformCost.value = Number(settings.platformCostNis ?? 0.1).toFixed(2);
+  els.allocationCustomerPrice.value = Number(settings.customerPriceNis ?? 0.2).toFixed(2);
+  els.allocationPlatformCost.value = Number(settings.platformCostNis ?? 0.1).toFixed(2);
+}
+
+function renderCreditMetrics() {
+  if (!els.creditAnalytics) return;
+  const analytics = state.credits.analytics || {};
+  const metrics = [
+    [t("consumedCreditsMetric"), formatNumber(analytics.consumedCredits)],
+    [t("grossRevenueMetric"), formatMoney(analytics.grossRevenueNis)],
+    [t("platformCostMetric"), formatMoney(analytics.platformCostNis)],
+    [t("netProfitMetric"), formatMoney(analytics.netProfitNis)],
+    [t("remainingCreditsMetric"), formatNumber(analytics.remainingMessages)],
+    [t("remainingMoneyMetric"), formatMoney(analytics.remainingMoneyNis)],
+    [t("allocatedCreditsMetric"), formatNumber(analytics.allocatedMessages)],
+    [t("allocatedMoneyMetric"), formatMoney(analytics.allocatedMoneyNis)],
+    [t("deliveryStatusMetric"), formatStatusCounts(analytics.deliveryStatusCounts, DELIVERY_STATUS_ORDER)],
+    [t("requestStatusMetric"), formatStatusCounts(analytics.requestStatusCounts, REQUEST_STATUS_ORDER)],
+  ];
+  els.creditAnalytics.textContent = "";
+  for (const [label, value] of metrics) {
+    const card = document.createElement("article");
+    card.className = "metric-card";
+    const title = document.createElement("span");
+    title.textContent = label;
+    const amount = document.createElement("strong");
+    amount.textContent = value;
+    card.append(title, amount);
+    els.creditAnalytics.append(card);
+  }
+}
+
+function renderCreditOrganizations() {
+  if (!els.creditOrgTbody) return;
+  els.creditOrgTbody.textContent = "";
+  els.creditOrgEmpty.classList.toggle("hidden", state.credits.organizations.length > 0);
+  for (const org of state.credits.organizations) {
+    const row = document.createElement("tr");
+    const name = document.createElement("td");
+    name.textContent = `${org.displayName} (${org.organizationId})`;
+    const type = document.createElement("td");
+    type.textContent = creditTypeLabel(org.organizationType);
+    const messages = document.createElement("td");
+    messages.textContent = formatNumber(org.messageBalance);
+    const money = document.createElement("td");
+    money.textContent = formatMoney(org.moneyBalanceNis);
+    const price = document.createElement("td");
+    price.textContent = formatMoney(org.customerPriceNis);
+    const cost = document.createElement("td");
+    cost.textContent = formatMoney(org.platformCostNis);
+    row.append(name, type, messages, money, price, cost);
+    els.creditOrgTbody.append(row);
+  }
+}
+
+function renderAllocationOptions() {
+  fillOrganizationSelect(els.allocationOrgType, els.allocationOrgId);
+  fillOrganizationSelect(els.usageOrgType, els.usageOrgId);
+}
+
+function fillOrganizationSelect(typeInput, selectInput) {
+  if (!typeInput || !selectInput) return;
+  const selected = selectInput.value;
+  const type = typeInput.value;
+  const choices = state.credits.organizations.filter((org) => org.organizationType === type);
+  selectInput.textContent = "";
+  for (const org of choices) {
+    const option = document.createElement("option");
+    option.value = org.organizationId;
+    option.textContent = `${org.displayName} (${org.organizationId})`;
+    selectInput.append(option);
+  }
+  if (choices.some((org) => org.organizationId === selected)) selectInput.value = selected;
+}
+
+function renderCreditLedger() {
+  if (!els.creditLedgerTbody) return;
+  els.creditLedgerTbody.textContent = "";
+  els.creditLedgerEmpty.classList.toggle("hidden", state.credits.ledger.length > 0);
+  for (const item of state.credits.ledger) {
+    const row = document.createElement("tr");
+    const date = document.createElement("td");
+    date.textContent = new Date(item.createdAt * 1000).toLocaleString(state.lang === "ar" ? "ar" : "en");
+    const type = document.createElement("td");
+    type.textContent = ledgerTypeLabel(item.entryType);
+    const org = document.createElement("td");
+    org.textContent = item.organizationId ? `${item.displayName} (${item.organizationId})` : item.displayName;
+    const messages = document.createElement("td");
+    messages.textContent = formatNumber(item.messageDelta);
+    const money = document.createElement("td");
+    money.textContent = formatMoney(item.moneyDeltaNis);
+    const status = document.createElement("td");
+    status.textContent = statusText(item.status);
+    const note = document.createElement("td");
+    note.textContent = item.note || "—";
+    row.append(date, type, org, messages, money, status, note);
+    els.creditLedgerTbody.append(row);
+  }
+}
+
+function renderCredits() {
+  fillCreditSettings(state.credits.settings);
+  renderCreditMetrics();
+  renderCreditOrganizations();
+  renderAllocationOptions();
+  renderCreditLedger();
+}
+
+async function loadCredits() {
+  const params = readCreditFilters();
+  const query = params.toString();
+  const data = await apiFetch(`/api/credits${query ? `?${query}` : ""}`);
+  state.credits = {
+    settings: data.settings || state.credits.settings,
+    organizations: data.organizations || [],
+    ledger: data.ledger || [],
+    analytics: data.analytics || null,
+  };
+  state.creditsLoaded = true;
+  renderCredits();
+}
+
+async function handleCreditSettings(event) {
+  event.preventDefault();
+  clearMessages();
+  if (state.pending.has("credit-settings")) return;
+  setPending("credit-settings", true, document.getElementById("credit-settings-submit"));
+  try {
+    const payload = Object.fromEntries(new FormData(els.creditSettingsForm).entries());
+    payload.defaultMessageBalance = Number(payload.defaultMessageBalance);
+    await apiFetch("/api/credits", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    await loadCredits();
+    showStatus(t("creditSettingsSaved"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    setPending("credit-settings", false, document.getElementById("credit-settings-submit"));
+  }
+}
+
+async function handleCreditAllocation(event) {
+  event.preventDefault();
+  clearMessages();
+  if (state.pending.has("credit-allocation")) return;
+  setPending("credit-allocation", true, document.getElementById("allocation-submit"));
+  try {
+    const payload = Object.fromEntries(new FormData(els.creditAllocationForm).entries());
+    payload.messageAmount = Number(payload.messageAmount || 0);
+    await apiFetch("/api/credits", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    els.creditAllocationForm.reset();
+    fillCreditSettings(state.credits.settings);
+    await loadCredits();
+    showStatus(t("creditsAllocated"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    setPending("credit-allocation", false, document.getElementById("allocation-submit"));
+  }
+
+  async function handleCreditUsage(event) {
+    event.preventDefault();
+    clearMessages();
+    if (state.pending.has("credit-usage")) return;
+    setPending("credit-usage", true, document.getElementById("usage-submit"));
+    try {
+      const payload = Object.fromEntries(new FormData(els.creditUsageForm).entries());
+      payload.entryType = "usage";
+      payload.messageAmount = Number(payload.messageAmount || 0);
+      payload.moneyAmountNis = "0";
+      await apiFetch("/api/credits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      els.creditUsageForm.reset();
+      await loadCredits();
+      showStatus(t("usageRecorded"));
+    } catch (error) {
+      showAlert(error.message);
+    } finally {
+      setPending("credit-usage", false, document.getElementById("usage-submit"));
+    }
+  }
+}
+
 async function bootstrapSession() {
   clearMessages();
   try {
@@ -1665,6 +2086,13 @@ async function handleLogout() {
     state.settings = null;
     state.requests = [];
     state.requestCounts = { new: 0, actionable: 0 };
+    state.credits = {
+      settings: { defaultMessageBalance: 500, customerPriceNis: 0.2, platformCostNis: 0.1 },
+      organizations: [],
+      ledger: [],
+      analytics: null,
+    };
+    state.creditsLoaded = false;
     state.stores = [];
     state.storesLoaded = false;
     state.clinics = [];
@@ -1899,6 +2327,22 @@ function initForms() {
     clearMessages();
     loadRequests().catch((error) => showAlert(error.message));
   });
+  els.creditsRefresh.addEventListener("click", () => {
+    clearMessages();
+    loadCredits().catch((error) => showAlert(error.message));
+  });
+  els.creditFilterApply.addEventListener("click", () => {
+    clearMessages();
+    loadCredits().catch((error) => showAlert(error.message));
+  });
+  els.creditLedgerSearch.addEventListener("change", () => loadCredits().catch((error) => showAlert(error.message)));
+  els.creditLedgerEntryType.addEventListener("change", () => loadCredits().catch((error) => showAlert(error.message)));
+  els.creditLedgerStatus.addEventListener("change", () => loadCredits().catch((error) => showAlert(error.message)));
+  els.allocationOrgType.addEventListener("change", renderAllocationOptions);
+  els.usageOrgType.addEventListener("change", renderAllocationOptions);
+  els.creditSettingsForm.addEventListener("submit", handleCreditSettings);
+  els.creditAllocationForm.addEventListener("submit", handleCreditAllocation);
+  els.creditUsageForm.addEventListener("submit", handleCreditUsage);
   els.addUserForm.addEventListener("submit", handleAddUser);
   els.passwordForm.addEventListener("submit", handlePasswordChange);
   els.logoutBtn.addEventListener("click", handleLogout);

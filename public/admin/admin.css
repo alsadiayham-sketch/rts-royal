@@ -540,6 +540,71 @@ select {
   margin-top: 1rem;
 }
 
+.credit-card {
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: var(--panel-soft);
+}
+
+.credit-card h3 {
+  margin-top: 0;
+}
+
+.credit-filters,
+.ledger-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  gap: .75rem;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+
+.ledger-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+  margin-top: 1.5rem;
+}
+
+.ledger-heading h3 {
+  margin-top: 0;
+}
+
+.ledger-filters {
+  grid-template-columns: minmax(12rem, 1fr) minmax(10rem, auto) minmax(10rem, auto);
+  max-width: 680px;
+  margin-bottom: .75rem;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .75rem;
+  margin-bottom: 1.25rem;
+}
+
+.metric-card {
+  border: 1px solid var(--border);
+  border-radius: .85rem;
+  padding: .85rem;
+  background: var(--panel);
+}
+
+.metric-card span {
+  display: block;
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.metric-card strong {
+  display: block;
+  margin-top: .25rem;
+  font-size: 1.25rem;
+}
+
 button:disabled {
   cursor: not-allowed;
   opacity: .55;
@@ -787,6 +852,16 @@ th {
 
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .credit-filters,
+  .ledger-filters,
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ledger-heading {
+    display: block;
   }
 
   .gallery-item {

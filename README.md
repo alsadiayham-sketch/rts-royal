@@ -10,7 +10,9 @@ iOS and Android development, and point of sale.
 ## Administration
 
 Sign in at `/admin/`. **Business Settings** changes the public WhatsApp number
-and approved POS release link. **Admins** adds administrators and activates or
+and approved POS release link. **Credits** manages the platform message balance,
+per-message customer price/cost defaults, organization allocations, delivery
+usage, the audit ledger, and credit analytics. **Admins** adds administrators and activates or
 deactivates accounts. **My Password** changes the current user's password and
 invalidates their existing sessions.
 

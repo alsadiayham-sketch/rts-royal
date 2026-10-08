@@ -20,6 +20,14 @@ import {
   normalizeStoreName,
   normalizeWarrantyMonths,
 } from "../functions/_lib/pos-store-validation.js";
+import {
+  agorotToNis,
+  normalizeDefaultMessageBalance,
+  normalizeMessageAmount,
+  normalizeNisToAgorot,
+  normalizeOrganizationType,
+  normalizeUnixDate,
+} from "../functions/_lib/credit-validation.js";
 
 test("normalizeUsername enforces lowercase ascii format", () => {
   assert.equal(normalizeUsername(" Admin.User-1 "), "admin.user-1");
@@ -69,6 +77,21 @@ test("POS store provisioning inputs are strictly normalized", () => {
   assert.equal(normalizeWarrantyMonths(0), null);
   assert.equal(normalizeApiBaseUrl("https://shop.pages.dev/"), "https://shop.pages.dev");
   assert.equal(normalizeApiBaseUrl("http://shop.example.com"), null);
+});
+
+test("credit administration inputs are strictly normalized", () => {
+  assert.equal(normalizeOrganizationType("business"), "business");
+  assert.equal(normalizeOrganizationType("clinic"), "clinic");
+  assert.equal(normalizeOrganizationType("other"), null);
+  assert.equal(normalizeDefaultMessageBalance(500), 500);
+  assert.equal(normalizeDefaultMessageBalance(-1), null);
+  assert.equal(normalizeMessageAmount("1000"), 1000);
+  assert.equal(normalizeMessageAmount("1.5"), null);
+  assert.equal(normalizeNisToAgorot("0.20", { allowZero: false }), 20);
+  assert.equal(normalizeNisToAgorot("0", { allowZero: false }), null);
+  assert.equal(agorotToNis(1234), 12.34);
+  assert.equal(normalizeUnixDate("2026-10-08"), Math.floor(Date.parse("2026-10-08T00:00:00Z") / 1000));
+  assert.equal(normalizeUnixDate("08-10-2026"), null);
 });
 
 test("new passwords require minimum length", () => {
