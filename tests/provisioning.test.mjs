@@ -62,7 +62,7 @@ function adminRequest(path, payload) {
   });
 }
 
-function useFirestoreMock(documents, { commitStatus = 200, capture = [] } = {}) {
+function useFirestoreMock(documents, { commitStatus = 200, capture = [], patches = [] } = {}) {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (input, options = {}) => {
     const url = new URL(input);
@@ -71,6 +71,12 @@ function useFirestoreMock(documents, { commitStatus = 200, capture = [] } = {}) 
       return new Response(JSON.stringify({ writeResults: [] }), { status: commitStatus });
     }
     const path = decodeURIComponent(url.pathname.split("/documents/")[1] || "");
+    if (options.method === "PATCH") {
+      const body = JSON.parse(options.body);
+      patches.push({ path, body });
+      documents[path] = { fields: body.fields };
+      return new Response(JSON.stringify(documents[path]), { status: 200 });
+    }
     const document = documents[path];
     return document
       ? new Response(JSON.stringify(document), { status: 200 })
@@ -293,18 +299,17 @@ test("Tracking owner login and dashboard enforce the provisioned product mode", 
   }
 });
 
-test("Tracking owner login rejects legacy plaintext password records", async () => {
+test("Tracking owner login accepts organization IDs and migrates legacy owner records", async () => {
+  const commits = [];
   const restoreFetch = useFirestoreMock({
     "projects/_global/settings/pos_stores": firestoreDocument({
       stores: [{
-        id: "legacy-store",
-        name: "Legacy Store",
+        id: "rts-testing",
+        name: "RTS Clinic · rts-testing",
         type: "firestore",
-        productType: "business",
-        ownerUsername: "legacy.owner",
       }],
     }),
-    "projects/legacy-store/settings/pos_users": firestoreDocument({
+    "projects/rts-testing/settings/pos_users": firestoreDocument({
       users: [{
         username: "legacy.owner",
         password: "legacy-plaintext-password",
@@ -312,21 +317,30 @@ test("Tracking owner login rejects legacy plaintext password records", async () 
         active: true,
       }],
     }),
-  });
+  }, { capture: commits });
   try {
     const response = await ownerLogin({
       request: new Request("https://admin.example/owner/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          organizationName: "Legacy Store",
+          organizationName: "rts-testing",
           username: "legacy.owner",
           password: "legacy-plaintext-password",
         }),
       }),
       env: { DB: database(), AUTH_SECRET: "test-only-auth-secret-is-long-enough" },
     });
-    assert.equal(response.status, 401);
+    assert.equal(response.status, 200);
+    const session = await response.json();
+    assert.equal(session.mode, "clinic");
+    assert.equal(commits.length, 1);
+    const migrationWrite = commits[0].writes[0];
+    assert.equal(migrationWrite.currentDocument.updateTime, "2026-10-11T00:00:00.000000Z");
+    const migratedOwner = migrationWrite.update.fields.users.arrayValue.values[0].mapValue.fields;
+    assert.equal(migratedOwner.password, undefined);
+    assert.ok(migratedOwner.passwordHash.stringValue);
+    assert.equal(migratedOwner.passwordVersion.integerValue, "1");
   } finally {
     restoreFetch();
   }

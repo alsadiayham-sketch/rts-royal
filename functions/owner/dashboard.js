@@ -1,5 +1,6 @@
 import { getFirestoreDocument } from "../_lib/firestore.js";
 import { requireOwnerSession } from "../_lib/owner-session.js";
+import { getPosStoreMode } from "../_lib/pos-store-mode.js";
 import { ApiError, jsonResponse, withApiGuard } from "../_lib/http.js";
 
 const REGISTRY_PATH = "projects/_global/settings/pos_stores";
@@ -28,8 +29,8 @@ export async function onRequestGet(context) {
     const store = (Array.isArray(registry?.stores) ? registry.stores : []).find(
       (candidate) =>
         candidate?.id === owner.organizationId &&
-        candidate?.ownerUsername === owner.ownerUsername &&
-        (candidate.productType === mode || candidate.type === mode)
+        (!candidate.ownerUsername || candidate.ownerUsername === owner.ownerUsername) &&
+        getPosStoreMode(candidate) === mode
     );
     if (!store) throw new ApiError(403, "OWNER_MODE_FORBIDDEN", "Owner session is no longer authorized.");
 
@@ -41,6 +42,9 @@ export async function onRequestGet(context) {
       (candidate) => candidate?.username === owner.ownerUsername
     );
     if (!ownerUser || ownerUser.active === false) {
+      throw new ApiError(403, "OWNER_MODE_FORBIDDEN", "Owner session is no longer authorized.");
+    }
+    if (!store.ownerUsername && ownerUser.role !== "admin" && ownerUser.isOwner !== true) {
       throw new ApiError(403, "OWNER_MODE_FORBIDDEN", "Owner session is no longer authorized.");
     }
     const passwordVersion = Number.isInteger(Number(ownerUser.passwordVersion))

@@ -1,5 +1,10 @@
-import { getFirestoreDocument } from "../_lib/firestore.js";
-import { hasStoredPosPassword, verifyStoredPosPassword } from "../_lib/pos-password.js";
+import {
+  commitFirestoreWrites,
+  getFirestoreDocument,
+  getFirestoreDocumentSnapshot,
+} from "../_lib/firestore.js";
+import { verifyStoredPosPassword } from "../_lib/pos-password.js";
+import { getPosStoreMode } from "../_lib/pos-store-mode.js";
 import { createOwnerSessionToken } from "../_lib/owner-session.js";
 import {
   ApiError,
@@ -19,6 +24,15 @@ function usersPath(organizationId) {
 
 function normalizeOrganizationName(value) {
   return typeof value === "string" ? value.trim().replace(/\s+/g, " ") : "";
+}
+
+function matchesOrganization(store, suppliedName) {
+  const normalizedId = typeof store?.id === "string" ? store.id.trim() : "";
+  const normalizedName = typeof store?.name === "string" ? store.name.trim() : "";
+  return (
+    normalizedId.localeCompare(suppliedName, undefined, { sensitivity: "accent" }) === 0 ||
+    normalizedName.localeCompare(suppliedName, undefined, { sensitivity: "accent" }) === 0
+  );
 }
 
 export async function onRequestPost(context) {
@@ -41,25 +55,40 @@ export async function onRequestPost(context) {
     const registry = await getFirestoreDocument(REGISTRY_PATH);
     const store = (Array.isArray(registry?.stores) ? registry.stores : []).find(
       (candidate) =>
-        typeof candidate?.name === "string" &&
-        candidate.name.trim().localeCompare(organizationName, undefined, { sensitivity: "accent" }) === 0 &&
-        candidate.ownerUsername === username
+        matchesOrganization(candidate, organizationName) &&
+        (!candidate.ownerUsername || candidate.ownerUsername === username)
     );
     if (!store) throw new ApiError(401, "OWNER_AUTH_FAILED", "Invalid owner credentials.");
 
-    const usersDocument = await getFirestoreDocument(usersPath(store.id));
+    const usersSnapshot = await getFirestoreDocumentSnapshot(usersPath(store.id));
+    const usersDocument = usersSnapshot?.data;
     const user = (Array.isArray(usersDocument?.users) ? usersDocument.users : []).find(
       (candidate) => candidate?.username === username
     );
-    const verification = user && hasStoredPosPassword(user)
+    const legacyOwner = !store.ownerUsername;
+    const verification = user && (!legacyOwner || user.role === "admin" || user.isOwner === true)
       ? await verifyStoredPosPassword(user, password)
-      : { verified: false };
+      : { verified: false, migratedUser: null };
     if (!user || user.active === false || !verification.verified) {
       throw new ApiError(401, "OWNER_AUTH_FAILED", "Invalid owner credentials.");
     }
-    const mode = store.productType === "clinic" || store.type === "clinic" ? "clinic" : "business";
-    const passwordVersion = Number.isInteger(Number(user.passwordVersion))
-      ? Math.max(1, Number(user.passwordVersion))
+    const authenticatedUser = verification.migratedUser
+      ? { ...verification.migratedUser, passwordVersion: 1 }
+      : user;
+    if (verification.migratedUser) {
+      const users = Array.isArray(usersDocument?.users) ? [...usersDocument.users] : [];
+      const index = users.findIndex((candidate) => candidate?.username === username);
+      users[index] = authenticatedUser;
+      await commitFirestoreWrites([{
+        path: usersPath(store.id),
+        data: { users },
+        updateTime: usersSnapshot?.updateTime,
+      }]);
+    }
+
+    const mode = getPosStoreMode(store);
+    const passwordVersion = Number.isInteger(Number(authenticatedUser.passwordVersion))
+      ? Math.max(1, Number(authenticatedUser.passwordVersion))
       : 1;
     const now = Math.floor(Date.now() / 1000);
     const token = await createOwnerSessionToken(env.AUTH_SECRET, {
@@ -73,8 +102,8 @@ export async function onRequestPost(context) {
       token,
       mode,
       organizationName: store.name,
-      ownerName: store.ownerName || user.displayName || user.name || username,
-      displayName: user.displayName || user.name || username,
+      ownerName: store.ownerName || authenticatedUser.displayName || authenticatedUser.name || username,
+      displayName: authenticatedUser.displayName || authenticatedUser.name || username,
     });
   });
 }
