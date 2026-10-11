@@ -2,6 +2,7 @@ import { getFirestoreDocument } from "../_lib/firestore.js";
 import { requireOwnerSession } from "../_lib/owner-session.js";
 import { getPosStoreMode } from "../_lib/pos-store-mode.js";
 import { ApiError, jsonResponse, withApiGuard } from "../_lib/http.js";
+import { buildOwnerDashboard } from "../_lib/owner-dashboard.js";
 
 const REGISTRY_PATH = "projects/_global/settings/pos_stores";
 
@@ -53,32 +54,12 @@ export async function onRequestGet(context) {
     if (passwordVersion !== owner.passwordVersion) {
       throw new ApiError(401, "OWNER_SESSION_REVOKED", "Owner credentials changed. Sign in again.");
     }
-    const warrantyEnd = licence?.warrantyEnd ? new Date(licence.warrantyEnd) : null;
-    const active = Boolean(warrantyEnd && !Number.isNaN(warrantyEnd.getTime()) && warrantyEnd.getTime() > Date.now());
-    const productLabel = mode === "clinic" ? "Clinic" : "Business";
-    const synchronizedLabel = new Date().toISOString();
-    return jsonResponse({
+    return jsonResponse(await buildOwnerDashboard({
+      db: env.DB,
+      store,
+      licence,
+      usersDocument,
       mode,
-      metrics: [
-        { key: "licence", label: "Licence", value: active ? "Active" : "Expired" },
-        { key: "licenceEnd", label: "Licence ends", value: warrantyEnd?.toISOString().slice(0, 10) || "Unavailable" },
-      ],
-      sites: [{
-        id: store.id,
-        name: store.name || store.id,
-        online: active,
-        updatedLabel: synchronizedLabel,
-        primaryLabel: `${productLabel} licence`,
-        primaryValue: active ? "Active" : "Expired",
-        ...(active ? {} : { attention: "Licence renewal is required." }),
-      }],
-      alerts: active ? [] : [{
-        id: "licence-expired",
-        title: `${productLabel} licence is inactive`,
-        detail: store.name || store.id,
-        level: "critical",
-      }],
-      synchronizedLabel,
-    });
+    }));
   });
 }

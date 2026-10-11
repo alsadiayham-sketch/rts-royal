@@ -28,6 +28,20 @@ The primary owner account is linked to the RTS Tracking API at
 `/owner/login` and `/owner/dashboard`; configure the Tracking app with this
 site as its HTTPS API base URL.
 
+`GET /owner/dashboard?mode=business|clinic` returns contract version 2 while
+retaining the original `mode`, `metrics`, `sites`, `alerts`, and
+`synchronizedLabel` fields used by current Tracking releases. New clients can
+also consume `overview`, `locations`, `recentActivity`, the partial
+privacy-safe `auditLog`, `financialMetrics`, `operationalMetrics`,
+`modeDetail`, and `dataAvailability`.
+
+The endpoint currently has authoritative licence, aggregate staff-account, and
+RTS platform messaging-credit data. It explicitly marks source-system sales,
+inventory, clinic workflow, revenue, and live connectivity as unavailable until
+Business and Clinic publish signed aggregate telemetry. Tracking never returns
+clinic patient identities, medical details, attachments, or unnecessary staff
+PII.
+
 The public enquiry form opens WhatsApp with an editable message; it does not
 send messages automatically or store enquiries in D1.
 
