@@ -104,6 +104,7 @@ export async function onRequestPost(context) {
     }
     const existing = index >= 0 ? users[index] : null;
     const nextUser = {
+      ...(existing || {}),
       username,
       name,
       displayName: name,
@@ -112,13 +113,7 @@ export async function onRequestPost(context) {
     };
     if (password) {
       Object.assign(nextUser, await createStoredPosPassword(password));
-    } else if (existing) {
-      Object.assign(nextUser, existing);
-      nextUser.username = username;
-      nextUser.name = name;
-      nextUser.displayName = name;
-      nextUser.role = role;
-      nextUser.active = existing.active !== false;
+      nextUser.passwordVersion = Math.max(1, Number(existing?.passwordVersion) || 1) + (existing ? 1 : 0);
     }
     if (index >= 0) users[index] = nextUser;
     else users.push(nextUser);
@@ -138,11 +133,14 @@ export async function onRequestPatch(context) {
     if (!storeId || !username || typeof payload.active !== "boolean") {
       throw new ApiError(400, "INVALID_POS_USER", "POS user details are invalid.");
     }
-    await requireStandaloneStore(storeId);
+    const store = await requireStandaloneStore(storeId);
 
     const users = await getUsers(storeId);
     const target = users.find((user) => user.username === username);
     if (!target) throw new ApiError(404, "POS_USER_NOT_FOUND", "POS user not found.");
+    if (store.ownerUsername === username && !payload.active) {
+      throw new ApiError(409, "OWNER_ACCOUNT_REQUIRED", "The linked owner account cannot be disabled.");
+    }
     assertUserStatusChangeAllowed({
       actorUsername: actor.username,
       targetUsername: username,
@@ -167,12 +165,15 @@ export async function onRequestDelete(context) {
     if (!storeId || !username) {
       throw new ApiError(400, "INVALID_POS_USER", "POS user details are invalid.");
     }
-    await requireStandaloneStore(storeId);
+    const store = await requireStandaloneStore(storeId);
 
     const users = await getUsers(storeId);
     const index = users.findIndex((user) => user.username === username);
     if (index < 0) return jsonResponse({ ok: true });
     const target = users[index];
+    if (store.ownerUsername === username) {
+      throw new ApiError(409, "OWNER_ACCOUNT_REQUIRED", "The linked owner account cannot be deleted.");
+    }
     if (actor.username === username) {
       throw new ApiError(400, "SELF_DELETE_FORBIDDEN", "You cannot delete your own account.");
     }

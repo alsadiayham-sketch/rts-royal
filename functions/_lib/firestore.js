@@ -74,6 +74,13 @@ export async function getFirestoreDocument(path) {
   return document ? decodeFields(document.fields) : null;
 }
 
+export async function getFirestoreDocumentSnapshot(path) {
+  const document = await firestoreRequest(path, { allowMissing: true });
+  return document
+    ? { data: decodeFields(document.fields), updateTime: document.updateTime || null }
+    : null;
+}
+
 export async function setFirestoreDocument(path, data) {
   const fields = Object.fromEntries(Object.entries(data).map(([key, value]) => [key, encodeValue(value)]));
   const document = await firestoreRequest(path, {
@@ -91,4 +98,45 @@ export async function patchFirestoreDocument(path, data) {
     body: { fields },
   });
   return decodeFields(document.fields);
+}
+
+export async function commitFirestoreWrites(writes) {
+  if (!Array.isArray(writes) || writes.length === 0) {
+    throw new TypeError("Firestore commit requires at least one write.");
+  }
+
+  const payload = {
+    writes: writes.map(({ path, data, create = false, updateTime = null }) => {
+      const fields = Object.fromEntries(Object.entries(data).map(([key, value]) => [key, encodeValue(value)]));
+      const write = {
+        update: {
+          name: `projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/${path}`,
+          fields,
+        },
+      };
+      if (create) write.currentDocument = { exists: false };
+      else if (updateTime) write.currentDocument = { updateTime };
+      return write;
+    }),
+  };
+
+  let response;
+  try {
+    const url = new URL(`${FIRESTORE_ROOT}:commit`);
+    url.searchParams.set("key", FIREBASE_WEB_API_KEY);
+    response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    throw new ApiError(502, "POS_REGISTRY_UNAVAILABLE", "POS store registry is unavailable.");
+  }
+  if (response.status === 409 || response.status === 412) {
+    throw new ApiError(409, "POS_REGISTRY_CONFLICT", "POS store registry changed. Please retry.");
+  }
+  if (!response.ok) {
+    throw new ApiError(502, "POS_REGISTRY_UNAVAILABLE", "POS store registry request failed.");
+  }
+  return response.json();
 }

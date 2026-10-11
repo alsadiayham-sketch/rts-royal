@@ -9,12 +9,16 @@ export async function createStoredPosPassword(password) {
   };
 }
 
-export async function verifyStoredPosPassword(user, password) {
-  if (
+export function hasStoredPosPassword(user) {
+  return (
     typeof user?.passwordSalt === "string" &&
     typeof user?.passwordHash === "string" &&
     Number.isInteger(Number(user.passwordIterations))
-  ) {
+  );
+}
+
+export async function verifyStoredPosPassword(user, password) {
+  if (hasStoredPosPassword(user)) {
     return {
       verified: await verifyPassword(password, {
         salt: user.passwordSalt,

@@ -1,9 +1,10 @@
 import { requireAuthenticatedUser } from "../_lib/auth.js";
 import {
+  commitFirestoreWrites,
   firestoreTimestamp,
   getFirestoreDocument,
+  getFirestoreDocumentSnapshot,
   patchFirestoreDocument,
-  setFirestoreDocument,
 } from "../_lib/firestore.js";
 import {
   ApiError,
@@ -23,6 +24,7 @@ import {
 import { enforceRateLimit } from "../_lib/rate-limit.js";
 import { normalizeUsername, validateNewPassword } from "../_lib/validation.js";
 import { createStoredPosPassword } from "../_lib/pos-password.js";
+import { createCreditAccount, deleteNewCreditAccount } from "../_lib/credit-provisioning.js";
 
 const REGISTRY_PATH = "projects/_global/settings/pos_stores";
 
@@ -74,7 +76,7 @@ export async function onRequestGet(context) {
 }
 
 export async function onRequestPost(context) {
-  return withApiGuard(context, async ({ request }) => {
+  return withApiGuard(context, async ({ request, env }) => {
     requireTrustedMutationRequest(request);
     requireJsonContentType(request);
     await authorizeMutation(context, "pos_stores_create");
@@ -99,11 +101,6 @@ export async function onRequestPost(context) {
     if (!backend) throw new ApiError(400, "INVALID_STORE_BACKEND", "Store backend is invalid.");
     if (!warrantyMonths) throw new ApiError(400, "INVALID_WARRANTY", "Warranty period is invalid.");
 
-    const stores = await loadStores();
-    if (stores.some((store) => store.id === id)) {
-      throw new ApiError(409, "STORE_EXISTS", "Store ID already exists.");
-    }
-
     let apiBaseUrl = "";
     let linkedProject = "";
     if (backend === "d1") {
@@ -114,50 +111,74 @@ export async function onRequestPost(context) {
       }
     }
 
-    let adminUsername = "";
-    if (backend === "firestore") {
-      adminUsername = normalizeUsername(payload.adminUsername);
-      const adminName = normalizeStoreName(payload.adminName);
-      const adminPassword = typeof payload.adminPassword === "string" ? payload.adminPassword : "";
-      const legacyClinicPassword = id === "rts-testing" && adminPassword.length >= 8 && adminPassword.length <= 128;
-      if (!adminUsername || !adminName || (!validateNewPassword(adminPassword) && !legacyClinicPassword)) {
-        throw new ApiError(400, "INVALID_STORE_ADMIN", "Initial store administrator is invalid.");
-      }
-      await setFirestoreDocument(usersPath(id), {
-        users: [
-          {
-            username: adminUsername,
-            ...(await createStoredPosPassword(adminPassword)),
-            name: adminName,
-            displayName: adminName,
-            role: "admin",
-            active: true,
-          },
-        ],
-      });
+    const adminUsername = normalizeUsername(payload.adminUsername);
+    const adminName = normalizeStoreName(payload.adminName);
+    const adminPassword = typeof payload.adminPassword === "string" ? payload.adminPassword : "";
+    if (!adminUsername || !adminName || !validateNewPassword(adminPassword)) {
+      throw new ApiError(400, "INVALID_STORE_ADMIN", "Initial store owner is invalid.");
     }
+    const users = [{
+      username: adminUsername,
+      ...(await createStoredPosPassword(adminPassword)),
+      name: adminName,
+      displayName: adminName,
+      role: "admin",
+      isOwner: true,
+      passwordVersion: 1,
+      active: true,
+    }];
 
     const warrantyEnd = new Date();
     warrantyEnd.setUTCMonth(warrantyEnd.getUTCMonth() + warrantyMonths);
-    await setFirestoreDocument(licencePath(id), {
+    const licence = {
       warrantyEnd: firestoreTimestamp(warrantyEnd.toISOString()),
       createdAt: firestoreTimestamp(new Date().toISOString()),
       storeName: name,
       dataBackend: backend,
+      productType: "business",
+      ownerUsername: adminUsername,
+      ownerName: adminName,
       ...(backend === "d1" ? { apiBaseUrl, linkedProject } : {}),
-    });
-
-    const registry = await getFirestoreDocument(REGISTRY_PATH);
-    const registryStores = Array.isArray(registry?.stores) ? registry.stores : [];
-    registryStores.push({
+    };
+    const registry = await getFirestoreDocumentSnapshot(REGISTRY_PATH);
+    const registryStores = Array.isArray(registry?.data?.stores) ? registry.data.stores : [];
+    if (registryStores.some((store) => store?.id === id)) {
+      throw new ApiError(409, "STORE_EXISTS", "Store ID already exists.");
+    }
+    const registryStore = {
       id,
       name,
       type: backend,
+      productType: "business",
       linkedProject,
       apiBaseUrl,
+      ownerUsername: adminUsername,
+      ownerName: adminName,
       createdAt: Date.now(),
-    });
-    await setFirestoreDocument(REGISTRY_PATH, { stores: registryStores });
+    };
+
+    let creditAccountCreated = false;
+    try {
+      creditAccountCreated = await createCreditAccount(env.DB, "business", id, name);
+      await commitFirestoreWrites([
+        { path: licencePath(id), data: licence, create: true },
+        { path: usersPath(id), data: { users }, create: true },
+        {
+          path: REGISTRY_PATH,
+          data: { stores: [...registryStores, registryStore] },
+          ...(registry?.updateTime ? { updateTime: registry.updateTime } : { create: true }),
+        },
+      ]);
+    } catch (error) {
+      if (creditAccountCreated) {
+        try {
+          await deleteNewCreditAccount(env.DB, "business", id);
+        } catch {
+          throw new ApiError(502, "PROVISIONING_ROLLBACK_FAILED", "Store provisioning could not be completed safely.");
+        }
+      }
+      throw error;
+    }
 
     return jsonResponse(
       {
@@ -170,6 +191,7 @@ export async function onRequestPost(context) {
           apiBaseUrl,
           warrantyEnd: warrantyEnd.toISOString(),
           adminUsername,
+          productType: "business",
         },
       },
       201
@@ -189,6 +211,11 @@ export async function onRequestPatch(context) {
       throw new ApiError(400, "INVALID_STORE_ACTION", "Store action is invalid.");
     }
 
+    const registry = await getFirestoreDocument(REGISTRY_PATH);
+    const stores = Array.isArray(registry?.stores) ? registry.stores : [];
+    if (!stores.some((store) => store?.id === id && store.type !== "clinic")) {
+      throw new ApiError(404, "STORE_NOT_FOUND", "Store not found.");
+    }
     const current = await getFirestoreDocument(licencePath(id));
     if (!current) throw new ApiError(404, "STORE_NOT_FOUND", "Store not found.");
     const warrantyEnd = new Date();

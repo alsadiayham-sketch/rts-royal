@@ -174,11 +174,11 @@ const I18N = {
     backendStandalone: "RTS Business فقط",
     linkedProjectLabel: "معرّف مشروع الويب",
     apiUrlLabel: "رابط واجهة المشروع",
-    d1UserNote: "تُنشأ حسابات الكاشير من لوحة المشروع المرتبط لأن كلمات المرور مشفرة على الخادم.",
-    storeAdminUsernameLabel: "اسم مستخدم المدير الأول",
-    storeAdminNameLabel: "اسم المدير المعروض",
-    storeAdminPasswordLabel: "كلمة مرور المدير الأول",
-    firestoreWarning: "كتالوج مستقل للمتجر. تُدار حسابات المستخدمين وبيانات الدخول مباشرة من RTS.",
+    d1UserNote: "تُنشأ حسابات الكاشير من لوحة المشروع المرتبط. يُستخدم حساب المالك أدناه أيضاً في RTS Tracking.",
+    storeAdminUsernameLabel: "اسم مستخدم المالك",
+    storeAdminNameLabel: "اسم المالك المعروض",
+    storeAdminPasswordLabel: "كلمة مرور المالك",
+    firestoreWarning: "المالك يستطيع تسجيل الدخول إلى RTS Business وRTS Tracking. أضف الموظفين بعد إنشاء المتجر.",
     createStore: "إنشاء المتجر",
     storesTableCaption: "قائمة متاجر RTS Business",
     warrantyStatusLabel: "حالة الترخيص",
@@ -188,12 +188,12 @@ const I18N = {
     clinicIdLabel: "معرّف العيادة",
     clinicIdHelp: "أحرف إنجليزية صغيرة وأرقام وشرطات فقط.",
     clinicNameLabel: "اسم العيادة",
-    clinicAdminTitle: "حساب مدير العيادة",
+    clinicAdminTitle: "حساب مالك العيادة",
     clinicUsersTitle: "حسابات موظفي العيادة (اختياري)",
     clinicUsersHelp: "يمكنك إنشاء العيادة بمدير فقط، أو إضافة عدة موظفين ومديرين الآن. يمكن تعديلهم لاحقاً.",
     addClinicUser: "إضافة مستخدم",
     removeClinicUser: "حذف المستخدم",
-    clinicPasswordLabel: "كلمة مرور العيادة",
+    clinicPasswordLabel: "كلمة مرور المالك",
     createClinic: "إنشاء العيادة",
     clinicsTableCaption: "قائمة عيادات RTS Clinic",
     noClinics: "لا توجد عيادات مسجلة بعد.",
@@ -417,11 +417,11 @@ const I18N = {
     backendStandalone: "RTS Business Only",
     linkedProjectLabel: "Website Project ID",
     apiUrlLabel: "Project API URL",
-    d1UserNote: "Cashier accounts are created in the linked project admin because passwords are encrypted server-side.",
-    storeAdminUsernameLabel: "Initial Admin Username",
-    storeAdminNameLabel: "Admin Display Name",
-    storeAdminPasswordLabel: "Initial Admin Password",
-    firestoreWarning: "An independent store catalogue. User accounts and sign-in details are managed directly from RTS.",
+    d1UserNote: "Cashier accounts are created in the linked project admin. The owner account below is also used by RTS Tracking.",
+    storeAdminUsernameLabel: "Owner Username",
+    storeAdminNameLabel: "Owner Display Name",
+    storeAdminPasswordLabel: "Owner Password",
+    firestoreWarning: "The owner can sign in to RTS Business and RTS Tracking. Add staff after creating the store.",
     createStore: "Create Store",
     storesTableCaption: "RTS Business stores list",
     warrantyStatusLabel: "Licence Status",
@@ -431,12 +431,12 @@ const I18N = {
     clinicIdLabel: "Clinic ID",
     clinicIdHelp: "Lowercase English letters, numbers, and hyphens only.",
     clinicNameLabel: "Clinic Name",
-    clinicAdminTitle: "Clinic Admin Account",
+    clinicAdminTitle: "Clinic Owner Account",
     clinicUsersTitle: "Clinic staff accounts (optional)",
     clinicUsersHelp: "Create the clinic with an administrator only, or add multiple staff and managers now. You can edit them later.",
     addClinicUser: "Add user",
     removeClinicUser: "Remove user",
-    clinicPasswordLabel: "Clinic Password",
+    clinicPasswordLabel: "Owner Password",
     createClinic: "Create Clinic",
     clinicsTableCaption: "RTS Clinic list",
     noClinics: "No clinics are registered yet.",
@@ -1299,12 +1299,11 @@ function renderStoresTable() {
 function syncStoreBackendFields() {
   const d1 = els.storeBackend.value === "d1";
   document.getElementById("d1-store-fields").classList.toggle("hidden", !d1);
-  document.getElementById("firestore-store-fields").classList.toggle("hidden", d1);
   for (const id of ["store-linked-project", "store-api-url"]) {
     document.getElementById(id).required = d1;
   }
   for (const id of ["store-admin-username", "store-admin-name", "store-admin-password"]) {
-    document.getElementById(id).required = !d1;
+    document.getElementById(id).required = true;
   }
 }
 
@@ -1641,6 +1640,24 @@ function mapApiError(errorCode, fallbackMessage) {
       state.lang === "ar" ? "تم إرسال حقول غير معروفة." : "Unknown fields were provided.",
     STORE_EXISTS:
       state.lang === "ar" ? "معرّف المتجر مستخدم بالفعل." : "Store ID already exists.",
+    CLINIC_EXISTS:
+      state.lang === "ar" ? "معرّف العيادة مستخدم بالفعل." : "Clinic ID already exists.",
+    INVALID_STORE_ADMIN:
+      state.lang === "ar"
+        ? "بيانات حساب المالك غير صالحة. استخدم كلمة مرور من 12 إلى 128 حرفاً."
+        : "Owner account details are invalid. Use a password of 12-128 characters.",
+    INVALID_CLINIC:
+      state.lang === "ar"
+        ? "بيانات العيادة أو حساب المالك غير صالحة."
+        : "Clinic or owner account details are invalid.",
+    INVALID_CLINIC_USERS:
+      state.lang === "ar" ? "حسابات موظفي العيادة غير صالحة أو مكررة." : "Clinic staff accounts are invalid or duplicated.",
+    POS_REGISTRY_CONFLICT:
+      state.lang === "ar" ? "تغيّر السجل أثناء الحفظ. حاول مرة أخرى." : "The registry changed while saving. Please try again.",
+    PROVISIONING_ROLLBACK_FAILED:
+      state.lang === "ar"
+        ? "تعذر إكمال الإنشاء بأمان. تواصل مع دعم RTS قبل إعادة المحاولة."
+        : "Provisioning could not complete safely. Contact RTS support before retrying.",
     POS_REGISTRY_UNAVAILABLE:
       state.lang === "ar"
         ? "تعذر الوصول إلى سجل متاجر نقطة البيع."
@@ -1649,6 +1666,10 @@ function mapApiError(errorCode, fallbackMessage) {
       state.lang === "ar"
         ? "لا يمكن تعطيل آخر مدير نشط للمتجر."
         : "The last active store manager cannot be disabled.",
+    OWNER_ACCOUNT_REQUIRED:
+      state.lang === "ar"
+        ? "لا يمكن تعطيل أو حذف حساب المالك المرتبط."
+        : "The linked owner account cannot be disabled or deleted.",
   };
 
   return dictionary[errorCode] || fallbackMessage || t("unexpectedError");

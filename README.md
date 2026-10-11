@@ -21,6 +21,13 @@ their own account or the last active administrator. Initial-password warnings
 remain visible until the password is changed. New passwords require 12-128
 characters. Use a password manager and unique passwords.
 
+Creating an RTS Business store or RTS Clinic atomically writes its licence,
+hashed owner account, and typed registry entry. It also initializes the D1
+credit account; if registry creation fails, that new D1 record is removed.
+The primary owner account is linked to the RTS Tracking API at
+`/owner/login` and `/owner/dashboard`; configure the Tracking app with this
+site as its HTTPS API base URL.
+
 The public enquiry form opens WhatsApp with an editable message; it does not
 send messages automatically or store enquiries in D1.
 

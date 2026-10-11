@@ -80,20 +80,25 @@ export async function onRequestPost(context) {
     }
 
     const role = user.role === "admin" ? "admin" : "worker";
+    const productType = store.productType === "clinic" || store.type === "clinic" ? "clinic" : "business";
     const sessionToken = await createPosSessionToken(env, {
       storeId,
       username,
       role,
+      productType,
       exp: Math.floor(Date.now() / 1000) + 60 * 60 * 8,
     });
 
     return jsonResponse({
       ok: true,
       sessionToken,
+      token: sessionToken,
+      productType,
       store: {
         id: storeId,
         name: store.name || licence.storeName || storeId,
         warrantyEnd: warrantyEnd.toISOString(),
+        productType,
       },
       user: {
         username,

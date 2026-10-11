@@ -1,8 +1,9 @@
 import { requireAuthenticatedUser } from "../_lib/auth.js";
 import {
+  commitFirestoreWrites,
   firestoreTimestamp,
   getFirestoreDocument,
-  setFirestoreDocument,
+  getFirestoreDocumentSnapshot,
   patchFirestoreDocument,
 } from "../_lib/firestore.js";
 import {
@@ -21,6 +22,7 @@ import {
 } from "../_lib/pos-store-validation.js";
 import { normalizeUsername, validateNewPassword } from "../_lib/validation.js";
 import { createStoredPosPassword } from "../_lib/pos-password.js";
+import { createCreditAccount, deleteNewCreditAccount } from "../_lib/credit-provisioning.js";
 
 const REGISTRY_PATH = "projects/_global/settings/pos_stores";
 
@@ -78,7 +80,7 @@ export async function onRequestGet(context) {
 }
 
 export async function onRequestPost(context) {
-  return withApiGuard(context, async ({ request }) => {
+  return withApiGuard(context, async ({ request, env }) => {
     requireTrustedMutationRequest(request);
     requireJsonContentType(request);
     await authorizeMutation(context, "clinics_create");
@@ -125,6 +127,8 @@ export async function onRequestPost(context) {
       name: adminName,
       displayName: adminName,
       role: "admin",
+      isOwner: true,
+      passwordVersion: 1,
       active: true,
     }];
     const usernames = new Set([adminUsername]);
@@ -147,31 +151,56 @@ export async function onRequestPost(context) {
       });
     }
 
-    const registry = await getFirestoreDocument(REGISTRY_PATH);
-    const stores = Array.isArray(registry?.stores) ? registry.stores : [];
+    const registry = await getFirestoreDocumentSnapshot(REGISTRY_PATH);
+    const stores = Array.isArray(registry?.data?.stores) ? registry.data.stores : [];
     if (stores.some((store) => store.id === id)) {
       throw new ApiError(409, "CLINIC_EXISTS", "Clinic ID already exists.");
     }
 
     const warrantyEnd = new Date();
     warrantyEnd.setUTCMonth(warrantyEnd.getUTCMonth() + warrantyMonths);
-    await setFirestoreDocument(licencePath(id), {
+    const createdAt = new Date().toISOString();
+    const licence = {
       warrantyEnd: firestoreTimestamp(warrantyEnd.toISOString()),
-      createdAt: firestoreTimestamp(new Date().toISOString()),
+      createdAt: firestoreTimestamp(createdAt),
       storeName: name,
       dataBackend: "firestore",
-    });
-    await setFirestoreDocument(usersPath(id), {
-      users,
-    });
-
-    stores.push({
+      productType: "clinic",
+      ownerUsername: adminUsername,
+      ownerName: adminName,
+    };
+    const registryClinic = {
       id,
       name,
       type: "clinic",
+      productType: "clinic",
+      ownerUsername: adminUsername,
+      ownerName: adminName,
       createdAt: Date.now(),
-    });
-    await setFirestoreDocument(REGISTRY_PATH, { stores });
+    };
+
+    let creditAccountCreated = false;
+    try {
+      creditAccountCreated = await createCreditAccount(env.DB, "clinic", id, name);
+      await commitFirestoreWrites([
+        { path: licencePath(id), data: licence, create: true },
+        { path: usersPath(id), data: { users }, create: true },
+        {
+          path: REGISTRY_PATH,
+          data: { stores: [...stores, registryClinic] },
+          ...(registry?.updateTime ? { updateTime: registry.updateTime } : { create: true }),
+        },
+      ]);
+    } catch (error) {
+      if (creditAccountCreated) {
+        try {
+          await deleteNewCreditAccount(env.DB, "clinic", id);
+        } catch {
+          throw new ApiError(502, "PROVISIONING_ROLLBACK_FAILED", "Clinic provisioning could not be completed safely.");
+        }
+      }
+      throw error;
+    }
     return jsonResponse({ ok: true, clinic: { id, name, warrantyEnd: warrantyEnd.toISOString() } }, 201);
   });
 }
