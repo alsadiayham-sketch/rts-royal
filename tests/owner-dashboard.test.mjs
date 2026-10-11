@@ -157,3 +157,101 @@ test("a future periodic heartbeat drives the location status without changing le
     false
   );
 });
+
+test("business aggregate telemetry populates operations, health, finances, and event counts", async () => {
+  const dashboard = await buildOwnerDashboard({
+    store: { id: "telemetry-market", name: "Telemetry Market", type: "firestore" },
+    licence: {
+      warrantyEnd: "2030-01-01T00:00:00.000Z",
+      telemetry: {
+        schemaVersion: 1,
+        productType: "business",
+        source: "rts-business-pos",
+        generatedAt: "2026-10-11T11:58:00.000Z",
+        receivedAt: "2026-10-11T11:58:02.000Z",
+        lastHeartbeatAt: "2026-10-11T11:58:00.000Z",
+        appVersion: "4.2.1",
+        metrics: {
+          salesToday: 2500.5,
+          ordersToday: 20,
+          averageOrderValue: 125.025,
+          inventoryValue: 9000,
+          lowStockItems: 3,
+          returnsToday: 1,
+          refundsToday: 50,
+          databaseHealthy: true,
+          syncHealthy: true,
+          backupHealthy: false,
+          terminalCount: 2,
+        },
+        eventCounters: {
+          auditEvents: 31,
+          salesCompleted: 20,
+          inventoryAdjustments: 2,
+        },
+      },
+    },
+    usersDocument: { users: [] },
+    mode: "business",
+    generatedAt: new Date("2026-10-11T12:00:00.000Z"),
+  });
+
+  assert.equal(dashboard.modeDetail.salesToday.available, true);
+  assert.equal(dashboard.modeDetail.salesToday.value, 2500.5);
+  assert.equal(dashboard.financialMetrics.businessRevenue.value, 2500.5);
+  assert.equal(dashboard.financialMetrics.sourceApplication.inventoryValue.value, 9000);
+  assert.equal(dashboard.operationalMetrics.health.metrics.terminalCount, 2);
+  assert.equal(dashboard.auditLog.completeness, "aggregate-only");
+  assert.equal(dashboard.auditLog.eventCounts.salesCompleted, 20);
+  assert.ok(dashboard.alerts.some((alert) => alert.id === "source-backupHealthy"));
+  assert.equal(dashboard.dataAvailability.unavailable.includes("sales"), false);
+  assert.equal(dashboard.dataAvailability.available.includes("aggregate-event-counters"), true);
+});
+
+test("clinic aggregate telemetry exposes counts and totals without leaking medical or free-text fields", async () => {
+  const dashboard = await buildOwnerDashboard({
+    store: { id: "telemetry-clinic", name: "Telemetry Clinic", type: "clinic" },
+    licence: {
+      warrantyEnd: "2030-01-01T00:00:00.000Z",
+      telemetry: {
+        schemaVersion: 1,
+        productType: "clinic",
+        source: "rts-clinic-pos",
+        generatedAt: "2026-10-11T11:58:00.000Z",
+        receivedAt: "2026-10-11T11:58:02.000Z",
+        lastHeartbeatAt: "2026-10-11T11:58:00.000Z",
+        appVersion: "2.1.0",
+        metrics: {
+          appointmentsToday: 12,
+          waitingCount: 2,
+          completedSessionsToday: 8,
+          followUpsDue: 4,
+          collectionsToday: 1600,
+          outstandingInsurance: 300,
+          syncHealthy: true,
+          patientName: "Sensitive Patient",
+        },
+        eventCounters: {
+          appointmentsCreated: 5,
+          paymentsRecorded: 8,
+          rawAuditEntry: "Sensitive diagnosis",
+        },
+        notes: "Sensitive medical notes",
+      },
+    },
+    usersDocument: { users: [] },
+    mode: "clinic",
+    generatedAt: new Date("2026-10-11T12:00:00.000Z"),
+  });
+
+  assert.equal(dashboard.modeDetail.appointmentsToday.value, 12);
+  assert.equal(dashboard.modeDetail.collectionsToday.value, 1600);
+  assert.equal(dashboard.financialMetrics.sourceApplication.revenueToday.value, 1600);
+  assert.equal(dashboard.financialMetrics.sourceApplication.outstandingBalance.value, 300);
+  assert.equal(dashboard.auditLog.eventCounts.paymentsRecorded, 8);
+  assert.equal(dashboard.modeDetail.patientDetailsIncluded, false);
+  const serialized = JSON.stringify(dashboard);
+  for (const privateValue of ["Sensitive Patient", "Sensitive diagnosis", "Sensitive medical notes", "rawAuditEntry"]) {
+    assert.equal(serialized.includes(privateValue), false);
+  }
+});

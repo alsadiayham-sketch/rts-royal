@@ -1,6 +1,6 @@
 import { getFirestoreDocument, setFirestoreDocument } from "../_lib/firestore.js";
-import { hmacSha256Hex } from "../_lib/crypto.js";
 import { verifyStoredPosPassword } from "../_lib/pos-password.js";
+import { getPosStoreMode } from "../_lib/pos-store-mode.js";
 import {
   ApiError,
   jsonResponse,
@@ -9,6 +9,7 @@ import {
   withApiGuard,
 } from "../_lib/http.js";
 import { enforceRateLimit } from "../_lib/rate-limit.js";
+import { createPosSessionToken } from "../_lib/pos-session.js";
 import { normalizeStoreId } from "../_lib/pos-store-validation.js";
 import { normalizeUsername } from "../_lib/validation.js";
 
@@ -20,16 +21,6 @@ function usersPath(storeId) {
 
 function licencePath(storeId) {
   return `projects/${storeId}/settings/pos`;
-}
-
-function toBase64Url(value) {
-  return btoa(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
-}
-
-async function createPosSessionToken(env, claims) {
-  const encodedClaims = toBase64Url(JSON.stringify(claims));
-  const signature = await hmacSha256Hex(env.AUTH_SECRET, encodedClaims);
-  return `${encodedClaims}.${signature}`;
 }
 
 export async function onRequestPost(context) {
@@ -80,8 +71,8 @@ export async function onRequestPost(context) {
     }
 
     const role = user.role === "admin" ? "admin" : "worker";
-    const productType = store.productType === "clinic" || store.type === "clinic" ? "clinic" : "business";
-    const sessionToken = await createPosSessionToken(env, {
+    const productType = getPosStoreMode(store);
+    const sessionToken = await createPosSessionToken(env.AUTH_SECRET, {
       storeId,
       username,
       role,

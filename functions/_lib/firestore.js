@@ -51,6 +51,9 @@ async function firestoreRequest(path, options = {}) {
   for (const field of options.updateMask ?? []) {
     url.searchParams.append("updateMask.fieldPaths", field);
   }
+  if (options.updateTime) {
+    url.searchParams.set("currentDocument.updateTime", options.updateTime);
+  }
   let response;
   try {
     response = await fetch(url, {
@@ -63,6 +66,9 @@ async function firestoreRequest(path, options = {}) {
   }
 
   if (response.status === 404 && options.allowMissing) return null;
+  if ((response.status === 409 || response.status === 412) && options.updateTime) {
+    throw new ApiError(409, "POS_REGISTRY_CONFLICT", "POS store registry changed. Please retry.");
+  }
   if (!response.ok) {
     throw new ApiError(502, "POS_REGISTRY_UNAVAILABLE", "POS store registry request failed.");
   }
@@ -95,6 +101,18 @@ export async function patchFirestoreDocument(path, data) {
   const document = await firestoreRequest(path, {
     method: "PATCH",
     updateMask: Object.keys(data),
+    body: { fields },
+  });
+  return decodeFields(document.fields);
+}
+
+export async function patchFirestoreDocumentAtUpdateTime(path, data, updateTime) {
+  if (!updateTime) throw new TypeError("Firestore conditional patch requires an update time.");
+  const fields = Object.fromEntries(Object.entries(data).map(([key, value]) => [key, encodeValue(value)]));
+  const document = await firestoreRequest(path, {
+    method: "PATCH",
+    updateMask: Object.keys(data),
+    updateTime,
     body: { fields },
   });
   return decodeFields(document.fields);

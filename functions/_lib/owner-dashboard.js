@@ -1,3 +1,5 @@
+import { sanitizeStoredTelemetry, telemetryHealthMetricKeys } from "./telemetry.js";
+
 const TELEMETRY_FRESHNESS_MS = 15 * 60 * 1000;
 
 function asIso(value) {
@@ -79,9 +81,9 @@ async function loadPlatformMessaging(db, mode, organizationId) {
   }
 }
 
-function telemetrySummary(licence, generatedAt) {
+function telemetrySummary(licence, generatedAt, sourceTelemetry) {
   const heartbeatAt = asIso(
-    licence?.telemetry?.lastHeartbeatAt
+    sourceTelemetry?.lastHeartbeatAt
       || licence?.tracking?.lastHeartbeatAt
       || licence?.lastHeartbeatAt
   );
@@ -91,6 +93,9 @@ function telemetrySummary(licence, generatedAt) {
       status: "unknown",
       lastHeartbeatAt: null,
       source: null,
+      generatedAt: null,
+      receivedAt: null,
+      appVersion: null,
       detail: "No periodic operational heartbeat is published by the source application.",
     };
   }
@@ -100,7 +105,10 @@ function telemetrySummary(licence, generatedAt) {
     available: true,
     status: ageMs <= TELEMETRY_FRESHNESS_MS ? "online" : "offline",
     lastHeartbeatAt: heartbeatAt,
-    source: "source-application-heartbeat",
+    source: sourceTelemetry?.source || "source-application-heartbeat",
+    generatedAt: sourceTelemetry?.generatedAt || null,
+    receivedAt: sourceTelemetry?.receivedAt || null,
+    appVersion: sourceTelemetry?.appVersion || null,
     detail: ageMs <= TELEMETRY_FRESHNESS_MS
       ? "A recent source-application heartbeat was received."
       : "The source-application heartbeat is stale.",
@@ -128,61 +136,130 @@ function ledgerActivity(row) {
   };
 }
 
-function modeDetail(mode) {
-  const unavailable = (reason) => ({ available: false, value: null, reason });
+function unavailableMetric(reason) {
+  return { available: false, value: null, reason };
+}
+
+function sourceMetric(sourceTelemetry, key, reason) {
+  if (!Object.hasOwn(sourceTelemetry?.metrics || {}, key)) return unavailableMetric(reason);
+  return {
+    available: true,
+    value: sourceTelemetry.metrics[key],
+    source: sourceTelemetry.source,
+    generatedAt: sourceTelemetry.generatedAt,
+  };
+}
+
+function modeDetail(mode, sourceTelemetry) {
   if (mode === "business") {
-    const reason = "RTS Business does not publish an owner-safe aggregate feed to RTS Royal.";
+    const reason = "RTS Business telemetry has not been received yet.";
     return {
       kind: "business",
-      salesToday: unavailable(reason),
-      ordersToday: unavailable(reason),
-      averageOrderValue: unavailable(reason),
-      lowStockItems: unavailable(reason),
-      inventoryValue: unavailable(reason),
-      returnsToday: unavailable(reason),
+      salesToday: sourceMetric(sourceTelemetry, "salesToday", reason),
+      ordersToday: sourceMetric(sourceTelemetry, "ordersToday", reason),
+      averageOrderValue: sourceMetric(sourceTelemetry, "averageOrderValue", reason),
+      lowStockItems: sourceMetric(sourceTelemetry, "lowStockItems", reason),
+      inventoryUnits: sourceMetric(sourceTelemetry, "inventoryUnits", reason),
+      inventoryValue: sourceMetric(sourceTelemetry, "inventoryValue", reason),
+      returnsToday: sourceMetric(sourceTelemetry, "returnsToday", reason),
+      refundsToday: sourceMetric(sourceTelemetry, "refundsToday", reason),
+      damageUnitsToday: sourceMetric(sourceTelemetry, "damageUnitsToday", reason),
     };
   }
 
-  const reason = "RTS Clinic stores operational and medical data only in its local workspace.";
+  const reason = "RTS Clinic telemetry has not been received yet.";
   return {
     kind: "clinic",
-    appointmentsToday: unavailable(reason),
-    waitingCount: unavailable(reason),
-    completedSessionsToday: unavailable(reason),
-    followUpsDue: unavailable(reason),
-    collectionsToday: unavailable(reason),
-    outstandingInsurance: unavailable(reason),
+    appointmentsToday: sourceMetric(sourceTelemetry, "appointmentsToday", reason),
+    waitingCount: sourceMetric(sourceTelemetry, "waitingCount", reason),
+    completedSessionsToday: sourceMetric(sourceTelemetry, "completedSessionsToday", reason),
+    followUpsDue: sourceMetric(sourceTelemetry, "followUpsDue", reason),
+    collectionsToday: sourceMetric(sourceTelemetry, "collectionsToday", reason),
+    outstandingInsurance: sourceMetric(sourceTelemetry, "outstandingInsurance", reason),
+    openSessions: sourceMetric(sourceTelemetry, "openSessions", reason),
+    activeAccounts: sourceMetric(sourceTelemetry, "activeAccounts", reason),
     patientDetailsIncluded: false,
   };
 }
 
-function operationalGaps(mode) {
+function operationalGaps(mode, sourceTelemetry, telemetry) {
+  const hasOperationalMetrics = Object.keys(sourceTelemetry?.metrics || {}).some(
+    (key) => !telemetryHealthMetricKeys().includes(key)
+  );
+  const gaps = [];
   if (mode === "business") {
-    return [
-      {
+    if (!hasOperationalMetrics) {
+      gaps.push({
         key: "business-operations",
         reason: "Sales, orders, inventory, returns, damage, and POS audit data remain in each Business backend.",
         requiredTelemetry: "Publish tenant-scoped aggregate snapshots and sanitized operational events to a server-authorized RTS Royal endpoint.",
-      },
-      {
+      });
+    }
+    if (!telemetry.available) {
+      gaps.push({
         key: "business-connectivity",
         reason: "The existing licence lastChecked value is a startup/login check, not a periodic heartbeat.",
         requiredTelemetry: "Publish a signed heartbeat with terminal count, application version, and last successful sync.",
-      },
-    ];
+      });
+    }
+    return gaps;
   }
-  return [
-    {
+  if (!hasOperationalMetrics) {
+    gaps.push({
       key: "clinic-operations",
       reason: "Appointments, sessions, payments, and audit records are stored in a local workspace.json file.",
       requiredTelemetry: "Publish aggregate-only counts and financial totals; never upload patient names, identifiers, notes, diagnoses, files, or session details.",
-    },
-    {
+    });
+  }
+  if (!telemetry.available) {
+    gaps.push({
       key: "clinic-connectivity",
       reason: "RTS Clinic currently authenticates remotely but does not publish a periodic heartbeat.",
       requiredTelemetry: "Publish a signed clinic heartbeat containing only clinic ID, app version, sync time, and aggregate queue health.",
-    },
-  ];
+    });
+  }
+  return gaps;
+}
+
+function sourceHealth(sourceTelemetry) {
+  const metrics = {};
+  for (const key of telemetryHealthMetricKeys()) {
+    if (Object.hasOwn(sourceTelemetry?.metrics || {}, key)) metrics[key] = sourceTelemetry.metrics[key];
+  }
+  return {
+    available: Object.keys(metrics).length > 0,
+    source: sourceTelemetry?.source || null,
+    generatedAt: sourceTelemetry?.generatedAt || null,
+    appVersion: sourceTelemetry?.appVersion || null,
+    metrics,
+  };
+}
+
+function sourceFinancials(mode, sourceTelemetry) {
+  const reason = mode === "clinic"
+    ? "Clinic financial aggregates are not published to RTS Royal."
+    : "Business financial aggregates are not published to RTS Royal.";
+  const fields = mode === "clinic"
+    ? {
+        revenueToday: "collectionsToday",
+        outstandingBalance: "outstandingInsurance",
+      }
+    : {
+        revenueToday: "salesToday",
+        averageOrderValue: "averageOrderValue",
+        inventoryValue: "inventoryValue",
+        refundsToday: "refundsToday",
+      };
+  const result = {};
+  for (const [key, metricKey] of Object.entries(fields)) {
+    result[key] = sourceMetric(sourceTelemetry, metricKey, reason);
+  }
+  return {
+    available: Object.values(result).some((metric) => metric.available),
+    source: sourceTelemetry?.source || null,
+    generatedAt: sourceTelemetry?.generatedAt || null,
+    ...result,
+  };
 }
 
 export async function buildOwnerDashboard({
@@ -199,7 +276,11 @@ export async function buildOwnerDashboard({
   const licenceCreatedAt = asIso(licence?.createdAt);
   const lastLicenceCheckAt = asIso(licence?.lastChecked);
   const staff = staffSummary(usersDocument);
-  const telemetry = telemetrySummary(licence, generatedAt);
+  const sourceTelemetry = sanitizeStoredTelemetry(licence?.telemetry, mode);
+  const telemetry = telemetrySummary(licence, generatedAt, sourceTelemetry);
+  const health = sourceHealth(sourceTelemetry);
+  const sourceFinances = sourceFinancials(mode, sourceTelemetry);
+  const eventCounters = sourceTelemetry?.eventCounters || {};
   const messaging = await loadPlatformMessaging(db, mode, store.id);
   const productLabel = mode === "clinic" ? "Clinic" : "Business";
   const organizationName = store.name || licence?.storeName || store.id;
@@ -268,6 +349,28 @@ export async function buildOwnerDashboard({
       level: messaging.messageBalance === 0 ? "critical" : "warning",
     });
   }
+  for (const [key, title] of [
+    ["databaseHealthy", "Source database health check failed"],
+    ["syncHealthy", "Source synchronization is unhealthy"],
+    ["backupHealthy", "Source backup health check failed"],
+  ]) {
+    if (sourceTelemetry?.metrics?.[key] === false) {
+      alerts.push({
+        id: `source-${key}`,
+        title,
+        detail: sourceTelemetry.generatedAt,
+        level: "critical",
+      });
+    }
+  }
+  if (Number(sourceTelemetry?.metrics?.failedSyncCount || 0) > 0) {
+    alerts.push({
+      id: "source-sync-failures",
+      title: "Source synchronization failures reported",
+      detail: `${sourceTelemetry.metrics.failedSyncCount} aggregate failures.`,
+      level: "warning",
+    });
+  }
 
   const metrics = [
     { key: "licence", label: "Licence", value: licenceActive ? "Active" : "Expired" },
@@ -287,6 +390,18 @@ export async function buildOwnerDashboard({
       label: "Message credits",
       value: String(messaging.messageBalance),
     });
+  }
+  const headlineMetrics = mode === "clinic"
+    ? [["appointmentsToday", "Appointments today"], ["waitingCount", "Waiting"]]
+    : [["salesToday", "Sales today"], ["ordersToday", "Orders today"]];
+  for (const [key, label] of headlineMetrics) {
+    if (Object.hasOwn(sourceTelemetry?.metrics || {}, key)) {
+      metrics.push({
+        key,
+        label,
+        value: key === "salesToday" ? formatNis(sourceTelemetry.metrics[key]) : String(sourceTelemetry.metrics[key]),
+      });
+    }
   }
 
   const attention = !licenceActive
@@ -321,6 +436,30 @@ export async function buildOwnerDashboard({
   if (lastLicenceCheckAt) available.push("last-licence-check");
   if (messaging.available) available.push("platform-messaging-balance", "platform-messaging-ledger");
   if (telemetry.available) available.push("operational-heartbeat");
+  if (health.available) available.push("source-health");
+  if (sourceFinances.available) available.push("source-financial-aggregates");
+  if (Object.keys(sourceTelemetry?.metrics || {}).length > 0) available.push(`${mode}-aggregate-metrics`);
+  if (Object.keys(eventCounters).length > 0) available.push("aggregate-event-counters");
+
+  const unavailable = mode === "clinic"
+    ? [
+        ["appointments", "appointmentsToday"],
+        ["queue", "waitingCount"],
+        ["sessions", "completedSessionsToday"],
+        ["follow-ups", "followUpsDue"],
+        ["clinic-revenue", "collectionsToday"],
+      ]
+    : [
+        ["sales", "salesToday"],
+        ["orders", "ordersToday"],
+        ["inventory", "inventoryValue"],
+        ["returns", "returnsToday"],
+        ["damage", null],
+      ];
+  const unavailableData = unavailable
+    .filter(([, metricKey]) => !metricKey || !Object.hasOwn(sourceTelemetry?.metrics || {}, metricKey))
+    .map(([key]) => key);
+  unavailableData.push("complete-audit-log");
 
   return {
     contractVersion: 2,
@@ -340,8 +479,13 @@ export async function buildOwnerDashboard({
     locations: [location],
     recentActivity,
     auditLog: {
-      completeness: "partial",
-      detail: "Only privacy-safe RTS Royal platform events are available.",
+      completeness: Object.keys(eventCounters).length > 0 ? "aggregate-only" : "partial",
+      detail: Object.keys(eventCounters).length > 0
+        ? "Privacy-safe source event counters and RTS Royal platform events are available; raw audit entries are never ingested."
+        : "Only privacy-safe RTS Royal platform events are available.",
+      source: sourceTelemetry?.source || null,
+      generatedAt: sourceTelemetry?.generatedAt || null,
+      eventCounts: eventCounters,
       events: recentActivity.map((activity) => ({
         id: activity.id,
         category: activity.category,
@@ -354,12 +498,15 @@ export async function buildOwnerDashboard({
     financialMetrics: {
       currency: "ILS",
       businessRevenue: {
-        available: false,
-        value: null,
-        reason: mode === "clinic"
-          ? "Clinic revenue remains local and is not published to Tracking."
-          : "Business sales remain in the tenant operational backend and are not published to RTS Royal.",
+        ...(mode === "business"
+          ? sourceMetric(
+              sourceTelemetry,
+              "salesToday",
+              "Business sales remain in the tenant operational backend and are not published to RTS Royal."
+            )
+          : unavailableMetric("Clinic revenue remains local and is not published to Tracking.")),
       },
+      sourceApplication: sourceFinances,
       platformMessaging: {
         available: messaging.available,
         source: messaging.source,
@@ -373,15 +520,14 @@ export async function buildOwnerDashboard({
     operationalMetrics: {
       connectivity: telemetry,
       staff,
+      health,
       sourceBackend: mode === "clinic" ? "local-workspace" : (licence?.dataBackend || store.type || "firestore"),
     },
-    modeDetail: modeDetail(mode),
+    modeDetail: modeDetail(mode, sourceTelemetry),
     dataAvailability: {
       available,
-      unavailable: mode === "clinic"
-        ? ["appointments", "queue", "sessions", "follow-ups", "clinic-revenue", "complete-audit-log"]
-        : ["sales", "orders", "inventory", "returns", "damage", "complete-audit-log"],
-      gaps: operationalGaps(mode),
+      unavailable: unavailableData,
+      gaps: operationalGaps(mode, sourceTelemetry, telemetry),
       privacy: {
         scope: "aggregate-only",
         patientMedicalDetailsIncluded: false,

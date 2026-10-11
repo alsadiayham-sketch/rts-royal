@@ -35,12 +35,30 @@ also consume `overview`, `locations`, `recentActivity`, the partial
 privacy-safe `auditLog`, `financialMetrics`, `operationalMetrics`,
 `modeDetail`, and `dataAvailability`.
 
-The endpoint currently has authoritative licence, aggregate staff-account, and
-RTS platform messaging-credit data. It explicitly marks source-system sales,
-inventory, clinic workflow, revenue, and live connectivity as unavailable until
-Business and Clinic publish signed aggregate telemetry. Tracking never returns
-clinic patient identities, medical details, attachments, or unnecessary staff
-PII.
+The endpoint has authoritative licence, aggregate staff-account, RTS platform
+messaging-credit data, and the latest privacy-safe source snapshot when one has
+been published. Missing Business or Clinic fields remain explicitly unavailable.
+Tracking never returns clinic patient identities, medical details, attachments,
+raw audit entries, or unnecessary staff PII.
+
+`POST /api/owner-telemetry` accepts the existing `/api/pos-login` bearer token.
+Tenant and product identity come only from the signed token. The JSON body is
+limited to 4 KiB and exactly `generatedAt`, `appVersion`, `metrics`, and
+`eventCounters`. Metrics are fixed, product-specific numeric/boolean aggregates;
+event counters are fixed non-negative integer keys. Snapshots older than 15
+minutes are rejected. The endpoint never accepts customer/patient identities,
+medical data, product names, bill IDs, notes, or raw audit records. It stores
+only the latest snapshot under the tenant licence `telemetry` field using a
+Firestore update-time precondition.
+
+Common metrics: `terminalCount`, `activeTerminalCount`, `pendingSyncCount`,
+`failedSyncCount`, `databaseHealthy`, `syncHealthy`, and `backupHealthy`.
+Business adds `salesToday`, `ordersToday`, `averageOrderValue`,
+`lowStockItems`, `inventoryValue`, `returnsToday`, and `refundsToday`. Clinic
+adds `appointmentsToday`, `waitingCount`, `completedSessionsToday`,
+`followUpsDue`, `collectionsToday`, and `outstandingInsurance`. Accepted event
+counters are common audit/login/sync/backup counters plus fixed Business
+sale/return/inventory or Clinic appointment/session/payment/follow-up counters.
 
 The public enquiry form opens WhatsApp with an editable message; it does not
 send messages automatically or store enquiries in D1.

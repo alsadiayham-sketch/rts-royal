@@ -86,7 +86,12 @@ export function requireJsonContentType(request) {
   }
 }
 
-export async function parseJsonBody(request, allowedFields, maxBytes = MAX_JSON_BYTES) {
+export async function parseJsonBody(
+  request,
+  allowedFields,
+  maxBytes = MAX_JSON_BYTES,
+  { discloseUnknownFields = true } = {}
+) {
   const bodyBytes = await request.arrayBuffer();
   if (bodyBytes.byteLength > maxBytes) {
     throw new ApiError(413, "PAYLOAD_TOO_LARGE", "JSON payload too large.");
@@ -105,7 +110,11 @@ export async function parseJsonBody(request, allowedFields, maxBytes = MAX_JSON_
 
   const extraFields = Object.keys(data).filter((key) => !allowedFields.includes(key));
   if (extraFields.length > 0) {
-    throw new ApiError(400, "UNKNOWN_FIELDS", `Unknown fields: ${extraFields.join(", ")}`);
+    throw new ApiError(
+      400,
+      "UNKNOWN_FIELDS",
+      discloseUnknownFields ? `Unknown fields: ${extraFields.join(", ")}` : "Payload contains unsupported fields."
+    );
   }
   return data;
 }
