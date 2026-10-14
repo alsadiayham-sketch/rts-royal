@@ -33,7 +33,9 @@ function database() {
           return this;
         },
         async first() {
-          if (sql.includes("JOIN users")) return { username: "admin", name: "Admin", need_change: 0, session_version: 1 };
+          if (sql.includes("JOIN users")) {
+            return { username: "admin", name: "Admin", role: "platform_admin", need_change: 0, session_version: 1 };
+          }
           if (sql.includes("RETURNING count")) return { count: 1 };
           if (sql.includes("SELECT 1 FROM credit_accounts")) return null;
           if (sql.includes("FROM credit_settings")) {
@@ -168,6 +170,7 @@ test("D1 business provisioning records the owner and desktop backend contract", 
         backend: "d1",
         linkedProject: "market-web",
         apiBaseUrl: "https://market.example.com",
+        messagingEnabled: true,
         warrantyMonths: 12,
         adminUsername: "market.owner",
         adminName: "Market Owner",
@@ -181,6 +184,8 @@ test("D1 business provisioning records the owner and desktop backend contract", 
     assert.equal(licence.update.fields.dataBackend.stringValue, "d1");
     assert.equal(licence.update.fields.productType.stringValue, "business");
     assert.equal(licence.update.fields.apiBaseUrl.stringValue, "https://market.example.com");
+    assert.equal(licence.update.fields.messaging.mapValue.fields.enabled.booleanValue, true);
+    assert.equal(licence.update.fields.messaging.mapValue.fields.contractVersion.integerValue, "1");
     const users = writes.find((write) => write.update.name.endsWith("/settings/pos_users"));
     assert.equal(users.update.fields.users.arrayValue.values[0].mapValue.fields.isOwner.booleanValue, true);
   } finally {

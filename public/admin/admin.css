@@ -313,6 +313,21 @@ td:last-child:has(.row-actions) { min-width: 15rem; }
 .clinic-initial-users { display: grid; gap: .75rem; }
 .clinic-initial-user { padding: .75rem 0; border-top: 1px solid var(--line); }
 .backend-fields { padding-top: .9rem; margin: .25rem 0 1rem; border-top: 1px solid var(--line); }
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: .65rem;
+  padding: .75rem;
+  margin: .25rem 0 .75rem;
+  border: 1px solid var(--line);
+  background: var(--surface-subtle);
+}
+.checkbox-row input[type="checkbox"] {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: .15rem 0 0;
+  flex: 0 0 auto;
+}
 
 @media (max-width: 1100px) {
   .overview-grid, .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

@@ -1,4 +1,4 @@
-import { requireAuthenticatedUser } from "../_lib/auth.js";
+import { requirePlatformAdmin } from "../_lib/auth.js";
 import {
   ApiError,
   jsonResponse,
@@ -88,7 +88,7 @@ export async function onRequestPost(context) {
 
 export async function onRequestGet(context) {
   return withApiGuard(context, async ({ env }) => {
-    await requireAuthenticatedUser(context, false);
+    await requirePlatformAdmin(context, false);
     return jsonResponse(await listRequests(env.DB));
   });
 }
@@ -97,7 +97,7 @@ export async function onRequestPatch(context) {
   return withApiGuard(context, async ({ request, env }) => {
     requireTrustedMutationRequest(request);
     requireJsonContentType(request);
-    const authUser = await requireAuthenticatedUser(context, false);
+    const authUser = await requirePlatformAdmin(context, false);
     await enforceRateLimit(context, {
       scope: "request_patch",
       accountPart: authUser.username,

@@ -13,6 +13,7 @@ import { createPasswordRecord, verifyPassword } from "../functions/_lib/crypto.j
 import { createStoredPosPassword, verifyStoredPosPassword } from "../functions/_lib/pos-password.js";
 import { assertUserStatusChangeAllowed } from "../functions/_lib/user-rules.js";
 import { createRateLimitKey } from "../functions/_lib/rate-limit.js";
+import { requirePlatformAdmin } from "../functions/_lib/auth.js";
 import {
   normalizeApiBaseUrl,
   normalizeBackend,
@@ -205,4 +206,42 @@ test("all API JSON responses include security and no-store headers", async () =>
     response.headers.get("Content-Security-Policy"),
     "default-src 'none'; frame-ancestors 'none'; base-uri 'none'"
   );
+});
+
+test("platform administration rejects authenticated sessions without the explicit admin role", async () => {
+  function contextFor(role) {
+    return {
+      request: new Request("https://rts.example.com/api/users", {
+        headers: { Cookie: "__Host-rts_session=test-session" },
+      }),
+      env: {
+        DB: {
+          prepare(sql) {
+            return {
+              bind() { return this; },
+              async first() {
+                if (sql.includes("JOIN users")) {
+                  return {
+                    username: "operator",
+                    name: "Operator",
+                    role,
+                    need_change: 0,
+                    session_version: 1,
+                  };
+                }
+                throw new Error(`Unexpected query: ${sql}`);
+              },
+              async run() { return { meta: { changes: 1 } }; },
+            };
+          },
+        },
+      },
+    };
+  }
+
+  await assert.rejects(
+    requirePlatformAdmin(contextFor("viewer")),
+    (error) => error.status === 403 && error.code === "ADMIN_REQUIRED"
+  );
+  assert.equal((await requirePlatformAdmin(contextFor("platform_admin"))).username, "operator");
 });

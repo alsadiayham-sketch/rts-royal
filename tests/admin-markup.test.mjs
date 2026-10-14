@@ -30,3 +30,14 @@ test("admin forms preserve authentication and core management entry points", () 
   assert.match(html, /id="global-status"[^>]*role="status"/);
   assert.match(html, /id="global-alert"[^>]*role="alert"/);
 });
+
+test("Business provisioning always collects an owner and exposes secure messaging setup", () => {
+  assert.match(html, /id="store-owner-fields" class="backend-fields"/);
+  for (const id of [
+    "store-admin-username",
+    "store-admin-name",
+    "store-admin-password",
+    "store-messaging-enabled",
+  ]) assert.ok(ids.includes(id), `missing Business setup field: ${id}`);
+  assert.match(html, /id="store-messaging-enabled"[^>]*checked/);
+});

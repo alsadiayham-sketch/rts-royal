@@ -174,6 +174,8 @@ const I18N = {
     backendStandalone: "RTS Business فقط",
     linkedProjectLabel: "معرّف مشروع الويب",
     apiUrlLabel: "رابط واجهة المشروع",
+    messagingEnabledLabel: "تجهيز خدمة إرسال الرسائل لهذا المتجر",
+    storeOwnerHelp: "حساب المالك مطلوب لتسجيل الدخول إلى RTS Business وRTS Tracking، ويمكن إدارة المستخدمين لاحقاً من هذه اللوحة.",
     d1UserNote: "تُنشأ حسابات الكاشير من لوحة المشروع المرتبط. يُستخدم حساب المالك أدناه أيضاً في RTS Tracking.",
     storeAdminUsernameLabel: "اسم مستخدم المالك",
     storeAdminNameLabel: "اسم المالك المعروض",
@@ -417,6 +419,8 @@ const I18N = {
     backendStandalone: "RTS Business Only",
     linkedProjectLabel: "Website Project ID",
     apiUrlLabel: "Project API URL",
+    messagingEnabledLabel: "Provision secure customer messaging for this store",
+    storeOwnerHelp: "The owner account is required for RTS Business and RTS Tracking sign-in. Users can be managed later from this portal.",
     d1UserNote: "Cashier accounts are created in the linked project admin. The owner account below is also used by RTS Tracking.",
     storeAdminUsernameLabel: "Owner Username",
     storeAdminNameLabel: "Owner Display Name",
@@ -1282,14 +1286,12 @@ function renderStoresTable() {
       disable.addEventListener("click", () => updateStoreLicence(store, "disable"));
       actions.append(disable);
     }
-    if (store.backend === "firestore") {
-      const users = document.createElement("button");
-      users.type = "button";
-      users.className = "secondary-btn compact-btn";
-      users.textContent = t("manageStoreUsers");
-      users.addEventListener("click", () => openStoreUsers(store));
-      actions.prepend(users);
-    }
+    const users = document.createElement("button");
+    users.type = "button";
+    users.className = "secondary-btn compact-btn";
+    users.textContent = t("manageStoreUsers");
+    users.addEventListener("click", () => openStoreUsers(store));
+    actions.prepend(users);
     actionsCell.append(actions);
     row.append(nameCell, idCell, backendCell, warrantyCell, actionsCell);
     els.storesTbody.append(row);
@@ -1327,13 +1329,11 @@ async function handleCreateStore(event) {
   const formData = new FormData(els.storeForm);
   const payload = Object.fromEntries(formData.entries());
   payload.warrantyMonths = Number(payload.warrantyMonths);
-  if (payload.backend === "d1") {
-    delete payload.adminUsername;
-    delete payload.adminName;
-    delete payload.adminPassword;
-  } else {
+  payload.messagingEnabled = payload.messagingEnabled === "on";
+  if (payload.backend !== "d1") {
     delete payload.linkedProject;
     delete payload.apiBaseUrl;
+    delete payload.messagingEnabled;
   }
 
   setPending("create-store", true, els.storeSubmit);

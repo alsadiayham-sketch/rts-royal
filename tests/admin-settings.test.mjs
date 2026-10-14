@@ -12,7 +12,13 @@ function settingsContext(content, authenticated = true) {
         bind(...args) { values = args; return this; },
         async first() {
           if (sql.includes("JOIN users")) {
-            return { username: "test-admin", name: "Test admin", need_change: 0, session_version: 1 };
+            return {
+              username: "test-admin",
+              name: "Test admin",
+              role: "platform_admin",
+              need_change: 0,
+              session_version: 1,
+            };
           }
           if (sql.includes("RETURNING count")) return { count: 1 };
           if (sql.includes("FROM site_settings")) {

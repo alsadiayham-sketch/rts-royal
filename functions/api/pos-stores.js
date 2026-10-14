@@ -1,4 +1,4 @@
-import { requireAuthenticatedUser } from "../_lib/auth.js";
+import { requirePlatformAdmin } from "../_lib/auth.js";
 import {
   commitFirestoreWrites,
   firestoreTimestamp,
@@ -51,6 +51,7 @@ async function loadStores() {
         linkedProject: store.linkedProject || licence?.linkedProject || "",
         apiBaseUrl: store.apiBaseUrl || licence?.apiBaseUrl || "",
         warrantyEnd: licence?.warrantyEnd || null,
+        messagingEnabled: licence?.messaging?.enabled === true,
         createdAt: store.createdAt || null,
       };
     })
@@ -58,7 +59,7 @@ async function loadStores() {
 }
 
 async function authorizeMutation(context, scope) {
-  const user = await requireAuthenticatedUser(context, false);
+  const user = await requirePlatformAdmin(context, false);
   await enforceRateLimit(context, {
     scope,
     accountPart: user.username,
@@ -70,7 +71,7 @@ async function authorizeMutation(context, scope) {
 
 export async function onRequestGet(context) {
   return withApiGuard(context, async () => {
-    await requireAuthenticatedUser(context, false);
+    await requirePlatformAdmin(context, false);
     return jsonResponse({ stores: await loadStores() });
   });
 }
@@ -90,6 +91,7 @@ export async function onRequestPost(context) {
       "adminUsername",
       "adminName",
       "adminPassword",
+      "messagingEnabled",
     ]);
 
     const id = normalizeStoreId(payload.id);
@@ -138,6 +140,10 @@ export async function onRequestPost(context) {
       productType: "business",
       ownerUsername: adminUsername,
       ownerName: adminName,
+      messaging: {
+        enabled: backend === "d1" && payload.messagingEnabled !== false,
+        contractVersion: 1,
+      },
       ...(backend === "d1" ? { apiBaseUrl, linkedProject } : {}),
     };
     const registry = await getFirestoreDocumentSnapshot(REGISTRY_PATH);
@@ -191,6 +197,7 @@ export async function onRequestPost(context) {
           apiBaseUrl,
           warrantyEnd: warrantyEnd.toISOString(),
           adminUsername,
+          messagingEnabled: licence.messaging.enabled,
           productType: "business",
         },
       },

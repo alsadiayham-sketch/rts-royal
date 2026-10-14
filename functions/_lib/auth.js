@@ -19,8 +19,8 @@ export async function requireAuthenticatedUser(context, includePasswordFields = 
   const now = Math.floor(Date.now() / 1000);
 
   const fields = includePasswordFields
-    ? "u.username, u.name, u.need_change, u.session_version, u.password_salt, u.password_hash, u.password_iterations"
-    : "u.username, u.name, u.need_change, u.session_version";
+    ? "u.username, u.name, u.role, u.need_change, u.session_version, u.password_salt, u.password_hash, u.password_iterations"
+    : "u.username, u.name, u.role, u.need_change, u.session_version";
 
   const row = await env.DB.prepare(
     `SELECT ${fields}
@@ -46,6 +46,14 @@ export async function requireAuthenticatedUser(context, includePasswordFields = 
     ...row,
     tokenHash,
   };
+}
+
+export async function requirePlatformAdmin(context, includePasswordFields = false) {
+  const user = await requireAuthenticatedUser(context, includePasswordFields);
+  if (user.role !== "platform_admin") {
+    throw new ApiError(403, "ADMIN_REQUIRED", "Platform administrator access is required.");
+  }
+  return user;
 }
 
 export async function createLoginSession(db, username, sessionVersion) {
@@ -81,7 +89,7 @@ export async function authenticateCredentials(db, username, password) {
   const genericFailure = new ApiError(401, "AUTH_FAILED", "Invalid username or password.");
   const row = await db
     .prepare(
-      `SELECT username, name, password_salt, password_hash, password_iterations, need_change, active, session_version
+      `SELECT username, name, role, password_salt, password_hash, password_iterations, need_change, active, session_version
        FROM users
        WHERE username = ?`
     )

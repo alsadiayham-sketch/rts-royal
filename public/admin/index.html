@@ -503,10 +503,14 @@
                     <label for="store-api-url" data-i18n="apiUrlLabel">رابط واجهة المشروع</label>
                     <input id="store-api-url" name="apiBaseUrl" type="url" dir="ltr" placeholder="https://example.pages.dev" />
                   </div>
+                  <label class="checkbox-row" for="store-messaging-enabled">
+                    <input id="store-messaging-enabled" name="messagingEnabled" type="checkbox" checked />
+                    <span data-i18n="messagingEnabledLabel">تجهيز خدمة إرسال الرسائل لهذا المتجر</span>
+                  </label>
                   <p class="backend-note" data-i18n="d1UserNote">تُنشأ حسابات الكاشير من لوحة المشروع المرتبط لأن كلمات المرور مشفرة على الخادم.</p>
                 </div>
 
-                <div id="firestore-store-fields" class="backend-fields hidden">
+                <div id="store-owner-fields" class="backend-fields">
                   <div class="form-grid">
                     <div class="field">
                       <label for="store-admin-username" data-i18n="storeAdminUsernameLabel">اسم مستخدم المدير الأول</label>
@@ -521,7 +525,7 @@
                       <input id="store-admin-password" name="adminPassword" type="password" minlength="12" maxlength="128" autocomplete="new-password" />
                     </div>
                   </div>
-                  <p class="backend-note" data-i18n="firestoreWarning">كتالوج مستقل للمتجر. تُدار حسابات المستخدمين وبيانات الدخول مباشرة من RTS.</p>
+                  <p class="backend-note" data-i18n="storeOwnerHelp">حساب المالك مطلوب لتسجيل الدخول إلى RTS Business وRTS Tracking، ويمكن إدارة المستخدمين لاحقاً من هذه اللوحة.</p>
                 </div>
 
                 <button id="store-submit" class="primary-btn" type="submit" data-i18n="createStore">إنشاء المتجر</button>

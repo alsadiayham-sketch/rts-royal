@@ -63,3 +63,9 @@ test("Arabic and English cover every static translation key", () => {
     }
   }
 });
+
+test("D1 Business creation keeps owner credentials and normalizes messaging entitlement", () => {
+  assert.doesNotMatch(source, /payload\.backend === "d1"[\s\S]{0,180}delete payload\.adminUsername/);
+  assert.match(source, /payload\.messagingEnabled = payload\.messagingEnabled === "on"/);
+  assert.match(source, /users\.addEventListener\("click", \(\) => openStoreUsers\(store\)\)/);
+});

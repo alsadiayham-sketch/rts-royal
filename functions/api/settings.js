@@ -1,4 +1,4 @@
-import { requireAuthenticatedUser } from "../_lib/auth.js";
+import { requirePlatformAdmin } from "../_lib/auth.js";
 import { DEFAULT_DOWNLOAD_URL } from "../_lib/constants.js";
 import { MAX_SETTINGS_JSON_BYTES } from "../_lib/constants.js";
 import {
@@ -130,7 +130,7 @@ export async function onRequestPut(context) {
     requireTrustedMutationRequest(request);
     requireJsonContentType(request);
 
-    const authUser = await requireAuthenticatedUser(context, false);
+    const authUser = await requirePlatformAdmin(context, false);
     await enforceRateLimit(context, {
       scope: "settings_put",
       accountPart: authUser.username,

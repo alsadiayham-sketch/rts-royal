@@ -1,4 +1,4 @@
-import { requireAuthenticatedUser } from "../_lib/auth.js";
+import { requirePlatformAdmin } from "../_lib/auth.js";
 import { getFirestoreDocument, setFirestoreDocument } from "../_lib/firestore.js";
 import {
   ApiError,
@@ -25,14 +25,11 @@ async function requireStandaloneStore(storeId) {
   const stores = Array.isArray(registry?.stores) ? registry.stores : [];
   const store = stores.find((item) => item.id === storeId);
   if (!store) throw new ApiError(404, "STORE_NOT_FOUND", "Store not found.");
-  if (store.type !== "firestore" && store.type !== "clinic" && store.id !== "rts-testing") {
-    throw new ApiError(409, "LINKED_STORE_USERS", "Linked-store users are managed by the website project.");
-  }
   return store;
 }
 
 async function requireStoreAdmin(context, scope) {
-  const user = await requireAuthenticatedUser(context, false);
+  const user = await requirePlatformAdmin(context, false);
   await enforceRateLimit(context, {
     scope,
     accountPart: user.username,
@@ -61,7 +58,7 @@ function validateRole(role) {
 
 export async function onRequestGet(context) {
   return withApiGuard(context, async ({ request }) => {
-    await requireAuthenticatedUser(context, false);
+    await requirePlatformAdmin(context, false);
     const storeId = normalizeStoreId(new URL(request.url).searchParams.get("storeId"));
     if (!storeId) throw new ApiError(400, "INVALID_STORE_ID", "Store ID is invalid.");
     await requireStandaloneStore(storeId);

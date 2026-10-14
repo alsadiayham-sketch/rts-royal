@@ -11,6 +11,7 @@ export async function onRequestGet(context) {
       user: {
         username: user.username,
         name: user.name,
+        role: user.role,
       },
       passwordChangeRecommended: Number(user.need_change) === 1,
     });

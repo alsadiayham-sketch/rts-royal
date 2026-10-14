@@ -1,4 +1,4 @@
-import { requireAuthenticatedUser } from "../_lib/auth.js";
+import { requirePlatformAdmin } from "../_lib/auth.js";
 import {
   commitFirestoreWrites,
   firestoreTimestamp,
@@ -55,7 +55,7 @@ async function loadClinics() {
 }
 
 async function authorizeMutation(context, scope) {
-  const user = await requireAuthenticatedUser(context, false);
+  const user = await requirePlatformAdmin(context, false);
   await enforceRateLimit(context, {
     scope,
     accountPart: user.username,
@@ -74,7 +74,7 @@ function validateClinicUser(username, name, password) {
 
 export async function onRequestGet(context) {
   return withApiGuard(context, async () => {
-    await requireAuthenticatedUser(context, false);
+    await requirePlatformAdmin(context, false);
     return jsonResponse({ clinics: await loadClinics() });
   });
 }

@@ -1,4 +1,4 @@
-import { requireAuthenticatedUser } from "../_lib/auth.js";
+import { requirePlatformAdmin } from "../_lib/auth.js";
 import {
   ApiError,
   jsonResponse,
@@ -281,7 +281,7 @@ function findOrganization(organizations, organizationType, organizationId) {
 
 export async function onRequestGet(context) {
   return withApiGuard(context, async ({ request, env }) => {
-    await requireAuthenticatedUser(context, false);
+    await requirePlatformAdmin(context, false);
     const url = new URL(request.url);
     const rawType = url.searchParams.get("type") || "";
     const organizationType = rawType ? normalizeOrganizationType(rawType) : null;
@@ -325,7 +325,7 @@ export async function onRequestPatch(context) {
   return withApiGuard(context, async ({ request, env }) => {
     requireTrustedMutationRequest(request);
     requireJsonContentType(request);
-    const user = await requireAuthenticatedUser(context, false);
+    const user = await requirePlatformAdmin(context, false);
     await enforceRateLimit(context, {
       scope: "credit_settings",
       accountPart: user.username,
@@ -358,7 +358,7 @@ export async function onRequestPost(context) {
   return withApiGuard(context, async ({ request, env }) => {
     requireTrustedMutationRequest(request);
     requireJsonContentType(request);
-    const user = await requireAuthenticatedUser(context, false);
+    const user = await requirePlatformAdmin(context, false);
     await enforceRateLimit(context, {
       scope: "credit_allocation",
       accountPart: user.username,
@@ -412,16 +412,66 @@ export async function onRequestPost(context) {
     if (!organization) throw new ApiError(404, "ORGANIZATION_NOT_FOUND", "Organization was not found.");
 
     const id = crypto.randomUUID();
-    const currentAccount = await env.DB.prepare(
-      `SELECT message_balance, money_balance_agorot
-       FROM credit_accounts
-       WHERE organization_type = ? AND organization_id = ?`
-    ).bind(organizationType, organizationId).first();
-    const currentMessages = Number(currentAccount?.message_balance ?? settings.defaultMessageBalance);
-    if (entryType === "usage" && currentMessages < messageAmount) {
-      throw new ApiError(400, "INSUFFICIENT_CREDITS", "Organization does not have enough message credits.");
-    }
     const messageDelta = entryType === "usage" ? -messageAmount : messageAmount;
+    if (entryType === "usage") {
+      const results = await env.DB.batch([
+        env.DB.prepare(
+          `INSERT OR IGNORE INTO credit_accounts
+             (organization_type, organization_id, display_name, message_balance, money_balance_agorot,
+              customer_price_agorot, platform_cost_agorot, created_at, updated_at)
+           VALUES (?, ?, ?, ?, 0, ?, ?, unixepoch(), unixepoch())`
+        ).bind(
+          organizationType,
+          organizationId,
+          organization.displayName,
+          settings.defaultMessageBalance,
+          customerPriceAgorot,
+          platformCostAgorot
+        ),
+        env.DB.prepare(
+          `UPDATE credit_accounts
+           SET display_name = ?,
+               message_balance = message_balance - ?,
+               customer_price_agorot = ?,
+               platform_cost_agorot = ?,
+               updated_at = unixepoch()
+           WHERE organization_type = ?
+             AND organization_id = ?
+             AND message_balance >= ?`
+        ).bind(
+          organization.displayName,
+          messageAmount,
+          customerPriceAgorot,
+          platformCostAgorot,
+          organizationType,
+          organizationId,
+          messageAmount
+        ),
+        env.DB.prepare(
+          `INSERT INTO credit_ledger
+             (id, organization_type, organization_id, display_name, entry_type, money_delta_agorot,
+              message_delta, customer_price_agorot, platform_cost_agorot, delivery_status, note, created_by, created_at)
+           SELECT ?, ?, ?, ?, 'usage', 0, ?, ?, ?, ?, ?, ?, unixepoch()
+           WHERE changes() = 1`
+        ).bind(
+          id,
+          organizationType,
+          organizationId,
+          organization.displayName,
+          messageDelta,
+          customerPriceAgorot,
+          platformCostAgorot,
+          deliveryStatus,
+          note,
+          user.username
+        ),
+      ]);
+      if (Number(results?.[1]?.meta?.changes || 0) !== 1) {
+        throw new ApiError(400, "INSUFFICIENT_CREDITS", "Organization does not have enough message credits.");
+      }
+      return jsonResponse({ ok: true, id }, 201);
+    }
+
     await env.DB.batch([
       env.DB.prepare(
         `INSERT INTO credit_accounts

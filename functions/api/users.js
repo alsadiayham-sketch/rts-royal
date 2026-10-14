@@ -1,4 +1,4 @@
-import { requireAuthenticatedUser } from "../_lib/auth.js";
+import { requirePlatformAdmin } from "../_lib/auth.js";
 import { createPasswordRecord } from "../_lib/crypto.js";
 import {
   ApiError,
@@ -37,7 +37,7 @@ async function listUsers(db) {
 
 export async function onRequestGet(context) {
   return withApiGuard(context, async ({ env }) => {
-    await requireAuthenticatedUser(context, false);
+    await requirePlatformAdmin(context, false);
     await opportunisticCleanup(env.DB, Math.floor(Date.now() / 1000));
     return jsonResponse({
       users: await listUsers(env.DB),
@@ -50,7 +50,7 @@ export async function onRequestPost(context) {
     requireTrustedMutationRequest(request);
     requireJsonContentType(request);
 
-    const authUser = await requireAuthenticatedUser(context, false);
+    const authUser = await requirePlatformAdmin(context, false);
     await enforceRateLimit(context, {
       scope: "users_create",
       accountPart: authUser.username,
@@ -83,8 +83,8 @@ export async function onRequestPost(context) {
     const record = await createPasswordRecord(password);
     await env.DB.prepare(
       `INSERT INTO users
-       (username, name, password_salt, password_hash, password_iterations, active, need_change, session_version, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, 1, 1, 1, unixepoch(), unixepoch())`
+       (username, name, password_salt, password_hash, password_iterations, role, active, need_change, session_version, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, 'platform_admin', 1, 1, 1, unixepoch(), unixepoch())`
     )
       .bind(username, name, record.salt, record.hash, record.iterations)
       .run();
@@ -110,7 +110,7 @@ export async function onRequestPatch(context) {
     requireTrustedMutationRequest(request);
     requireJsonContentType(request);
 
-    const authUser = await requireAuthenticatedUser(context, false);
+    const authUser = await requirePlatformAdmin(context, false);
     await enforceRateLimit(context, {
       scope: "users_patch",
       accountPart: authUser.username,

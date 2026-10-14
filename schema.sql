@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS users (
   password_salt TEXT NOT NULL,
   password_hash TEXT NOT NULL,
   password_iterations INTEGER NOT NULL DEFAULT 100000 CHECK (password_iterations >= 100000),
+  role TEXT NOT NULL DEFAULT 'platform_admin' CHECK (role IN ('platform_admin')),
   active INTEGER NOT NULL DEFAULT 1 CHECK (active IN (0, 1)),
   need_change INTEGER NOT NULL DEFAULT 1 CHECK (need_change IN (0, 1)),
   session_version INTEGER NOT NULL DEFAULT 1 CHECK (session_version >= 1),
