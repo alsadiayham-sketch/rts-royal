@@ -305,9 +305,27 @@ td:last-child:has(.row-actions) { min-width: 15rem; }
 .status-pill { display: inline-flex; align-items: center; gap: .25rem; padding: .15rem .5rem; border: 1px solid; border-radius: 99px; font-size: .78rem; white-space: nowrap; }
 .status-pill.active { border-color: #9cd0b5; background: var(--success-soft); color: var(--success); }
 .status-pill.inactive { border-color: #e4afbd; background: var(--danger-soft); color: #9a2848; }
+.status-pill.suspended { border-color: #e3c27d; background: #fff8e6; color: #7c5410; }
 .status-pill.backend-d1 { border-color: #d5c4df; background: var(--purple-soft); color: var(--purple); }
 .status-pill.backend-firestore { border-color: var(--line); color: var(--muted); }
 .stacked-form, .store-users-panel { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+.link-row { display: flex; flex-wrap: wrap; gap: .5rem; }
+.admin-dialog {
+  width: min(760px, 96vw);
+  max-height: 90vh;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.admin-dialog::backdrop { background: rgb(18 12 23 / 48%); }
+.admin-dialog .stacked-form {
+  margin: 0;
+  padding: 1.25rem;
+  border-top: 0;
+  overflow: auto;
+  max-height: 86vh;
+}
+.admin-dialog[open] { display: block; }
 .clinic-user-fieldset { margin: 1rem 0; padding: 1rem; border: 1px solid var(--line); background: #fff; min-width: 0; }
 .clinic-user-fieldset legend { padding: 0 .4rem; color: var(--purple); font-weight: 750; }
 .clinic-initial-users { display: grid; gap: .75rem; }

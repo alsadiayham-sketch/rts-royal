@@ -21,6 +21,7 @@ const I18N = {
     tabStores: "متاجر RTS Business",
     tabClinics: "عيادات RTS Clinic",
     tabRequests: "الطلبات",
+    tabJahiz: "جاهز Jahiz",
     tabCredits: "الأرصدة",
     tabUsers: "المشرفون",
     tabPassword: "كلمة المرور الخاصة بي",
@@ -37,6 +38,8 @@ const I18N = {
     overviewRequests: "الطلبات التي تحتاج إجراء",
     overviewStores: "متاجر تم تحميلها",
     overviewClinics: "عيادات تم تحميلها",
+    overviewJahizVenues: "متاجر جاهز",
+    overviewJahizApplications: "طلبات جاهز بانتظار الإجراء",
     logoutButton: "تسجيل الخروج",
     whatsappLabel: "رقم واتساب",
     downloadLabel: "رابط تحميل برنامج POS",
@@ -82,6 +85,61 @@ const I18N = {
     requestsIntro: "طلبات العملاء المحفوظة من نموذج الموقع.",
     refreshRequests: "تحديث الطلبات",
     noRequests: "لا توجد طلبات بعد.",
+    jahizIntro: "إدارة متاجر جاهز، طلبات التسجيل العامة، الاشتراكات، والخطط المدفوعة اليدوية.",
+    refreshJahiz: "تحديث جاهز",
+    jahizPaymentsDisabled: "الدفع الإلكتروني معطل حالياً. استخدم التسجيل اليدوي للمدفوعات.",
+    jahizCreateVenueTitle: "إضافة متجر جاهز",
+    jahizVenueNameLabel: "اسم المتجر",
+    jahizSlugLabel: "Slug المتجر",
+    jahizBusinessTypeLabel: "نوع النشاط",
+    jahizBusinessRestaurant: "مطعم",
+    jahizBusinessCafe: "مقهى",
+    jahizOwnerNameLabel: "اسم المالك",
+    jahizOwnerUsernameLabel: "اسم مستخدم المالك",
+    jahizOwnerPasswordLabel: "كلمة مرور المالك",
+    jahizExpiresAtLabel: "انتهاء الاشتراك",
+    jahizPlanLabel: "الخطة",
+    jahizNoPlan: "بدون خطة",
+    jahizDemoLabel: "حساب تجريبي",
+    jahizCreateVenue: "إنشاء متجر جاهز",
+    jahizPlanManagerTitle: "إدارة الخطط",
+    jahizNoPlans: "لا توجد خطط جاهزة بعد.",
+    jahizPlanNameLabel: "اسم الخطة",
+    jahizCurrencyLabel: "العملة",
+    jahizAmountLabel: "المبلغ",
+    jahizPlanMonthsLabel: "عدد الأشهر",
+    jahizPlanActiveLabel: "الخطة مفعلة",
+    jahizSavePlan: "حفظ الخطة",
+    jahizEditPlan: "تعديل الخطة",
+    jahizClearPlanForm: "مسح الحقول",
+    jahizRecordPaymentTitle: "تسجيل دفعة يدوية",
+    jahizVenueLabel: "المتجر",
+    jahizRecordPayment: "تسجيل الدفعة",
+    jahizApplicationsTitle: "طلبات التسجيل العامة",
+    jahizNoApplications: "لا توجد طلبات تسجيل جاهز.",
+    jahizVenuesTitle: "متاجر جاهز",
+    jahizNoVenues: "لا توجد متاجر جاهز.",
+    jahizLinksLabel: "الروابط",
+    jahizContactLabel: "التواصل",
+    jahizApproveTitle: "اعتماد طلب جاهز",
+    jahizApprove: "اعتماد",
+    jahizReject: "رفض",
+    jahizSubscriptionTitle: "تحديث اشتراك المتجر",
+    jahizUpdateSubscription: "حفظ الاشتراك",
+    jahizResetPasswordTitle: "إعادة تعيين كلمة مرور المالك",
+    jahizResetPassword: "إعادة التعيين",
+    jahizOwnerLink: "دخول المالك",
+    jahizCustomerLink: "رابط العملاء",
+    jahizSuspended: "معلق",
+    jahizStatusUpdated: "تم تحديث اشتراك المتجر.",
+    jahizVenueCreated: "تم إنشاء متجر جاهز.",
+    jahizApplicationApproved: "تم اعتماد طلب التسجيل.",
+    jahizApplicationRejected: "تم رفض الطلب.",
+    jahizPlanSaved: "تم حفظ الخطة.",
+    jahizPaymentRecorded: "تم تسجيل الدفعة.",
+    jahizPasswordReset: "تم تحديث بيانات دخول المالك.",
+    cancelLabel: "إلغاء",
+    generatePassword: "توليد",
     creditsIntro: "إدارة أرصدة رسائل المنصة وأسعار الرسائل وتخصيص المال أو الرسائل للمنظمات.",
     refreshCredits: "تحديث الأرصدة",
     creditDefaultsTitle: "إعدادات الرصيد الافتراضية",
@@ -266,6 +324,7 @@ const I18N = {
     tabStores: "RTS Business Stores",
     tabClinics: "RTS Clinics",
     tabRequests: "Requests",
+    tabJahiz: "Jahiz",
     tabCredits: "Credits",
     tabUsers: "Admins",
     tabPassword: "My Password",
@@ -282,6 +341,8 @@ const I18N = {
     overviewRequests: "Requests needing action",
     overviewStores: "Loaded stores",
     overviewClinics: "Loaded clinics",
+    overviewJahizVenues: "Jahiz venues",
+    overviewJahizApplications: "Jahiz applications pending action",
     logoutButton: "Logout",
     whatsappLabel: "WhatsApp Number",
     downloadLabel: "POS Download URL",
@@ -327,6 +388,61 @@ const I18N = {
     requestsIntro: "Customer requests saved from the public website form.",
     refreshRequests: "Refresh requests",
     noRequests: "No requests yet.",
+    jahizIntro: "Manage Jahiz venues, public signup approvals, subscriptions, and manual billing plans.",
+    refreshJahiz: "Refresh Jahiz",
+    jahizPaymentsDisabled: "Online payments are currently disabled. Use manual payment records.",
+    jahizCreateVenueTitle: "Add Jahiz venue",
+    jahizVenueNameLabel: "Venue name",
+    jahizSlugLabel: "Venue slug",
+    jahizBusinessTypeLabel: "Business type",
+    jahizBusinessRestaurant: "Restaurant",
+    jahizBusinessCafe: "Cafe",
+    jahizOwnerNameLabel: "Owner name",
+    jahizOwnerUsernameLabel: "Owner username",
+    jahizOwnerPasswordLabel: "Owner password",
+    jahizExpiresAtLabel: "Subscription expires",
+    jahizPlanLabel: "Plan",
+    jahizNoPlan: "No plan",
+    jahizDemoLabel: "Demo account",
+    jahizCreateVenue: "Create Jahiz venue",
+    jahizPlanManagerTitle: "Plan manager",
+    jahizNoPlans: "No plans yet.",
+    jahizPlanNameLabel: "Plan name",
+    jahizCurrencyLabel: "Currency",
+    jahizAmountLabel: "Amount",
+    jahizPlanMonthsLabel: "Months",
+    jahizPlanActiveLabel: "Plan is active",
+    jahizSavePlan: "Save plan",
+    jahizEditPlan: "Edit plan",
+    jahizClearPlanForm: "Clear form",
+    jahizRecordPaymentTitle: "Record manual payment",
+    jahizVenueLabel: "Venue",
+    jahizRecordPayment: "Record payment",
+    jahizApplicationsTitle: "Public signup applications",
+    jahizNoApplications: "No Jahiz applications.",
+    jahizVenuesTitle: "Jahiz venues",
+    jahizNoVenues: "No Jahiz venues yet.",
+    jahizLinksLabel: "Links",
+    jahizContactLabel: "Contact",
+    jahizApproveTitle: "Approve Jahiz application",
+    jahizApprove: "Approve",
+    jahizReject: "Reject",
+    jahizSubscriptionTitle: "Update venue subscription",
+    jahizUpdateSubscription: "Save subscription",
+    jahizResetPasswordTitle: "Reset owner password",
+    jahizResetPassword: "Reset password",
+    jahizOwnerLink: "Owner login",
+    jahizCustomerLink: "Customer link",
+    jahizSuspended: "Suspended",
+    jahizStatusUpdated: "Venue subscription updated.",
+    jahizVenueCreated: "Jahiz venue created.",
+    jahizApplicationApproved: "Application approved.",
+    jahizApplicationRejected: "Application rejected.",
+    jahizPlanSaved: "Plan saved.",
+    jahizPaymentRecorded: "Payment recorded.",
+    jahizPasswordReset: "Owner credentials updated.",
+    cancelLabel: "Cancel",
+    generatePassword: "Generate",
     creditsIntro: "Manage platform message credit balances, message prices, and money/message allocations per organization.",
     refreshCredits: "Refresh credits",
     creditDefaultsTitle: "Default credit settings",
@@ -497,7 +613,7 @@ function readPreferences() {
     const value = JSON.parse(localStorage.getItem(PREFERENCES_KEY) || "{}");
     return {
       lang: value.lang === "en" ? "en" : "ar",
-      section: ["overview", "settings", "stores", "clinics", "requests", "credits", "users", "password"].includes(value.section) ? value.section : "overview",
+      section: ["overview", "settings", "stores", "clinics", "requests", "jahiz", "credits", "users", "password"].includes(value.section) ? value.section : "overview",
     };
   } catch {
     return { lang: "ar", section: "overview" };
@@ -524,6 +640,13 @@ let state = {
   requests: [],
   requestsLoaded: false,
   requestCounts: { new: 0, actionable: 0 },
+  jahiz: {
+    venues: [],
+    applications: [],
+    plans: [],
+    paymentsEnabled: false,
+    loaded: false,
+  },
   credits: {
     settings: { defaultMessageBalance: 500, customerPriceNis: 0.2, platformCostNis: 0.1 },
     organizations: [],
@@ -584,6 +707,60 @@ const els = {
   requestsList: document.getElementById("requests-list"),
   requestsEmpty: document.getElementById("requests-empty"),
   requestsBadge: document.getElementById("requests-badge"),
+  jahizRefresh: document.getElementById("jahiz-refresh"),
+  jahizSearch: document.getElementById("jahiz-search"),
+  jahizBadge: document.getElementById("jahiz-badge"),
+  jahizMetrics: document.getElementById("jahiz-metrics"),
+  jahizPaymentsWarning: document.getElementById("jahiz-payments-warning"),
+  jahizCreateForm: document.getElementById("jahiz-create-form"),
+  jahizCreatePlan: document.getElementById("jahiz-create-plan-id"),
+  jahizCreateSubmit: document.getElementById("jahiz-create-submit"),
+  jahizCreateGeneratePassword: document.getElementById("jahiz-create-generate-password"),
+  jahizPlanForm: document.getElementById("jahiz-plan-form"),
+  jahizPlanId: document.getElementById("jahiz-plan-id"),
+  jahizPlanCurrency: document.getElementById("jahiz-plan-currency"),
+  jahizPlanAmount: document.getElementById("jahiz-plan-amount"),
+  jahizPlanSubmit: document.getElementById("jahiz-plan-submit"),
+  jahizPlanClear: document.getElementById("jahiz-plan-clear"),
+  jahizPlansTbody: document.getElementById("jahiz-plans-tbody"),
+  jahizPlansEmpty: document.getElementById("jahiz-plans-empty"),
+  jahizPaymentForm: document.getElementById("jahiz-payment-form"),
+  jahizPaymentVenueId: document.getElementById("jahiz-payment-venue-id"),
+  jahizPaymentCurrency: document.getElementById("jahiz-payment-currency"),
+  jahizPaymentAmount: document.getElementById("jahiz-payment-amount"),
+  jahizPaymentSubmit: document.getElementById("jahiz-payment-submit"),
+  jahizApplicationsTbody: document.getElementById("jahiz-applications-tbody"),
+  jahizApplicationsEmpty: document.getElementById("jahiz-applications-empty"),
+  jahizVenuesTbody: document.getElementById("jahiz-venues-tbody"),
+  jahizVenuesEmpty: document.getElementById("jahiz-venues-empty"),
+  jahizApproveDialog: document.getElementById("jahiz-approve-dialog"),
+  jahizApproveForm: document.getElementById("jahiz-approve-form"),
+  jahizApproveSummary: document.getElementById("jahiz-approve-summary"),
+  jahizApproveApplicationId: document.getElementById("jahiz-approve-application-id"),
+  jahizApproveSlug: document.getElementById("jahiz-approve-slug"),
+  jahizApproveUsername: document.getElementById("jahiz-approve-username"),
+  jahizApprovePassword: document.getElementById("jahiz-approve-password"),
+  jahizApproveExpiresAt: document.getElementById("jahiz-approve-expires-at"),
+  jahizApprovePlanId: document.getElementById("jahiz-approve-plan-id"),
+  jahizApproveSubmit: document.getElementById("jahiz-approve-submit"),
+  jahizApproveCancel: document.getElementById("jahiz-approve-cancel"),
+  jahizApproveGeneratePassword: document.getElementById("jahiz-approve-generate-password"),
+  jahizSubscriptionDialog: document.getElementById("jahiz-subscription-dialog"),
+  jahizSubscriptionForm: document.getElementById("jahiz-subscription-form"),
+  jahizSubscriptionVenueId: document.getElementById("jahiz-subscription-venue-id"),
+  jahizSubscriptionStatus: document.getElementById("jahiz-subscription-status"),
+  jahizSubscriptionExpiresAt: document.getElementById("jahiz-subscription-expires-at"),
+  jahizSubscriptionPlanId: document.getElementById("jahiz-subscription-plan-id"),
+  jahizSubscriptionSubmit: document.getElementById("jahiz-subscription-submit"),
+  jahizSubscriptionCancel: document.getElementById("jahiz-subscription-cancel"),
+  jahizResetDialog: document.getElementById("jahiz-reset-dialog"),
+  jahizResetForm: document.getElementById("jahiz-reset-form"),
+  jahizResetVenueId: document.getElementById("jahiz-reset-venue-id"),
+  jahizResetUsername: document.getElementById("jahiz-reset-username"),
+  jahizResetPassword: document.getElementById("jahiz-reset-password"),
+  jahizResetSubmit: document.getElementById("jahiz-reset-submit"),
+  jahizResetCancel: document.getElementById("jahiz-reset-cancel"),
+  jahizResetGeneratePassword: document.getElementById("jahiz-reset-generate-password"),
   creditsRefresh: document.getElementById("credits-refresh"),
   creditSettingsForm: document.getElementById("credit-settings-form"),
   creditDefaultBalance: document.getElementById("credit-default-balance"),
@@ -1082,7 +1259,7 @@ function renderStoreUsersTable() {
     const edit = document.createElement("button");
     edit.type = "button";
     edit.className = "secondary-btn compact-btn";
-    edit.textContent = t("editStoreUser");
+    edit.textContent = t("jahizEditPlan");
     edit.addEventListener("click", () => beginEditStoreUser(user));
     actionCell.append(edit);
     const toggle = document.createElement("button");
@@ -1599,6 +1776,7 @@ function updateLanguageUi() {
   renderStoresTable();
   renderClinicsTable();
   renderStoreUsersTable();
+  renderJahiz();
   renderContentEditor();
   renderShowcaseEditor();
   renderHeroSlidesEditor();
@@ -1670,6 +1848,16 @@ function mapApiError(errorCode, fallbackMessage) {
       state.lang === "ar"
         ? "لا يمكن تعطيل أو حذف حساب المالك المرتبط."
         : "The linked owner account cannot be disabled or deleted.",
+    INVALID_CURRENCY:
+      state.lang === "ar" ? "العملة غير مدعومة." : "Unsupported currency.",
+    INVALID_AMOUNT:
+      state.lang === "ar" ? "المبلغ غير صالح." : "Invalid amount.",
+    INVALID_APPLICATION:
+      state.lang === "ar" ? "طلب التسجيل غير صالح." : "Invalid signup application.",
+    INVALID_PLAN:
+      state.lang === "ar" ? "بيانات الخطة غير صالحة." : "Invalid plan payload.",
+    INVALID_VENUE:
+      state.lang === "ar" ? "بيانات المتجر غير صالحة." : "Invalid venue payload.",
   };
 
   return dictionary[errorCode] || fallbackMessage || t("unexpectedError");
@@ -1739,6 +1927,8 @@ function switchTab(name) {
     if (!state.clinicsLoaded) loadClinics().catch((error) => showAlert(error.message));
   } else if (name === "requests") {
     loadRequests().catch((error) => showAlert(error.message));
+  } else if (name === "jahiz") {
+    if (!state.jahiz.loaded) loadJahiz().catch((error) => showAlert(error.message));
   } else if (name === "credits") {
     els.creditSearch?.focus();
     if (!state.creditsLoaded) loadCredits().catch((error) => showAlert(error.message));
@@ -1755,6 +1945,8 @@ function renderOverview() {
     [t("overviewRequests"), state.requestsLoaded ? state.requestCounts.actionable || 0 : "—"],
     [t("overviewStores"), state.storesLoaded ? state.stores.length : "—"],
     [t("overviewClinics"), state.clinicsLoaded ? state.clinics.length : "—"],
+    [t("overviewJahizVenues"), state.jahiz.loaded ? state.jahiz.venues.length : "—"],
+    [t("overviewJahizApplications"), state.jahiz.loaded ? state.jahiz.applications.filter((item) => item.status === "pending").length : "—"],
   ];
   els.overviewMetrics.textContent = "";
   for (const [label, value] of metrics) {
@@ -1793,6 +1985,9 @@ function clearSensitiveInputs() {
     "store-admin-password",
     "clinic-admin-password",
     "clinic-employee-password",
+    "jahiz-create-password",
+    "jahiz-approve-password",
+    "jahiz-reset-password",
   ]) {
     const input = document.getElementById(id);
     if (input) input.value = "";
@@ -2000,6 +2195,57 @@ function statusText(status) {
 const REQUEST_STATUSES = new Set(["new", "in_progress", "resolved", "archived"]);
 const DELIVERY_STATUS_ORDER = ["requested", "queued", "delivered", "failed", "cancelled"];
 const REQUEST_STATUS_ORDER = ["new", "in_progress", "resolved", "archived"];
+const JAHIZ_ALLOWED_CURRENCIES = new Set(["ILS", "USD", "JOD"]);
+const JAHIZ_MINOR_DECIMALS = { ILS: 2, USD: 2, JOD: 3 };
+
+function generateStrongPassword() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*_-+=?";
+  const bytes = new Uint32Array(18);
+  crypto.getRandomValues(bytes);
+  let value = "";
+  for (const raw of bytes) value += chars[raw % chars.length];
+  if (!/[A-Z]/.test(value)) value += "A";
+  if (!/[a-z]/.test(value)) value += "a";
+  if (!/[0-9]/.test(value)) value += "7";
+  if (!/[!@#$%^&*_\-+=?]/.test(value)) value += "!";
+  return value.slice(0, 24);
+}
+
+function normalizeIsoDate(value) {
+  const input = String(value || "").trim();
+  if (!input) return null;
+  const date = new Date(`${input}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString();
+}
+
+function dateInputValue(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toISOString().slice(0, 10);
+}
+
+function currencyMinorFactor(currency) {
+  return 10 ** (JAHIZ_MINOR_DECIMALS[currency] ?? 2);
+}
+
+function toAmountMinor(amount, currency) {
+  const text = String(amount ?? "").trim();
+  if (!text) return 0;
+  const number = Number(text);
+  if (!Number.isFinite(number) || number < 0) throw new Error(state.lang === "ar" ? "المبلغ غير صالح." : "Invalid amount.");
+  return Math.round(number * currencyMinorFactor(currency));
+}
+
+function fromAmountMinor(amountMinor, currency) {
+  const number = Number(amountMinor || 0) / currencyMinorFactor(currency);
+  const decimals = JAHIZ_MINOR_DECIMALS[currency] ?? 2;
+  return new Intl.NumberFormat(state.lang === "ar" ? "ar" : "en", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  }).format(number);
+}
 
 function formatStatusCounts(counts = {}, statuses = []) {
   const parts = statuses
@@ -2153,6 +2399,520 @@ async function loadCredits() {
   renderCredits();
 }
 
+function resolvePlanName(planId) {
+  if (!planId) return "—";
+  const plan = state.jahiz.plans.find((item) => item.id === planId);
+  return plan?.name || planId;
+}
+
+function venueOwnerLink(slug) {
+  return `/jahiz/login/?shop=${encodeURIComponent(slug || "")}`;
+}
+
+function venueCustomerLink(slug) {
+  return `/jahiz/s/?shop=${encodeURIComponent(slug || "")}`;
+}
+
+function renderJahizMetrics() {
+  if (!els.jahizMetrics) return;
+  const venues = state.jahiz.venues || [];
+  const applications = state.jahiz.applications || [];
+  const activeCount = venues.filter((item) => item.status === "active").length;
+  const pendingApps = applications.filter((item) => item.status === "pending").length;
+  const metrics = [
+    [t("jahizVenuesTitle"), venues.length],
+    [t("active"), activeCount],
+    [t("jahizApplicationsTitle"), applications.length],
+    [t("overviewJahizApplications"), pendingApps],
+  ];
+  els.jahizMetrics.textContent = "";
+  for (const [label, value] of metrics) {
+    const card = document.createElement("article");
+    card.className = "metric-card";
+    const title = document.createElement("span");
+    title.textContent = label;
+    const amount = document.createElement("strong");
+    amount.textContent = String(value);
+    card.append(title, amount);
+    els.jahizMetrics.append(card);
+  }
+}
+
+function setPlanOptions(select) {
+  if (!select) return;
+  const selected = select.value;
+  select.textContent = "";
+  const none = document.createElement("option");
+  none.value = "";
+  none.textContent = t("jahizNoPlan");
+  select.append(none);
+  for (const plan of state.jahiz.plans) {
+    const option = document.createElement("option");
+    option.value = plan.id || "";
+    option.textContent = `${plan.name} (${plan.currency} ${fromAmountMinor(plan.amountMinor, plan.currency)} / ${plan.months})${plan.active ? "" : ` · ${t("inactive")}`}`;
+    select.append(option);
+  }
+  if ([...select.options].some((opt) => opt.value === selected)) select.value = selected;
+}
+
+function setVenueOptions(select) {
+  if (!select) return;
+  const selected = select.value;
+  select.textContent = "";
+  for (const venue of state.jahiz.venues) {
+    const option = document.createElement("option");
+    option.value = venue.id;
+    option.textContent = `${venue.name} (${venue.slug})`;
+    select.append(option);
+  }
+  if ([...select.options].some((opt) => opt.value === selected)) select.value = selected;
+}
+
+function openDialog(dialog) {
+  if (!dialog) return;
+  if (typeof dialog.showModal === "function") dialog.showModal();
+  else dialog.setAttribute("open", "open");
+}
+
+function closeDialog(dialog) {
+  if (!dialog) return;
+  if (typeof dialog.close === "function") dialog.close();
+  else dialog.removeAttribute("open");
+}
+
+function applicationStatusLabel(status) {
+  if (REQUEST_STATUSES.has(status)) return requestStatusLabel(status);
+  if (status === "pending") return state.lang === "ar" ? "قيد المراجعة" : "Pending";
+  if (status === "approved") return state.lang === "ar" ? "معتمد" : "Approved";
+  if (status === "rejected") return state.lang === "ar" ? "مرفوض" : "Rejected";
+  return status || "—";
+}
+
+function businessTypeLabel(value) {
+  if (value === "cafe") return t("jahizBusinessCafe");
+  if (value === "restaurant") return t("jahizBusinessRestaurant");
+  return value || "—";
+}
+
+function renderJahizApplications() {
+  if (!els.jahizApplicationsTbody) return;
+  els.jahizApplicationsTbody.textContent = "";
+  const query = els.jahizSearch?.value?.trim().toLocaleLowerCase() || "";
+  const applications = (state.jahiz.applications || []).filter((item) =>
+    `${item.name} ${item.ownerName} ${item.email} ${item.phone} ${item.status}`.toLocaleLowerCase().includes(query));
+  els.jahizApplicationsEmpty?.classList.toggle("hidden", applications.length !== 0);
+  const pendingCount = applications.filter((item) => item.status === "pending").length;
+  els.jahizBadge?.classList.toggle("hidden", pendingCount < 1);
+  if (els.jahizBadge) els.jahizBadge.textContent = String(pendingCount);
+  for (const app of applications) {
+    const row = document.createElement("tr");
+    const name = document.createElement("td");
+    name.textContent = app.name || "—";
+    const type = document.createElement("td");
+    type.textContent = businessTypeLabel(app.businessType);
+    const owner = document.createElement("td");
+    owner.textContent = app.ownerName || "—";
+    const contact = document.createElement("td");
+    contact.textContent = [app.email, app.phone].filter(Boolean).join(" · ") || "—";
+    const status = document.createElement("td");
+    const pill = document.createElement("span");
+    pill.className = `status-pill ${app.status === "pending" ? "inactive" : "active"}`;
+    pill.textContent = applicationStatusLabel(app.status);
+    status.append(pill);
+    const createdAt = document.createElement("td");
+    createdAt.textContent = app.createdAt ? new Date(app.createdAt).toLocaleString(state.lang === "ar" ? "ar" : "en") : "—";
+    const message = document.createElement("td");
+    message.textContent = app.message || "—";
+    const actions = document.createElement("td");
+    const list = document.createElement("div");
+    list.className = "row-actions";
+    if (app.status === "pending") {
+      const approve = document.createElement("button");
+      approve.type = "button";
+      approve.className = "secondary-btn compact-btn";
+      approve.textContent = t("jahizApprove");
+      approve.addEventListener("click", () => openApproveDialog(app));
+      const reject = document.createElement("button");
+      reject.type = "button";
+      reject.className = "secondary-btn compact-btn danger-btn";
+      reject.textContent = t("jahizReject");
+      reject.addEventListener("click", () => rejectJahizApplication(app.id));
+      list.append(approve, reject);
+    } else {
+      list.textContent = "—";
+    }
+    actions.append(list);
+    row.append(name, type, owner, contact, status, createdAt, message, actions);
+    els.jahizApplicationsTbody.append(row);
+  }
+}
+
+function renderJahizVenues() {
+  if (!els.jahizVenuesTbody) return;
+  els.jahizVenuesTbody.textContent = "";
+  const query = els.jahizSearch?.value?.trim().toLocaleLowerCase() || "";
+  const venues = (state.jahiz.venues || []).filter((item) =>
+    `${item.name} ${item.slug} ${item.ownerUsername || ""} ${item.status}`.toLocaleLowerCase().includes(query));
+  els.jahizVenuesEmpty?.classList.toggle("hidden", venues.length !== 0);
+  for (const venue of venues) {
+    const row = document.createElement("tr");
+    const name = document.createElement("td");
+    name.textContent = venue.name || "—";
+    const type = document.createElement("td");
+    type.textContent = businessTypeLabel(venue.businessType);
+    const status = document.createElement("td");
+    const pill = document.createElement("span");
+    pill.className = `status-pill ${venue.status === "active" ? "active" : venue.status === "suspended" ? "suspended" : "inactive"}`;
+    pill.textContent = venue.status === "suspended" ? t("jahizSuspended") : venue.status === "active" ? t("active") : venue.status;
+    status.append(pill);
+    const expiresAt = document.createElement("td");
+    expiresAt.textContent = formatLicenceDate(venue.expiresAt);
+    const plan = document.createElement("td");
+    plan.textContent = resolvePlanName(venue.planId);
+    const links = document.createElement("td");
+    const linkRow = document.createElement("div");
+    linkRow.className = "link-row";
+    const ownerLink = document.createElement("a");
+    ownerLink.href = venueOwnerLink(venue.slug);
+    ownerLink.target = "_blank";
+    ownerLink.rel = "noopener noreferrer";
+    ownerLink.className = "secondary-btn compact-btn";
+    ownerLink.textContent = t("jahizOwnerLink");
+    const customerLink = document.createElement("a");
+    customerLink.href = venueCustomerLink(venue.slug);
+    customerLink.target = "_blank";
+    customerLink.rel = "noopener noreferrer";
+    customerLink.className = "secondary-btn compact-btn";
+    customerLink.textContent = t("jahizCustomerLink");
+    linkRow.append(ownerLink, customerLink);
+    links.append(linkRow);
+    const actions = document.createElement("td");
+    const actionRow = document.createElement("div");
+    actionRow.className = "row-actions";
+    const subscription = document.createElement("button");
+    subscription.type = "button";
+    subscription.className = "secondary-btn compact-btn";
+    subscription.textContent = t("jahizUpdateSubscription");
+    subscription.addEventListener("click", () => openSubscriptionDialog(venue));
+    const reset = document.createElement("button");
+    reset.type = "button";
+    reset.className = "secondary-btn compact-btn";
+    reset.textContent = t("jahizResetPassword");
+    reset.addEventListener("click", () => openResetDialog(venue));
+    actionRow.append(subscription, reset);
+    actions.append(actionRow);
+    row.append(name, type, status, expiresAt, plan, links, actions);
+    els.jahizVenuesTbody.append(row);
+  }
+}
+
+function renderJahizPlans() {
+  if (!els.jahizPlansTbody) return;
+  els.jahizPlansTbody.textContent = "";
+  const plans = state.jahiz.plans || [];
+  els.jahizPlansEmpty?.classList.toggle("hidden", plans.length !== 0);
+  for (const plan of plans) {
+    const row = document.createElement("tr");
+    const name = document.createElement("td");
+    name.textContent = plan.name || "—";
+    const currency = document.createElement("td");
+    currency.textContent = plan.currency || "—";
+    const amount = document.createElement("td");
+    amount.textContent = plan.currency ? fromAmountMinor(plan.amountMinor, plan.currency) : "—";
+    const months = document.createElement("td");
+    months.textContent = formatNumber(plan.months);
+    const status = document.createElement("td");
+    const pill = document.createElement("span");
+    pill.className = `status-pill ${plan.active ? "active" : "inactive"}`;
+    pill.textContent = plan.active ? t("active") : t("inactive");
+    status.append(pill);
+    const actions = document.createElement("td");
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "secondary-btn compact-btn";
+    edit.textContent = t("editStoreUser");
+    edit.addEventListener("click", () => {
+      els.jahizPlanId.value = plan.id || "";
+      els.jahizPlanForm.elements.name.value = plan.name || "";
+      els.jahizPlanForm.elements.currency.value = plan.currency || "ILS";
+      els.jahizPlanAmount.step = (JAHIZ_MINOR_DECIMALS[els.jahizPlanForm.elements.currency.value] === 3) ? "0.001" : "0.01";
+      els.jahizPlanForm.elements.amount.value = String(Number(plan.amountMinor || 0) / currencyMinorFactor(plan.currency || "ILS"));
+      els.jahizPlanForm.elements.months.value = String(plan.months || 1);
+      els.jahizPlanForm.elements.active.checked = Boolean(plan.active);
+      els.jahizPlanForm.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    actions.append(edit);
+    row.append(name, currency, amount, months, status, actions);
+    els.jahizPlansTbody.append(row);
+  }
+}
+
+function renderJahiz() {
+  renderJahizMetrics();
+  renderJahizApplications();
+  renderJahizVenues();
+  renderJahizPlans();
+  setPlanOptions(els.jahizCreatePlan);
+  setPlanOptions(els.jahizApprovePlanId);
+  setPlanOptions(els.jahizSubscriptionPlanId);
+  setVenueOptions(els.jahizPaymentVenueId);
+  if (els.jahizPaymentsWarning) {
+    els.jahizPaymentsWarning.classList.toggle("hidden", Boolean(state.jahiz.paymentsEnabled));
+  }
+}
+
+function openApproveDialog(application) {
+  if (!application || !els.jahizApproveForm) return;
+  els.jahizApproveForm.reset();
+  els.jahizApproveApplicationId.value = application.id;
+  els.jahizApproveSummary.textContent = `${application.name || "—"} · ${application.ownerName || "—"}`;
+  const suggestedSlug = String(application.name || "")
+    .normalize("NFKD")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "")
+    .slice(0, 64);
+  els.jahizApproveSlug.value = suggestedSlug || "";
+  els.jahizApproveUsername.value = "";
+  els.jahizApprovePassword.value = generateStrongPassword();
+  setPlanOptions(els.jahizApprovePlanId);
+  openDialog(els.jahizApproveDialog);
+}
+
+function openSubscriptionDialog(venue) {
+  if (!venue || !els.jahizSubscriptionForm) return;
+  els.jahizSubscriptionForm.reset();
+  els.jahizSubscriptionVenueId.value = venue.id;
+  els.jahizSubscriptionStatus.value = venue.status === "suspended" ? "suspended" : "active";
+  els.jahizSubscriptionExpiresAt.value = dateInputValue(venue.expiresAt);
+  setPlanOptions(els.jahizSubscriptionPlanId);
+  els.jahizSubscriptionPlanId.value = venue.planId || "";
+  openDialog(els.jahizSubscriptionDialog);
+}
+
+function openResetDialog(venue) {
+  if (!venue || !els.jahizResetForm) return;
+  els.jahizResetForm.reset();
+  els.jahizResetVenueId.value = venue.id;
+  els.jahizResetUsername.value = venue.ownerUsername || "";
+  els.jahizResetPassword.value = generateStrongPassword();
+  openDialog(els.jahizResetDialog);
+}
+
+async function loadJahiz() {
+  setDatasetLoading("jahiz", true);
+  try {
+    const data = await apiFetch("/api/jahiz/admin");
+    state.jahiz = {
+      venues: Array.isArray(data.venues) ? data.venues : [],
+      applications: Array.isArray(data.applications) ? data.applications : [],
+      plans: Array.isArray(data.plans) ? data.plans : [],
+      paymentsEnabled: Boolean(data.paymentsEnabled),
+      loaded: true,
+    };
+    renderJahiz();
+    renderOverview();
+  } finally {
+    setDatasetLoading("jahiz", false);
+  }
+}
+
+async function submitJahizAction(payload) {
+  await apiFetch("/api/jahiz/admin", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  await loadJahiz();
+}
+
+async function handleJahizCreate(event) {
+  event.preventDefault();
+  clearMessages();
+  if (state.pending.has("jahiz-create")) return;
+  const form = new FormData(els.jahizCreateForm);
+  const payload = {
+    action: "create",
+    name: String(form.get("name") || "").trim(),
+    slug: String(form.get("slug") || "").trim().toLowerCase(),
+    businessType: String(form.get("businessType") || ""),
+    ownerName: String(form.get("ownerName") || "").trim(),
+    username: String(form.get("username") || "").trim(),
+    password: String(form.get("password") || ""),
+    isDemo: form.get("isDemo") === "on",
+    expiresAt: normalizeIsoDate(form.get("expiresAt")),
+    planId: String(form.get("planId") || "").trim() || undefined,
+  };
+  setPending("jahiz-create", true, els.jahizCreateSubmit);
+  try {
+    await submitJahizAction(payload);
+    els.jahizCreateForm.reset();
+    clearSensitiveInputs();
+    showStatus(t("jahizVenueCreated"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    setPending("jahiz-create", false, els.jahizCreateSubmit);
+    if (document.getElementById("jahiz-create-password")) document.getElementById("jahiz-create-password").value = "";
+  }
+}
+
+async function handleJahizApprove(event) {
+  event.preventDefault();
+  clearMessages();
+  if (state.pending.has("jahiz-approve")) return;
+  const form = new FormData(els.jahizApproveForm);
+  const payload = {
+    action: "approve",
+    applicationId: String(form.get("applicationId") || ""),
+    slug: String(form.get("slug") || "").trim().toLowerCase(),
+    username: String(form.get("username") || "").trim(),
+    password: String(form.get("password") || ""),
+    isDemo: form.get("isDemo") === "on",
+    expiresAt: normalizeIsoDate(form.get("expiresAt")),
+    planId: String(form.get("planId") || "").trim() || undefined,
+  };
+  setPending("jahiz-approve", true, els.jahizApproveSubmit);
+  try {
+    await submitJahizAction(payload);
+    closeDialog(els.jahizApproveDialog);
+    clearSensitiveInputs();
+    showStatus(t("jahizApplicationApproved"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    setPending("jahiz-approve", false, els.jahizApproveSubmit);
+    if (document.getElementById("jahiz-approve-password")) document.getElementById("jahiz-approve-password").value = "";
+  }
+}
+
+async function rejectJahizApplication(applicationId) {
+  if (!applicationId || !window.confirm(`${t("jahizReject")}?`)) return;
+  const key = `jahiz-reject-${applicationId}`;
+  if (state.pending.has(key)) return;
+  state.pending.add(key);
+  try {
+    await submitJahizAction({ action: "reject", applicationId });
+    showStatus(t("jahizApplicationRejected"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    state.pending.delete(key);
+  }
+}
+
+async function handleJahizSubscription(event) {
+  event.preventDefault();
+  clearMessages();
+  if (state.pending.has("jahiz-subscription")) return;
+  const form = new FormData(els.jahizSubscriptionForm);
+  const payload = {
+    action: "update",
+    venueId: String(form.get("venueId") || ""),
+    status: String(form.get("status") || "active"),
+    expiresAt: normalizeIsoDate(form.get("expiresAt")),
+    planId: String(form.get("planId") || "").trim() || undefined,
+  };
+  setPending("jahiz-subscription", true, els.jahizSubscriptionSubmit);
+  try {
+    await submitJahizAction(payload);
+    closeDialog(els.jahizSubscriptionDialog);
+    showStatus(t("jahizStatusUpdated"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    setPending("jahiz-subscription", false, els.jahizSubscriptionSubmit);
+  }
+}
+
+async function handleJahizReset(event) {
+  event.preventDefault();
+  clearMessages();
+  if (state.pending.has("jahiz-reset")) return;
+  const form = new FormData(els.jahizResetForm);
+  const payload = {
+    action: "reset-password",
+    venueId: String(form.get("venueId") || ""),
+    username: String(form.get("username") || "").trim(),
+    password: String(form.get("password") || ""),
+  };
+  setPending("jahiz-reset", true, els.jahizResetSubmit);
+  try {
+    await submitJahizAction(payload);
+    closeDialog(els.jahizResetDialog);
+    clearSensitiveInputs();
+    showStatus(t("jahizPasswordReset"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    setPending("jahiz-reset", false, els.jahizResetSubmit);
+    if (document.getElementById("jahiz-reset-password")) document.getElementById("jahiz-reset-password").value = "";
+  }
+}
+
+async function handleJahizPlanSave(event) {
+  event.preventDefault();
+  clearMessages();
+  if (state.pending.has("jahiz-plan")) return;
+  const form = new FormData(els.jahizPlanForm);
+  const currency = String(form.get("currency") || "").toUpperCase();
+  if (!JAHIZ_ALLOWED_CURRENCIES.has(currency)) {
+    showAlert(state.lang === "ar" ? "العملة غير مدعومة." : "Unsupported currency.");
+    return;
+  }
+  const payload = {
+    action: "save-plan",
+    id: String(form.get("id") || "").trim() || undefined,
+    name: String(form.get("name") || "").trim(),
+    currency,
+    amountMinor: toAmountMinor(form.get("amount"), currency),
+    months: Number(form.get("months") || 0),
+    active: form.get("active") === "on",
+  };
+  setPending("jahiz-plan", true, els.jahizPlanSubmit);
+  try {
+    await submitJahizAction(payload);
+    showStatus(t("jahizPlanSaved"));
+    els.jahizPlanForm.reset();
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    setPending("jahiz-plan", false, els.jahizPlanSubmit);
+  }
+}
+
+async function handleJahizPayment(event) {
+  event.preventDefault();
+  clearMessages();
+  if (state.pending.has("jahiz-payment")) return;
+  const form = new FormData(els.jahizPaymentForm);
+  const currency = String(form.get("currency") || "").toUpperCase();
+  if (!JAHIZ_ALLOWED_CURRENCIES.has(currency)) {
+    showAlert(state.lang === "ar" ? "العملة غير مدعومة." : "Unsupported currency.");
+    return;
+  }
+  const payload = {
+    action: "record-payment",
+    venueId: String(form.get("venueId") || ""),
+    amountMinor: toAmountMinor(form.get("amount"), currency),
+    currency,
+    months: Number(form.get("months") || 0),
+    note: String(form.get("note") || "").trim(),
+  };
+  setPending("jahiz-payment", true, els.jahizPaymentSubmit);
+  try {
+    await submitJahizAction(payload);
+    showStatus(t("jahizPaymentRecorded"));
+    els.jahizPaymentForm.reset();
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    setPending("jahiz-payment", false, els.jahizPaymentSubmit);
+  }
+}
+
 async function handleCreditSettings(event) {
   event.preventDefault();
   clearMessages();
@@ -2239,6 +2999,8 @@ async function bootstrapSession() {
     els.passwordWarning.classList.toggle("hidden", !state.passwordChangeRecommended);
     els.passwordWarning.textContent = state.passwordChangeRecommended ? t("warningChangePassword") : "";
     const results = await Promise.allSettled([loadSettings(), loadUsers(), loadRequests(), loadStores(), loadClinics()]);
+    const jahizResult = await Promise.allSettled([loadJahiz()]);
+    results.push(...jahizResult);
     const authFailure = results.find((result) => result.status === "rejected" && result.reason?.status === 401);
     if (authFailure) {
       resetAuthenticatedUi();
@@ -2272,6 +3034,14 @@ function resetAuthenticatedUi() {
   state.requests = [];
   state.requestsLoaded = false;
   state.requestCounts = { new: 0, actionable: 0 };
+  state.jahiz = {
+    settings: null,
+    venues: [],
+    applications: [],
+    plans: [],
+    paymentsEnabled: false,
+    loaded: false,
+  };
   state.credits = {
     settings: { defaultMessageBalance: 500, customerPriceNis: 0.2, platformCostNis: 0.1 },
     organizations: [],
@@ -2577,6 +3347,42 @@ function initForms() {
     clearMessages();
     loadRequests().catch((error) => showAlert(error.message));
   });
+  els.jahizRefresh.addEventListener("click", () => {
+    clearMessages();
+    loadJahiz().catch((error) => showAlert(error.message));
+  });
+  els.jahizSearch.addEventListener("input", () => {
+    renderJahizApplications();
+    renderJahizVenues();
+  });
+  els.jahizCreateGeneratePassword.addEventListener("click", () => {
+    document.getElementById("jahiz-create-password").value = generateStrongPassword();
+  });
+  els.jahizApproveGeneratePassword.addEventListener("click", () => {
+    document.getElementById("jahiz-approve-password").value = generateStrongPassword();
+  });
+  els.jahizResetGeneratePassword.addEventListener("click", () => {
+    document.getElementById("jahiz-reset-password").value = generateStrongPassword();
+  });
+  els.jahizCreateForm.addEventListener("submit", handleJahizCreate);
+  els.jahizApproveForm.addEventListener("submit", handleJahizApprove);
+  els.jahizApproveCancel.addEventListener("click", () => closeDialog(els.jahizApproveDialog));
+  els.jahizSubscriptionForm.addEventListener("submit", handleJahizSubscription);
+  els.jahizSubscriptionCancel.addEventListener("click", () => closeDialog(els.jahizSubscriptionDialog));
+  els.jahizResetForm.addEventListener("submit", handleJahizReset);
+  els.jahizResetCancel.addEventListener("click", () => closeDialog(els.jahizResetDialog));
+  els.jahizPlanForm.addEventListener("submit", handleJahizPlanSave);
+  els.jahizPlanClear.addEventListener("click", () => {
+    els.jahizPlanForm.reset();
+    els.jahizPlanId.value = "";
+  });
+  els.jahizPaymentForm.addEventListener("submit", handleJahizPayment);
+  els.jahizPlanCurrency.addEventListener("change", () => {
+    els.jahizPlanAmount.step = (JAHIZ_MINOR_DECIMALS[els.jahizPlanCurrency.value] === 3) ? "0.001" : "0.01";
+  });
+  els.jahizPaymentCurrency.addEventListener("change", () => {
+    els.jahizPaymentAmount.step = (JAHIZ_MINOR_DECIMALS[els.jahizPaymentCurrency.value] === 3) ? "0.001" : "0.01";
+  });
   els.creditsRefresh.addEventListener("click", () => {
     clearMessages();
     loadCredits().catch((error) => showAlert(error.message));
@@ -2605,6 +3411,12 @@ function initAdmin() {
   initMobileNavigation();
   wirePasswordToggleButtons();
   syncStoreBackendFields();
+  if (els.jahizPlanCurrency && els.jahizPlanAmount) {
+    els.jahizPlanAmount.step = (JAHIZ_MINOR_DECIMALS[els.jahizPlanCurrency.value] === 3) ? "0.001" : "0.01";
+  }
+  if (els.jahizPaymentCurrency && els.jahizPaymentAmount) {
+    els.jahizPaymentAmount.step = (JAHIZ_MINOR_DECIMALS[els.jahizPaymentCurrency.value] === 3) ? "0.001" : "0.01";
+  }
   updateLanguageUi();
   return bootstrapSession();
 }

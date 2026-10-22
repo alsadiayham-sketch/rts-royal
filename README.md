@@ -65,11 +65,13 @@ send messages automatically or store enquiries in D1.
 
 ## Development
 
-Requires Node.js 22 or later.
+Requires Node.js 24 or later.
 
 ```powershell
 npm ci
+npm run build:jahiz
 npx wrangler d1 execute rts-royal-db --local --file schema.sql
+npx wrangler d1 execute rts-royal-db --local --file migrations/0005_jahiz.sql
 npm run dev
 ```
 
@@ -89,6 +91,41 @@ initialization. GitHub repository secrets `CLOUDFLARE_API_TOKEN` and
 passwords, database exports, and `.wrangler/` out of source control.
 
 ## Product and assets
+
+### Jahiz | جاهز
+
+Jahiz is the bilingual restaurant/cafe order-readiness product at `/jahiz/`.
+Public applications are submitted at `/jahiz/signup/`; platform administrators
+approve them or create venues directly in the **Jahiz** tab at `/admin/`.
+Each venue has a separate owner login at `/jahiz/login/?shop=SLUG` and customer
+QR destination at `/jahiz/s/?shop=SLUG`. Owner/staff cookies and accounts are
+separate from RTS administrator credentials, and all operations are tenant-scoped.
+
+Owners manage orders, staff, branding, and an allowlisted drag-and-drop block
+layout. The tracking block cannot be removed. No custom HTML or JavaScript is
+accepted. QR generation runs locally using the bundled `qrcode` library; PNG/SVG
+export and printing do not send venue URLs to an external QR service. Rebuild
+`public/jahiz/vendor/` with `npm run build:jahiz`; the dependency license ships
+beside the bundle. HTTPS images are allowed only by the scoped Jahiz page CSP.
+
+Customers enter a receipt number and the random pickup code supplied by staff,
+or open a private order link. Receipt numbers alone cannot unlock tracking.
+Private links carry their code in a URL fragment, not a server-visible query,
+and the customer page removes the fragment after reading it. Staff should share
+these codes only with the matching customer.
+Customers leave the tracking page open. Updates poll
+every five seconds; sound requires a user gesture and device support. Background
+or closed-tab alerts are **not guaranteed**, including on iPhones. This release
+does not include Web Push, SMS, automatic POS import, or payment-provider checkout.
+The platform supports manual subscription plans/payments. Online checkout stays
+explicitly disabled until a real provider is configured and integrated.
+JOD amounts use three decimal places; ILS/USD use two. Fictional demo venues are
+free and isolated; their credentials must never be committed or published.
+
+Apply the additive `migrations/0005_jahiz.sql` to D1 before deploying Jahiz.
+The production workflow applies it after the existing base schema. Existing RTS
+data is not replaced. Deployment credentials and generated demo passwords stay
+outside `public/` and source control.
 
 The website showcases the real **RTS Business 4.0** Windows application. Public
 screenshots avoid customer/store identifiers, and the release download is restricted
