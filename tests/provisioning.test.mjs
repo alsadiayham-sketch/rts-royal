@@ -193,6 +193,33 @@ test("D1 business provisioning records the owner and desktop backend contract", 
   }
 });
 
+test("Firestore Business creation provisions server authentication without changing data routing", async () => {
+  const commits = [];
+  const restoreFetch = useFirestoreMock({
+    "projects/_global/settings/pos_stores": firestoreDocument({ stores: [] }),
+  }, { capture: commits });
+  try {
+    const response = await createStore({
+      request: adminRequest("/api/pos-stores", {
+        id: "rts-resturant", name: "Restaurant Test", backend: "firestore",
+        warrantyMonths: 12, adminUsername: "owner", adminName: "Owner",
+        adminPassword: "fixture-only-owner-password",
+      }),
+      env: { DB: database(), AUTH_SECRET: "test-only-auth-secret-is-long-enough" },
+    });
+    assert.equal(response.status, 201);
+    const fields = commits[0].writes.find((write) => write.update.name.endsWith("/settings/pos")).update.fields;
+    assert.equal(fields.dataBackend.stringValue, "firestore");
+    assert.equal(fields.authBackend.stringValue, "rts");
+    assert.equal(fields.authContractVersion.integerValue, "1");
+    assert.equal(fields.authApiBaseUrl.stringValue, "https://rts-royal.pages.dev");
+    assert.equal(fields.apiBaseUrl, undefined);
+    assert.equal(fields.messaging.mapValue.fields.enabled.booleanValue, false);
+  } finally {
+    restoreFetch();
+  }
+});
+
 test("a failed Firestore commit compensates a newly created D1 credit account", async () => {
   const restoreFetch = useFirestoreMock({
     "projects/_global/settings/pos_stores": firestoreDocument({ stores: [] }),

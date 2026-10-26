@@ -24,11 +24,18 @@ const copy = {
     save: "حفظ ونشر", remove: "حذف", edit: "تعديل", hide: "إخفاء", show: "إظهار", up: "للأعلى",
     down: "للأسفل", addBlock: "إضافة قسم", preview: "معاينة مباشرة", staffOnly: "هذه الإعدادات متاحة للمالك فقط.",
     paymentOff: "الدفع الإلكتروني غير مهيأ", joinTitle: "انضم إلى قائمة الانتظار",
-    joinHelp: "أدخل رقم الطلب ورمز الاستلام الذي يقدمه لك فريق المنشأة.", join: "متابعة طلبي",
+    joinHelp: "أدخل رقم الإيصال ورمز الاستلام الخاص الذي يقدمه لك فريق المنشأة.", join: "متابعة طلبي",
     notFound: "لم نعثر على منشأة بهذه البيانات.", orderError: "تعذر العثور على إيصال المتابعة. تحقق من الرابط.",
     keepOpen: "أبقِ هذه الصفحة مفتوحة لتتلقى التحديثات. لا تتوفر إشعارات دفع في هذه الخدمة.",
     enableAlert: "تفعيل التنبيه الصوتي والاهتزاز", alertOn: "تم تفعيل التنبيه لهذه الجلسة.",
-    review: "قيّم تجربتك", receipt: "إيصال المتابعة", timeUnknown: "الوقت قيد التحديث", demo: "منشأة تجريبية",
+    review: "قيّم تجربتك",     receipt: "إيصال المتابعة", receiptNumber: "رقم الإيصال", privateCode: "رمز الاستلام الخاص",
+    privateCodeHelp: "12 حرفاً أو رقماً · تم التحقق منه عند الانضمام", tracking: "متابعة الطلب",
+    trackingEyebrow: "صفحتك الخاصة للمتابعة", trackingPromise: "حالة الطلب وتقدير الجاهزية في مكان واحد.",
+    stepWaiting: "قيد الانتظار", stepReady: "جاهز للاستلام", stepDone: "مكتمل",
+    stepCancelled: "ملغي", estimateLabel: "التقدير الحالي", statusLabel: "حالة الطلب",
+    countdownLabel: "الوقت المتبقي التقريبي", errorAlert: "تعذر إكمال المتابعة. راجع البيانات وحاول مجدداً.",
+    skipTracking: "تخطي إلى متابعة الطلب", skipStatus: "تخطي إلى حالة الطلب", footer: "Jahiz جاهز · RTS",
+    timeUnknown: "الوقت قيد التحديث", demo: "منشأة تجريبية",
     print: "طباعة / حفظ PDF", downloadPng: "تنزيل PNG عالي الدقة", downloadSvg: "تنزيل SVG",
     copyLink: "نسخ الرابط", copyTrackingLink: "نسخ رابط متابعة العميل", password: "كلمة المرور",
     currentPassword: "كلمة المرور الحالية", newPassword: "كلمة مرور جديدة", changePassword: "تغيير كلمة المرور",
@@ -59,11 +66,18 @@ const copy = {
     qr: "QR and print", staff: "Team", account: "Billing and account", save: "Save and publish", remove: "Remove",
     edit: "Edit", hide: "Hide", show: "Show", up: "Move up", down: "Move down", addBlock: "Add section",
     preview: "Live preview", staffOnly: "These settings are available to the owner only.", paymentOff: "Online payment is not configured",
-    joinTitle: "Join the queue", joinHelp: "Enter the order number and pickup code provided by venue staff.", join: "Track my order",
+    joinTitle: "Join the queue",     joinHelp: "Enter the receipt number and private pickup code provided by venue staff.", join: "Track my order",
     notFound: "We could not find a venue with these details.", orderError: "We could not find that tracking receipt. Check the link.",
     keepOpen: "Keep this page open for updates. Push notifications are not available in this service.",
     enableAlert: "Enable sound and vibration alert", alertOn: "Alerts are enabled for this session.", review: "Rate your experience",
-    receipt: "Tracking receipt", timeUnknown: "Time is being updated", demo: "Demo venue", print: "Print / save PDF",
+    receipt: "Tracking receipt", receiptNumber: "Receipt number", privateCode: "Private pickup code",
+    privateCodeHelp: "12 characters · verified when you joined", tracking: "Order tracking",
+    trackingEyebrow: "Your private tracking page", trackingPromise: "Your order status and readiness estimate in one place.",
+    stepWaiting: "Waiting", stepReady: "Ready for pickup", stepDone: "Complete",
+    stepCancelled: "Cancelled", estimateLabel: "Current estimate", statusLabel: "Order status",
+    countdownLabel: "Estimated time remaining", errorAlert: "We could not continue tracking. Check your details and try again.",
+    skipTracking: "Skip to order tracking", skipStatus: "Skip to order status", footer: "Jahiz جاهز · RTS",
+    timeUnknown: "Time is being updated", demo: "Demo venue", print: "Print / save PDF",
     downloadPng: "Download high-resolution PNG", downloadSvg: "Download SVG", copyLink: "Copy link",
     copyTrackingLink: "Copy customer tracking link", password: "Password", currentPassword: "Current password",
     newPassword: "New password", changePassword: "Change password", staffName: "Staff name", staffUsername: "Username",
@@ -127,6 +141,7 @@ function setLanguage(lang) {
   state.lang = lang; localStorage.setItem("jahiz-language", lang);
   document.documentElement.lang = lang; document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
   document.querySelectorAll("[data-lang]").forEach(button => { button.textContent = lang === "ar" ? "English" : "العربية"; });
+  document.querySelectorAll("[data-customer-copy]").forEach(node => { node.textContent = t(node.dataset.customerCopy); });
   if (document.body.dataset.page === "owner" && state.session) renderOwner();
   if (document.body.dataset.page === "join" && state.venue) renderJoinPage();
   if (document.body.dataset.page === "order") renderOrder();
@@ -140,14 +155,35 @@ function iconNode(block, alt = "") {
     const span = el("span", { class: "j-block-icon", "aria-label": alt || null }); span.insertAdjacentHTML("beforeend", icon.value); return span;
   })();
 }
+function playFeedbackTone(type = "success") {
+  try {
+    const context = new AudioContext(), oscillator = context.createOscillator(), gain = context.createGain();
+    oscillator.frequency.value = type === "error" ? 280 : 660;
+    gain.gain.setValueAtTime(.0001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(.08, context.currentTime + .02);
+    gain.gain.exponentialRampToValueAtTime(.0001, context.currentTime + .16);
+    oscillator.connect(gain).connect(context.destination); oscillator.start(); oscillator.stop(context.currentTime + .18);
+  } catch {}
+}
+function customerMasthead(venue, compact = false) {
+  const branding = normalizeBranding(venue.branding || {});
+  const head = el("header", { class: "j-venue-masthead" });
+  if (branding.logoUrl && safeUrl(branding.logoUrl, true)) head.append(el("img", { class: "j-venue-logo", src: branding.logoUrl, alt: venue.name || "Jahiz" }));
+  const identity = el("div", { class: "j-venue-identity" }, [
+    el("p", { class: "j-venue-eyebrow", text: compact ? t("tracking") : t("trackingEyebrow") }),
+    el(compact ? "h2" : "h1", { text: venue.name || "Jahiz" }),
+  ]);
+  if (venue.isDemo) identity.append(el("span", { class: "j-badge", text: t("demo") }));
+  head.append(identity);
+  return head;
+}
 function renderCustomer(parent, venue, { compact = false } = {}) {
   const branding = applyCustomerTheme(parent, venue.branding || {});
   parent.replaceChildren();
   const feedbackBox = !compact ? el("div", { id: "join-feedback", class: "j-feedback hidden", role: "alert", "aria-live": "assertive" }) : null;
-  const shell = el("div", { class: "j-customer-native" });
-  if (branding.logoUrl && safeUrl(branding.logoUrl, true)) shell.append(el("img", { class: "j-customer-logo", src: branding.logoUrl, alt: venue.name || "Jahiz" }));
-  shell.append(el("h2", { text: venue.name || "Jahiz" }));
-  if (venue.isDemo) shell.append(el("span", { class: "j-badge", text: t("demo") }));
+  const shell = el("div", { class: "j-customer-native j-customer-experience" });
+  shell.append(customerMasthead(venue, compact));
+  if (!compact) shell.append(el("p", { class: "j-venue-intro", text: t("trackingPromise") }));
   for (const block of visibleBlocks(branding)) {
     const section = el("section", { class: `j-customer-block j-block-${block.type}` });
     if (block.icon || block.iconUrl) section.append(iconNode(block, block.text || ""));
@@ -172,18 +208,23 @@ function renderCustomer(parent, venue, { compact = false } = {}) {
   parent.append(shell);
 }
 function renderTracking(venue, compact) {
-  const area = el("div", { class: "j-tracking-area" }, [el("h3", { text: t("joinTitle") }), el("p", { text: t("joinHelp") })]);
+  const area = el("section", { class: "j-tracking-area", "aria-labelledby": "tracking-title" }, [
+    el("div", { class: "j-tracking-heading" }, [
+      el("span", { class: "j-tracking-index", text: "01", "aria-hidden": "true" }),
+      el("div", {}, [el("h3", { id: "tracking-title", text: t("joinTitle") }), el("p", { text: t("joinHelp") })]),
+    ]),
+  ]);
   if (compact) return area;
-  const form = el("form");
-  const number = el("input", { name: "number", inputmode: "numeric", autocomplete: "off", required: "", maxlength: "12", placeholder: t("number") });
-  const pickupCode = el("input", { name: "pickupCode", autocomplete: "one-time-code", autocapitalize: "characters", spellcheck: "false", required: "", maxlength: "12", placeholder: t("pickupCode"), dir: "ltr" });
+  const form = el("form", { class: "j-tracking-form" });
+  const number = el("input", { name: "number", inputmode: "numeric", autocomplete: "off", required: "", maxlength: "12", placeholder: t("number"), "aria-label": t("receiptNumber") });
+  const pickupCode = el("input", { name: "pickupCode", autocomplete: "one-time-code", autocapitalize: "characters", spellcheck: "false", required: "", maxlength: "12", placeholder: t("pickupCode"), dir: "ltr", "aria-label": t("privateCode") });
   number.value = state.joinPrefill?.number || ""; pickupCode.value = state.joinPrefill?.pickupCode || "";
-  form.append(field(t("number"), number), field(t("pickupCode"), pickupCode, t("pickupHelp")), el("button", { class: "j-button", type: "submit", text: t("join") }));
+  form.append(field(t("receiptNumber"), number), field(t("privateCode"), pickupCode, t("pickupHelp")), el("button", { class: "j-button j-track-action", type: "submit", text: t("join") }));
   form.addEventListener("submit", async event => {
     event.preventDefault(); const receipt = number.value.trim(); const code = normalizePickupCode(pickupCode.value); pickupCode.value = code;
-    if (!/^\d{1,12}$/.test(receipt) || !/^[A-Z0-9]{12}$/.test(code)) return feedback("#join-feedback", t("required"));
+    if (!/^\d{1,12}$/.test(receipt) || !/^[A-Z0-9]{12}$/.test(code)) { playFeedbackTone("error"); return feedback("#join-feedback", t("required")); }
     try { const answer = await api("/public/join", { method: "POST", body: JSON.stringify({ slug: venue.slug, number: receipt, pickupCode: code }) }); location.assign(`/jahiz/order/?token=${encodeURIComponent(answer.token)}`); }
-    catch (error) { feedback("#join-feedback", error.message === "NETWORK" ? t("network") : error.message); }
+    catch (error) { playFeedbackTone("error"); feedback("#join-feedback", error.message === "NETWORK" ? t("network") : error.message); }
   });
   area.append(form); return area;
 }
@@ -419,10 +460,49 @@ async function renderJoinPage() { renderCustomer($("#join-content"), state.venue
 function consumeJoinFragment() { const params = new URLSearchParams(location.hash.slice(1)); if (location.hash) history.replaceState(null, "", `${location.pathname}${location.search}`); return { number: String(params.get("number") || "").trim(), pickupCode: normalizePickupCode(params.get("code")) }; }
 async function initJoin() { state.joinPrefill = consumeJoinFragment(); const slug = new URLSearchParams(location.search).get("shop") || ""; try { state.venue = (await api(`/public/venue?slug=${encodeURIComponent(slug)}`)).venue; renderJoinPage(); } catch { $("#join-content").replaceChildren(el("p", { text: t("notFound") })); } }
 function remainingTime(value) { const seconds = Math.max(0, Math.ceil((new Date(value).valueOf() - Date.now()) / 1000)); return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`; }
+function statusProgress(status) {
+  const states = ["waiting", "ready", "done"];
+  return status === "cancelled" ? 0 : Math.max(0, states.indexOf(status));
+}
+function orderJourney(status) {
+  const current = statusProgress(status);
+  const steps = [
+    { status: "waiting", label: t("stepWaiting") },
+    { status: "ready", label: t("stepReady") },
+    { status: "done", label: t("stepDone") },
+  ];
+  return el("ol", { class: `j-order-progress ${status === "cancelled" ? "cancelled" : ""}`, "aria-label": t("statusLabel") }, steps.map((step, index) => {
+    const state = status === "cancelled" ? "" : index < current ? "complete" : index === current ? "current" : "";
+    return el("li", { class: state, "aria-current": state === "current" ? "step" : null }, [
+      el("span", { class: "j-progress-dot", text: String(index + 1), "aria-hidden": "true" }),
+      el("span", { text: step.label }),
+    ]);
+  }));
+}
 function renderOrder() {
   const root = $("#order-content"); if (!root || !state.order) return; clearInterval(state.receiptTimer); applyCustomerTheme(root, state.venue.branding || {}); root.replaceChildren();
-  const order = state.order; const notice = el("div", { id: "order-feedback", class: "j-feedback hidden", role: "status", "aria-live": "polite" }); const countdown = el("p", { text: order.estimatedReadyAt ? remainingTime(order.estimatedReadyAt) : t("timeUnknown") });
-  root.append(notice, el("p", { class: "j-kicker", text: state.venue.name || "" }), el("h1", { text: t("receipt") }), el("div", { class: "j-public-number", text: order.number }), el("span", { class: `j-status ${order.status}`, text: t(order.status) }), countdown, el("p", { class: "j-note", text: t("keepOpen") }), el("button", { class: "j-button secondary", type: "button", text: t("enableAlert"), onclick: enableAlerts }));
+  const order = state.order;
+  const notice = el("div", { id: "order-feedback", class: "j-feedback hidden", role: "status", "aria-live": "polite" });
+  const countdown = el("strong", { class: "j-countdown-value", text: order.estimatedReadyAt ? remainingTime(order.estimatedReadyAt) : t("timeUnknown"), dir: "ltr" });
+  const receipt = el("section", { class: "j-receipt-details", "aria-label": t("receipt") }, [
+    el("div", { class: "j-receipt-item" }, [el("span", { class: "j-detail-label", text: t("receiptNumber") }), el("strong", { class: "j-public-number", text: order.number, dir: "ltr" })]),
+    el("div", { class: "j-receipt-item j-private-code" }, [el("span", { class: "j-detail-label", text: t("privateCode") }), el("strong", { text: "•••• •••• ••••", dir: "ltr" }), el("small", { text: t("privateCodeHelp") })]),
+  ]);
+  const estimate = el("section", { class: "j-order-estimate", "aria-live": "polite" }, [
+    el("span", { class: "j-detail-label", text: t("countdownLabel") }), countdown,
+    el("span", { class: `j-status ${order.status}`, text: order.status === "cancelled" ? t("stepCancelled") : t(order.status) }),
+  ]);
+  const journey = el("div", { class: "j-order-journey" }, [
+    customerMasthead(state.venue, true),
+    el("p", { class: "j-venue-intro", text: t("trackingPromise") }),
+    el("h1", { text: t("receipt") }),
+    receipt,
+    orderJourney(order.status),
+    estimate,
+    el("p", { class: "j-note", text: t("keepOpen") }),
+    el("button", { class: "j-button secondary j-alert-action", type: "button", text: t("enableAlert"), onclick: enableAlerts }),
+  ]);
+  root.append(notice, journey);
   if (order.estimatedReadyAt && order.status === "waiting") state.receiptTimer = setInterval(() => { countdown.textContent = remainingTime(order.estimatedReadyAt); }, 1000);
 }
 function playReadyTone() { try { const context = new AudioContext(), oscillator = context.createOscillator(), gain = context.createGain(); oscillator.frequency.value = 880; gain.gain.setValueAtTime(.0001, context.currentTime); gain.gain.exponentialRampToValueAtTime(.12, context.currentTime + .02); gain.gain.exponentialRampToValueAtTime(.0001, context.currentTime + .4); oscillator.connect(gain).connect(context.destination); oscillator.start(); oscillator.stop(context.currentTime + .42); } catch {} }

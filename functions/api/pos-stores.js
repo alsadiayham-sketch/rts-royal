@@ -137,6 +137,11 @@ export async function onRequestPost(context) {
       createdAt: firestoreTimestamp(new Date().toISOString()),
       storeName: name,
       dataBackend: backend,
+      ...(backend === "firestore" ? {
+        authBackend: "rts",
+        authContractVersion: 1,
+        authApiBaseUrl: "https://rts-royal.pages.dev",
+      } : {}),
       productType: "business",
       ownerUsername: adminUsername,
       ownerName: adminName,

@@ -24,6 +24,13 @@ characters. Use a password manager and unique passwords.
 Creating an RTS Business store or RTS Clinic atomically writes its licence,
 hashed owner account, and typed registry entry. It also initializes the D1
 credit account; if registry creation fails, that new D1 record is removed.
+New Firestore-backed Business stores additionally declare RTS server authentication
+(`authBackend: "rts"`, `authContractVersion: 1`, and
+`authApiBaseUrl: "https://rts-royal.pages.dev"`). Business 4.0.10+ uses that
+server to verify passwords without rerouting the store's data to D1. Existing
+Firestore stores need these fields enabled on their licence by an administrator;
+never switch `dataBackend` merely to bypass a login guard. Owner passwords are
+unchanged by this configuration.
 The primary owner account is linked to the RTS Tracking API at
 `/owner/login` and `/owner/dashboard`; configure the Tracking app with this
 site as its HTTPS API base URL.

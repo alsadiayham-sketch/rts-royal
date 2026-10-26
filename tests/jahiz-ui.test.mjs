@@ -48,3 +48,34 @@ test("Jahiz protects customer rendering and exposes safe builder contracts", asy
   assert.match(app, /copyTrackingLink/);
   assert.doesNotMatch(app, /console\.(?:log|info|debug).*pickupCode/);
 });
+
+test("Jahiz customer scan and receipt routes keep a branded, private tracking hierarchy", async () => {
+  const [app, css, join, order] = await Promise.all([
+    read("jahiz.js"), read("jahiz.css"), read("s/index.html"), read("order/index.html"),
+  ]);
+  assert.match(app, /function customerMasthead/);
+  assert.match(app, /j-customer-experience/);
+  assert.match(app, /j-tracking-index/);
+  assert.match(app, /receiptNumber/);
+  assert.match(app, /privateCodeHelp/);
+  assert.match(app, /function statusProgress/);
+  assert.match(app, /function orderJourney/);
+  assert.match(app, /j-order-progress/);
+  assert.match(app, /data-customer-copy/);
+  assert.match(app, /skipTracking/);
+  assert.match(app, /skipStatus/);
+  assert.match(app, /playFeedbackTone\("error"\)/);
+  assert.match(app, /navigator\.vibrate/);
+  assert.match(app, /aria-live": "polite"/);
+  assert.match(css, /\.j-venue-masthead\{/);
+  assert.match(css, /\.j-tracking-area\{/);
+  assert.match(css, /\.j-order-progress\{/);
+  assert.match(css, /prefers-reduced-motion:reduce/);
+  for (const page of [join, order]) {
+    assert.match(page, /class="j-customer-route"/);
+    assert.match(page, /class="skip"/);
+    assert.match(page, /data-customer-copy=/);
+    assert.match(page, /j-customer-footer/);
+  }
+  assert.match(order, /aria-live="polite"/);
+});
