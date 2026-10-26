@@ -102,9 +102,27 @@ QR destination at `/jahiz/s/?shop=SLUG`. Owner/staff cookies and accounts are
 separate from RTS administrator credentials, and all operations are tenant-scoped.
 
 Owners manage orders, staff, branding, and an allowlisted drag-and-drop block
-layout. The tracking block cannot be removed. No custom HTML or JavaScript is
-accepted. QR generation runs locally using the bundled `qrcode` library; PNG/SVG
-export and printing do not send venue URLs to an external QR service. Rebuild
+layout. The tracking block cannot be removed. The page designer includes live
+native previews, backgrounds, readable content surfaces, layout/spacing controls,
+icons, and versioned JSON template import/export. Raster uploads support PNG,
+JPEG, and WebP; raw SVG uploads are not accepted.
+
+Owners can also upload HTML with embedded CSS, optionally adding a separate CSS
+file. Uploaded designs are sanitized server-side and shown in a sandboxed section;
+scripts, forms, embedded frames, navigation, and external stylesheets are not
+supported. The real tracking form remains outside this section. Uploaded HTML
+previews update after saving; native block changes preview immediately. The public
+HTML endpoint serves only active venues and uses an independent restrictive CSP,
+including sandboxing even if someone opens the endpoint directly. Existing saved
+branding remains compatible; these settings use the existing JSON column.
+Published HTML/CSS is publicly viewable like any webpage source; never upload
+credentials, private customer data, or other secrets in a template.
+
+QR generation runs locally using the bundled `qrcode` library; PNG/SVG
+export and printing do not send venue URLs to an external QR service. All QR
+variants encode a full HTTPS customer URL, not a relative path. Posters or images
+exported before this fix must be downloaded/printed again; an existing printed QR
+cannot be changed remotely. Rebuild
 `public/jahiz/vendor/` with `npm run build:jahiz`; the dependency license ships
 beside the bundle. HTTPS images are allowed only by the scoped Jahiz page CSP.
 

@@ -8,6 +8,7 @@ export async function onRequest(context) {
     "img-src 'self' data: https:",
     "font-src 'self'",
     "connect-src 'self'",
+    "frame-src 'self'",
     "object-src 'none'",
     "base-uri 'none'",
     "form-action 'self'",

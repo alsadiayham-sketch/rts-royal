@@ -4,11 +4,16 @@ import vm from 'node:vm';
 import { readFile } from 'node:fs/promises';
 import jsQR from 'jsqr';
 import { onRequest } from '../functions/jahiz/_middleware.js';
+import { customerPageUrl } from '../public/jahiz/links.js';
 
 test('shipped browser QR bundle roundtrips venue URLs with an independent decoder', async () => {
   const context = vm.createContext({ TextEncoder, Uint8Array, Uint32Array, console });
   vm.runInContext(await readFile('public/jahiz/vendor/qrcode.js', 'utf8'), context);
-  const destination = 'https://rts-royal.pages.dev/jahiz/s/?shop=jahiz-demo-cafe';
+  const destination = customerPageUrl({
+    slug: 'jahiz-demo-cafe',
+    customerUrl: '/jahiz/s/?shop=jahiz-demo-cafe',
+  }, 'https://rts-royal.pages.dev');
+  assert.equal(destination, 'https://rts-royal.pages.dev/jahiz/s/?shop=jahiz-demo-cafe');
   const { modules } = context.QRCode.create(destination, { errorCorrectionLevel: 'M' });
   const scale = 5;
   const width = (modules.size + 8) * scale;
@@ -30,6 +35,17 @@ test('shipped browser QR bundle roundtrips venue URLs with an independent decode
   assert.doesNotMatch(svg, /<script|https?:\/\/(?!www.w3.org)/);
 });
 
+test('customer links remain canonical HTTPS destinations rather than search text or external URLs', () => {
+  const venue = { slug: 'my-cafe', customerUrl: 'https://untrusted.example/redirect' };
+  assert.equal(customerPageUrl(venue, 'https://rts-royal.pages.dev/'),
+    'https://rts-royal.pages.dev/jahiz/s/?shop=my-cafe');
+  assert.equal(customerPageUrl(venue, 'http://127.0.0.1:8788'),
+    'http://127.0.0.1:8788/jahiz/s/?shop=my-cafe');
+  assert.throws(() => customerPageUrl(venue, 'http://rts.example'), /HTTPS/);
+  assert.throws(() => customerPageUrl({ slug: '../admin' }, 'https://rts.example'), /valid venue/);
+  assert.throws(() => customerPageUrl(null, 'https://rts.example'), /valid venue/);
+});
+
 test('Jahiz CSP replaces inherited image restrictions without relaxing scripts', async () => {
   const response = await onRequest({
     request: new Request('https://rts.example/jahiz/s/?shop=example'),
@@ -41,6 +57,7 @@ test('Jahiz CSP replaces inherited image restrictions without relaxing scripts',
   assert.equal(response.headers.get('Content-Type'), 'text/html');
   assert.match(response.headers.get('Content-Security-Policy'), /img-src 'self' data: https:/);
   assert.match(response.headers.get('Content-Security-Policy'), /script-src 'self';/);
+  assert.match(response.headers.get('Content-Security-Policy'), /frame-src 'self';/);
   assert.doesNotMatch(response.headers.get('Content-Security-Policy'), /unsafe-inline|unsafe-eval|,/);
   assert.equal(response.headers.get('Referrer-Policy'), 'no-referrer');
 });

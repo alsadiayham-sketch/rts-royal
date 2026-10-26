@@ -31,10 +31,13 @@ import {
   validateApplication,
   validateBranding,
 } from "./jahiz-validation.js";
+import { jahizPageResponse, sanitizeJahizHtml } from "./jahiz-html.js";
 
 const DAY = 86400;
 const MONTH = 30 * DAY;
 const PICKUP_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const MAX_STORED_BRANDING_BYTES = 1024 * 1024;
+const MAX_CUSTOM_HTML_BYTES = 200 * 1024;
 
 function iso(epoch) {
   return epoch === null || epoch === undefined ? null : new Date(Number(epoch) * 1000).toISOString();
@@ -64,7 +67,17 @@ function userDto(row) {
   };
 }
 
-function venueDto(row, { admin = false } = {}) {
+function brandingDto(value, { publicView = false } = {}) {
+  const branding = parseStoredBranding(value);
+  if (publicView) {
+    const hasCustomPage = typeof branding.customHtml === "string" && branding.customHtml.trim().length > 0;
+    delete branding.customHtml;
+    branding.hasCustomPage = hasCustomPage;
+  }
+  return branding;
+}
+
+function venueDto(row, { admin = false, publicView = false } = {}) {
   const venue = {
     id: row.venue_id ?? row.id,
     slug: row.slug,
@@ -74,7 +87,7 @@ function venueDto(row, { admin = false } = {}) {
     expiresAt: iso(row.expires_at),
     isDemo: Boolean(row.is_demo),
     planId: row.plan_id ?? null,
-    branding: parseStoredBranding(row.branding_json),
+    branding: brandingDto(row.branding_json, { publicView }),
     customerUrl: `/jahiz/s/?shop=${encodeURIComponent(row.slug)}`,
     ownerUrl: `/jahiz/login/?shop=${encodeURIComponent(row.slug)}`,
   };
@@ -488,7 +501,7 @@ async function sessionGet(context) {
       : Promise.resolve({ results: [] }),
   ]);
   return jsonResponse({
-    venue: venueDto(auth),
+    venue: venueDto(auth, { publicView: auth.role !== "owner" }),
     user: userDto(auth),
     staff: (staffResult.results || []).map(userDto),
     billing: {
@@ -540,12 +553,20 @@ async function passwordPost(context) {
 async function settingsPatch(context) {
   requireMutation(context.request);
   const auth = await requireJahizUser(context, { owner: true });
-  const payload = await parseJsonBody(context.request, ["branding"], 320 * 1024);
+  const payload = await parseJsonBody(context.request, ["branding"], 1024 * 1024);
   const branding = validateBranding(payload.branding);
+  branding.customHtml = sanitizeJahizHtml(branding.customHtml);
+  if (new TextEncoder().encode(branding.customHtml).byteLength > MAX_CUSTOM_HTML_BYTES) {
+    throw new ApiError(400, "CUSTOM_HTML_TOO_LARGE", "Sanitized custom HTML exceeds 200KB.");
+  }
+  const storedBranding = JSON.stringify(branding);
+  if (new TextEncoder().encode(storedBranding).byteLength > MAX_STORED_BRANDING_BYTES) {
+    throw new ApiError(413, "BRANDING_TOO_LARGE", "Branding exceeds the 1MB storage limit.");
+  }
   await context.env.DB.prepare(
     `UPDATE jahiz_venues SET branding_json = ?, branding_revision = branding_revision + 1,
        updated_at = unixepoch() WHERE id = ?`
-  ).bind(JSON.stringify(branding), auth.venue_id).run();
+  ).bind(storedBranding, auth.venue_id).run();
   return jsonResponse({ branding, revision: Number(auth.branding_revision) + 1 });
 }
 
@@ -719,7 +740,23 @@ async function publicVenueGet(context) {
      WHERE slug = ? AND status = 'active' AND (expires_at IS NULL OR expires_at > ?)`
   ).bind(slug, now).first();
   if (!row) throw new ApiError(404, "VENUE_NOT_FOUND", "Venue was not found.");
-  return jsonResponse({ venue: venueDto(row) });
+  return jsonResponse({ venue: venueDto(row, { publicView: true }) });
+}
+
+async function publicPageGet(context) {
+  const slug = requireSlug(new URL(context.request.url).searchParams.get("slug"));
+  const now = Math.floor(Date.now() / 1000);
+  const row = await context.env.DB.prepare(
+    `SELECT branding_json
+     FROM jahiz_venues
+     WHERE slug = ? AND status = 'active' AND (expires_at IS NULL OR expires_at > ?)`
+  ).bind(slug, now).first();
+  if (!row) throw new ApiError(404, "VENUE_NOT_FOUND", "Venue was not found.");
+  const customHtml = parseStoredBranding(row.branding_json).customHtml;
+  if (typeof customHtml !== "string" || !customHtml.trim()) {
+    throw new ApiError(404, "PAGE_NOT_FOUND", "Custom page was not found.");
+  }
+  return jahizPageResponse(customHtml);
 }
 
 async function publicJoinPost(context) {
@@ -787,7 +824,7 @@ async function publicOrderGet(context) {
       slug: row.slug,
       name: row.venue_name,
       businessType: row.business_type,
-      branding: parseStoredBranding(row.branding_json),
+      branding: brandingDto(row.branding_json, { publicView: true }),
       customerUrl: `/jahiz/s/?shop=${encodeURIComponent(row.slug)}`,
     },
     serverTime: iso(now),
@@ -809,6 +846,7 @@ export async function routeJahiz(context, path, method) {
   if (path === "orders" && method === "POST") return ordersPost(context);
   if (path === "orders" && method === "PATCH") return ordersPatch(context);
   if (path === "public/venue" && method === "GET") return publicVenueGet(context);
+  if (path === "public/page" && method === "GET") return publicPageGet(context);
   if (path === "public/join" && method === "POST") return publicJoinPost(context);
   if (path === "public/order" && method === "GET") return publicOrderGet(context);
   if (path === "checkout") {
