@@ -483,6 +483,14 @@
                     <input id="store-name" name="name" type="text" maxlength="80" required />
                   </div>
                   <div class="field">
+                    <label for="store-business-type" data-i18n="businessTypeLabel">نوع النشاط</label>
+                    <select id="store-business-type" name="businessType" required aria-describedby="store-business-type-help">
+                      <option value="shop" data-i18n="businessTypeShop">محل تجاري</option>
+                      <option value="restaurant" data-i18n="businessTypeRestaurant">مطعم / مقهى</option>
+                    </select>
+                    <small id="store-business-type-help" data-i18n="businessTypeHelp">يحدد واجهة RTS Business. يدير مدير المطعم الأقسام والأصناف داخل التطبيق.</small>
+                  </div>
+                  <div class="field">
                     <label for="store-warranty" data-i18n="warrantyLabel">مدة الترخيص بالأشهر</label>
                     <input id="store-warranty" name="warrantyMonths" type="number" min="1" max="60" value="12" required />
                   </div>
@@ -540,6 +548,7 @@
                     <tr>
                       <th data-i18n="storeNameLabel">اسم المتجر</th>
                       <th data-i18n="storeIdLabel">المعرّف</th>
+                      <th data-i18n="businessTypeLabel">نوع النشاط</th>
                       <th data-i18n="backendLabel">مصدر البيانات</th>
                       <th data-i18n="warrantyStatusLabel">حالة الترخيص</th>
                       <th data-i18n="actionsLabel">إجراءات</th>

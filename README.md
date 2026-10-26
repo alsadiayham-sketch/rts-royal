@@ -31,6 +31,16 @@ server to verify passwords without rerouting the store's data to D1. Existing
 Firestore stores need these fields enabled on their licence by an administrator;
 never switch `dataBackend` merely to bypass a login guard. Owner passwords are
 unchanged by this configuration.
+
+RTS Admin selects **Shop** or **Restaurant / Cafe** when creating a Business
+tenant, and can change it in the Business stores table. This writes only
+`businessType: "shop" | "restaurant"` on the tenant licence; it does not change
+`productType`, storage routing, passwords, or existing transactions. Business
+4.0.11+ gives this central selection precedence over legacy local restaurant
+flags. Unconfigured legacy tenants remain unconfigured until explicitly saved.
+Menu sections and items are managed by the restaurant administrator inside
+Business, not by switching the business type in the desktop add-ons screen.
+
 The primary owner account is linked to the RTS Tracking API at
 `/owner/login` and `/owner/dashboard`; configure the Tracking app with this
 site as its HTTPS API base URL.

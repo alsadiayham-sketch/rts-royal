@@ -69,3 +69,40 @@ test("D1 Business creation keeps owner credentials and normalizes messaging enti
   assert.match(source, /payload\.messagingEnabled = payload\.messagingEnabled === "on"/);
   assert.match(source, /users\.addEventListener\("click", \(\) => openStoreUsers\(store\)\)/);
 });
+
+test("central mode control saves the selected mode and permits retry after PATCH or refresh failure", async () => {
+  for (const fails of [false, "patch", "refresh"]) {
+    const { context } = adminContext();
+    Object.assign(context, {
+      calls: [], store: { id: "restaurant-test", businessType: "shop" },
+      select: { value: "restaurant", disabled: false },
+      button: { disabled: false }, fails,
+    });
+    vm.runInContext(`
+      clearMessages = () => {};
+      showAlert = message => calls.push({ error: message });
+      showStatus = message => calls.push({ success: message });
+      loadStores = async () => {
+        if (fails === "refresh") throw new Error("refresh failed");
+        calls.push({ refreshed: true });
+      };
+      apiFetch = async (url, options) => {
+        calls.push({ url, method: options.method, payload: JSON.parse(options.body) });
+        if (fails === "patch") throw new Error("save failed");
+        return { ok: true };
+      };
+    `, context);
+    await vm.runInContext("updateStoreBusinessType(store, select, button)", context);
+    const request = context.calls[0];
+    assert.equal(request.url, "/api/pos-stores");
+    assert.equal(request.method, "PATCH");
+    assert.equal(request.payload.action, "set-business-type");
+    assert.equal(request.payload.businessType, "restaurant");
+    assert.equal(request.payload.id, "restaurant-test");
+    assert.equal(context.store.businessType, fails ? "shop" : "restaurant");
+    assert.equal(context.select.disabled, false);
+    assert.equal(context.button.disabled, !fails);
+    assert.equal(vm.runInContext("state.pending.size", context), 0);
+    assert.ok(context.calls.some(call => fails ? call.error : call.success));
+  }
+});

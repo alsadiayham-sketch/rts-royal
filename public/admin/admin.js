@@ -225,6 +225,13 @@ const I18N = {
     storeIdLabel: "معرّف المتجر",
     storeIdHelp: "إنجليزي صغير وأرقام وشرطات فقط. لا يمكن تغييره لاحقاً.",
     storeNameLabel: "اسم المتجر",
+    businessTypeLabel: "نوع النشاط",
+    businessTypeShop: "محل تجاري",
+    businessTypeRestaurant: "مطعم / مقهى",
+    businessTypeUnconfigured: "غير محدد مركزياً",
+    businessTypeHelp: "يحدد واجهة RTS Business. يدير مدير المطعم الأقسام والأصناف داخل التطبيق.",
+    saveBusinessType: "حفظ النوع",
+    businessTypeUpdated: "تم حفظ نوع النشاط. أعد تسجيل الدخول في RTS Business لتطبيق الواجهة.",
     warrantyLabel: "مدة الترخيص بالأشهر",
     backendLabel: "مصدر البيانات",
     backendD1: "RTS Business + موقع إلكتروني — مخزون مشترك",
@@ -528,6 +535,13 @@ const I18N = {
     storeIdLabel: "Store ID",
     storeIdHelp: "Lowercase English letters, numbers, and hyphens only. It cannot be changed later.",
     storeNameLabel: "Store Name",
+    businessTypeLabel: "Business Type",
+    businessTypeShop: "Shop",
+    businessTypeRestaurant: "Restaurant / Café",
+    businessTypeUnconfigured: "Not centrally configured",
+    businessTypeHelp: "Selects the RTS Business interface. Restaurant admins manage menu sections and items inside the app.",
+    saveBusinessType: "Save Type",
+    businessTypeUpdated: "Business type saved. Sign in again to RTS Business to apply the interface.",
     warrantyLabel: "Licence Period in Months",
     backendLabel: "Data Source",
     backendD1: "RTS Business + Website — Shared Inventory",
@@ -1420,7 +1434,7 @@ function renderStoresTable() {
   if (!els.storesTbody) return;
   els.storesTbody.textContent = "";
   const query = els.storesSearch?.value.trim().toLocaleLowerCase() || "";
-  const stores = state.stores.filter((item) => `${item.id} ${item.name} ${item.backend}`.toLocaleLowerCase().includes(query));
+  const stores = state.stores.filter((item) => `${item.id} ${item.name} ${item.backend} ${item.businessType || ""}`.toLocaleLowerCase().includes(query));
   els.storesEmpty.classList.toggle("hidden", stores.length !== 0);
   const now = Date.now();
   for (const store of stores) {
@@ -1430,6 +1444,33 @@ function renderStoresTable() {
     const idCell = document.createElement("td");
     idCell.dir = "ltr";
     idCell.textContent = store.id;
+    const businessTypeCell = document.createElement("td");
+    const businessTypeControls = document.createElement("div");
+    businessTypeControls.className = "row-actions";
+    const businessTypeSelect = document.createElement("select");
+    businessTypeSelect.setAttribute("aria-label", `${t("businessTypeLabel")} · ${store.name}`);
+    for (const [value, label] of [
+      ["", "businessTypeUnconfigured"], ["shop", "businessTypeShop"], ["restaurant", "businessTypeRestaurant"],
+    ]) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = t(label);
+      option.disabled = value === "";
+      businessTypeSelect.append(option);
+    }
+    businessTypeSelect.value = store.businessType || "";
+    const saveBusinessType = document.createElement("button");
+    saveBusinessType.type = "button";
+    saveBusinessType.className = "secondary-btn compact-btn";
+    saveBusinessType.textContent = t("saveBusinessType");
+    saveBusinessType.disabled = true;
+    businessTypeSelect.addEventListener("change", () => {
+      saveBusinessType.disabled = !businessTypeSelect.value || businessTypeSelect.value === store.businessType;
+    });
+    saveBusinessType.addEventListener("click", () =>
+      updateStoreBusinessType(store, businessTypeSelect, saveBusinessType));
+    businessTypeControls.append(businessTypeSelect, saveBusinessType);
+    businessTypeCell.append(businessTypeControls);
     const backendCell = document.createElement("td");
     const backendPill = document.createElement("span");
     backendPill.className = `status-pill backend-${store.backend}`;
@@ -1470,7 +1511,7 @@ function renderStoresTable() {
     users.addEventListener("click", () => openStoreUsers(store));
     actions.prepend(users);
     actionsCell.append(actions);
-    row.append(nameCell, idCell, backendCell, warrantyCell, actionsCell);
+    row.append(nameCell, idCell, businessTypeCell, backendCell, warrantyCell, actionsCell);
     els.storesTbody.append(row);
   }
 }
@@ -1568,6 +1609,31 @@ async function updateStoreLicence(store, action) {
     showAlert(error.message);
   } finally {
     state.pending.delete(key);
+  }
+}
+
+async function updateStoreBusinessType(store, select, button) {
+  clearMessages();
+  const key = `store-business-type-${store.id}`;
+  if (state.pending.has(key) || !["shop", "restaurant"].includes(select.value)) return;
+  const businessType = select.value;
+  setPending(key, true, button);
+  select.disabled = true;
+  try {
+    await apiFetch("/api/pos-stores", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: store.id, action: "set-business-type", businessType }),
+    });
+    await loadStores();
+    store.businessType = businessType;
+    showStatus(t("businessTypeUpdated"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    setPending(key, false, button);
+    select.disabled = false;
+    button.disabled = select.value === store.businessType;
   }
 }
 

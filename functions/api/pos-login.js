@@ -10,7 +10,7 @@ import {
 } from "../_lib/http.js";
 import { enforceRateLimit } from "../_lib/rate-limit.js";
 import { createPosSessionToken } from "../_lib/pos-session.js";
-import { normalizeStoreId } from "../_lib/pos-store-validation.js";
+import { normalizeBusinessType, normalizeStoreId } from "../_lib/pos-store-validation.js";
 import { normalizeUsername } from "../_lib/validation.js";
 
 const REGISTRY_PATH = "projects/_global/settings/pos_stores";
@@ -90,6 +90,7 @@ export async function onRequestPost(context) {
         name: store.name || licence.storeName || storeId,
         warrantyEnd: warrantyEnd.toISOString(),
         productType,
+        ...(normalizeBusinessType(licence.businessType) ? { businessType: licence.businessType } : {}),
       },
       user: {
         username,

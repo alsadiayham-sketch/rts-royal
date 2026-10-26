@@ -21,6 +21,10 @@ export function normalizeBackend(value) {
   return value === "d1" || value === "firestore" ? value : null;
 }
 
+export function normalizeBusinessType(value) {
+  return value === "shop" || value === "restaurant" ? value : null;
+}
+
 export function normalizeApiBaseUrl(value) {
   if (typeof value !== "string") return null;
   try {
@@ -31,4 +35,3 @@ export function normalizeApiBaseUrl(value) {
     return null;
   }
 }
-

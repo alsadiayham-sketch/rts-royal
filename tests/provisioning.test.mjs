@@ -1,7 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { onRequestPost as createStore } from "../functions/api/pos-stores.js";
+import {
+  onRequestPost as createStore,
+  onRequestPatch as updateStore,
+  onRequestGet as listStores,
+} from "../functions/api/pos-stores.js";
+import { onRequestPost as posLogin } from "../functions/api/pos-login.js";
 import { onRequestPost as createClinic } from "../functions/api/clinics.js";
 import { onRequestPost as ownerLogin } from "../functions/owner/login.js";
 import { onRequestGet as ownerDashboard } from "../functions/owner/dashboard.js";
@@ -21,7 +26,7 @@ function firestoreDocument(data, updateTime = "2026-10-11T00:00:00.000000Z") {
   return { updateTime, fields: Object.fromEntries(Object.entries(data).map(([key, value]) => [key, firestoreFields(value)])) };
 }
 
-function database() {
+function database(role = "platform_admin") {
   const calls = [];
   return {
     calls,
@@ -34,7 +39,7 @@ function database() {
         },
         async first() {
           if (sql.includes("JOIN users")) {
-            return { username: "admin", name: "Admin", role: "platform_admin", need_change: 0, session_version: 1 };
+            return { username: "admin", name: "Admin", role, need_change: 0, session_version: 1 };
           }
           if (sql.includes("RETURNING count")) return { count: 1 };
           if (sql.includes("SELECT 1 FROM credit_accounts")) return null;
@@ -52,9 +57,9 @@ function database() {
   };
 }
 
-function adminRequest(path, payload) {
+function adminRequest(path, payload, method = "POST") {
   return new Request(`https://admin.example${path}`, {
-    method: "POST",
+    method,
     headers: {
       Origin: "https://admin.example",
       "Content-Type": "application/json",
@@ -64,7 +69,7 @@ function adminRequest(path, payload) {
   });
 }
 
-function useFirestoreMock(documents, { commitStatus = 200, capture = [], patches = [] } = {}) {
+function useFirestoreMock(documents, { commitStatus = 200, patchStatus = 200, capture = [], patches = [] } = {}) {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (input, options = {}) => {
     const url = new URL(input);
@@ -75,8 +80,17 @@ function useFirestoreMock(documents, { commitStatus = 200, capture = [], patches
     const path = decodeURIComponent(url.pathname.split("/documents/")[1] || "");
     if (options.method === "PATCH") {
       const body = JSON.parse(options.body);
-      patches.push({ path, body });
-      documents[path] = { fields: body.fields };
+      const updateMask = url.searchParams.getAll("updateMask.fieldPaths");
+      const updateTime = url.searchParams.get("currentDocument.updateTime");
+      patches.push({ path, body, updateMask, updateTime });
+      if (patchStatus !== 200) return new Response("{}", { status: patchStatus });
+      if (updateTime && updateTime !== documents[path]?.updateTime) {
+        return new Response("{}", { status: 412 });
+      }
+      documents[path] = {
+        ...documents[path],
+        fields: updateMask.length ? { ...documents[path]?.fields, ...body.fields } : body.fields,
+      };
       return new Response(JSON.stringify(documents[path]), { status: 200 });
     }
     const document = documents[path];
@@ -183,6 +197,7 @@ test("D1 business provisioning records the owner and desktop backend contract", 
     const licence = writes.find((write) => write.update.name.endsWith("/projects/royal-market/settings/pos"));
     assert.equal(licence.update.fields.dataBackend.stringValue, "d1");
     assert.equal(licence.update.fields.productType.stringValue, "business");
+    assert.equal(licence.update.fields.businessType.stringValue, "shop");
     assert.equal(licence.update.fields.apiBaseUrl.stringValue, "https://market.example.com");
     assert.equal(licence.update.fields.messaging.mapValue.fields.enabled.booleanValue, true);
     assert.equal(licence.update.fields.messaging.mapValue.fields.contractVersion.integerValue, "1");
@@ -202,14 +217,17 @@ test("Firestore Business creation provisions server authentication without chang
     const response = await createStore({
       request: adminRequest("/api/pos-stores", {
         id: "rts-resturant", name: "Restaurant Test", backend: "firestore",
+        businessType: "restaurant",
         warrantyMonths: 12, adminUsername: "owner", adminName: "Owner",
         adminPassword: "fixture-only-owner-password",
       }),
       env: { DB: database(), AUTH_SECRET: "test-only-auth-secret-is-long-enough" },
     });
     assert.equal(response.status, 201);
+    assert.equal((await response.json()).store.businessType, "restaurant");
     const fields = commits[0].writes.find((write) => write.update.name.endsWith("/settings/pos")).update.fields;
     assert.equal(fields.dataBackend.stringValue, "firestore");
+    assert.equal(fields.businessType.stringValue, "restaurant");
     assert.equal(fields.authBackend.stringValue, "rts");
     assert.equal(fields.authContractVersion.integerValue, "1");
     assert.equal(fields.authApiBaseUrl.stringValue, "https://rts-royal.pages.dev");
@@ -217,6 +235,123 @@ test("Firestore Business creation provisions server authentication without chang
     assert.equal(fields.messaging.mapValue.fields.enabled.booleanValue, false);
   } finally {
     restoreFetch();
+  }
+});
+
+test("central business type update changes only the requested licence field", async () => {
+  const path = "projects/restaurant-test/settings/pos";
+  const original = {
+    warrantyEnd: "2099-01-01T00:00:00.000Z", ownerUsername: "owner",
+    dataBackend: "firestore", authBackend: "rts", productType: "business",
+    messaging: { enabled: true }, businessType: "shop",
+  };
+  const documents = {
+    "projects/_global/settings/pos_stores": firestoreDocument({
+      stores: [{ id: "restaurant-test", type: "firestore", productType: "business" }],
+    }),
+    [path]: firestoreDocument(original),
+  };
+  const patches = [];
+  const restoreFetch = useFirestoreMock(documents, { patches });
+  try {
+    const response = await updateStore({
+      request: adminRequest("/api/pos-stores", {
+        id: "restaurant-test", action: "set-business-type", businessType: "restaurant",
+      }, "PATCH"),
+      env: { DB: database(), AUTH_SECRET: "test-only-auth-secret-is-long-enough" },
+    });
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).businessType, "restaurant");
+    assert.equal(patches.length, 1);
+    assert.equal(patches[0].path, path);
+    assert.deepEqual(patches[0].updateMask, ["businessType"]);
+    assert.equal(patches[0].updateTime, "2026-10-11T00:00:00.000000Z");
+    assert.deepEqual(documents[path].fields, firestoreDocument({ ...original, businessType: "restaurant" }).fields);
+  } finally {
+    restoreFetch();
+  }
+});
+
+test("business type updates reject invalid values, non-platform admins, clinics and conflicts", async () => {
+  for (const scenario of [
+    { businessType: "cafe", role: "platform_admin", storeType: "firestore", status: 400 },
+    { businessType: "restaurant", role: "admin", storeType: "firestore", status: 403 },
+    { businessType: "restaurant", role: "platform_admin", storeType: "clinic", status: 404 },
+    { businessType: "restaurant", role: "platform_admin", storeType: "firestore", patchStatus: 412, status: 409 },
+  ]) {
+    const patches = [];
+    const original = firestoreDocument({ businessType: "shop", dataBackend: "firestore" });
+    const path = "projects/mode-test/settings/pos";
+    const documents = {
+      "projects/_global/settings/pos_stores": firestoreDocument({
+        stores: [{ id: "mode-test", type: scenario.storeType }],
+      }),
+      [path]: structuredClone(original),
+    };
+    const restoreFetch = useFirestoreMock(documents, { patches, patchStatus: scenario.patchStatus });
+    try {
+      const response = await updateStore({
+        request: adminRequest("/api/pos-stores", {
+          id: "mode-test", action: "set-business-type", businessType: scenario.businessType,
+        }, "PATCH"),
+        env: { DB: database(scenario.role), AUTH_SECRET: "test-only-auth-secret-is-long-enough" },
+      });
+      assert.equal(response.status, scenario.status);
+      assert.deepEqual(documents[path], original);
+      if (!scenario.patchStatus) assert.equal(patches.length, 0);
+    } finally {
+      restoreFetch();
+    }
+  }
+});
+
+test("store listing reads central mode without assigning a mode to legacy tenants", async () => {
+  const restoreFetch = useFirestoreMock({
+    "projects/_global/settings/pos_stores": firestoreDocument({
+      stores: [{ id: "food", type: "firestore" }, { id: "legacy", type: "firestore" }],
+    }),
+    "projects/food/settings/pos": firestoreDocument({ businessType: "restaurant" }),
+    "projects/legacy/settings/pos": firestoreDocument({ dataBackend: "firestore" }),
+  });
+  try {
+    const response = await listStores({
+      request: new Request("https://admin.example/api/pos-stores", {
+        headers: { Cookie: "__Host-rts_session=admin-session" },
+      }),
+      env: { DB: database(), AUTH_SECRET: "test-only-auth-secret-is-long-enough" },
+    });
+    assert.equal(response.status, 200);
+    const { stores } = await response.json();
+    assert.equal(stores.find(store => store.id === "food").businessType, "restaurant");
+    assert.equal(stores.find(store => store.id === "legacy").businessType, null);
+  } finally {
+    restoreFetch();
+  }
+});
+
+test("desktop sign-in exposes only a valid centrally configured business type", async () => {
+  const password = "fixture-only-login-password";
+  const user = { username: "owner", role: "admin", active: true, ...await createStoredPosPassword(password) };
+  for (const businessType of ["restaurant", "shop", undefined]) {
+    const restoreFetch = useFirestoreMock({
+      "projects/_global/settings/pos_stores": firestoreDocument({
+        stores: [{ id: "mode-test", type: "firestore", productType: "business" }],
+      }),
+      "projects/mode-test/settings/pos": firestoreDocument({
+        warrantyEnd: "2099-01-01T00:00:00.000Z", ...(businessType ? { businessType } : {}),
+      }),
+      "projects/mode-test/settings/pos_users": firestoreDocument({ users: [user] }),
+    });
+    try {
+      const response = await posLogin({
+        request: adminRequest("/api/pos-login", { storeId: "mode-test", username: "owner", password }),
+        env: { DB: database(), AUTH_SECRET: "test-only-auth-secret-is-long-enough" },
+      });
+      assert.equal(response.status, 200);
+      assert.equal((await response.json()).store.businessType, businessType);
+    } finally {
+      restoreFetch();
+    }
   }
 });
 

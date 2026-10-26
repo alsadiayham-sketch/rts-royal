@@ -5,6 +5,7 @@ import {
   getFirestoreDocument,
   getFirestoreDocumentSnapshot,
   patchFirestoreDocument,
+  patchFirestoreDocumentAtUpdateTime,
 } from "../_lib/firestore.js";
 import {
   ApiError,
@@ -17,6 +18,7 @@ import {
 import {
   normalizeApiBaseUrl,
   normalizeBackend,
+  normalizeBusinessType,
   normalizeStoreId,
   normalizeStoreName,
   normalizeWarrantyMonths,
@@ -48,6 +50,7 @@ async function loadStores() {
         id: store.id,
         name: store.name || store.id,
         backend: store.type || licence?.dataBackend || "firestore",
+        businessType: normalizeBusinessType(licence?.businessType),
         linkedProject: store.linkedProject || licence?.linkedProject || "",
         apiBaseUrl: store.apiBaseUrl || licence?.apiBaseUrl || "",
         warrantyEnd: licence?.warrantyEnd || null,
@@ -85,6 +88,7 @@ export async function onRequestPost(context) {
       "id",
       "name",
       "backend",
+      "businessType",
       "warrantyMonths",
       "linkedProject",
       "apiBaseUrl",
@@ -97,10 +101,12 @@ export async function onRequestPost(context) {
     const id = normalizeStoreId(payload.id);
     const name = normalizeStoreName(payload.name);
     const backend = normalizeBackend(payload.backend);
+    const businessType = normalizeBusinessType(payload.businessType === undefined ? "shop" : payload.businessType);
     const warrantyMonths = normalizeWarrantyMonths(payload.warrantyMonths);
     if (!id) throw new ApiError(400, "INVALID_STORE_ID", "Store ID is invalid.");
     if (!name) throw new ApiError(400, "INVALID_STORE_NAME", "Store name is invalid.");
     if (!backend) throw new ApiError(400, "INVALID_STORE_BACKEND", "Store backend is invalid.");
+    if (!businessType) throw new ApiError(400, "INVALID_BUSINESS_TYPE", "Select shop or restaurant.");
     if (!warrantyMonths) throw new ApiError(400, "INVALID_WARRANTY", "Warranty period is invalid.");
 
     let apiBaseUrl = "";
@@ -143,6 +149,7 @@ export async function onRequestPost(context) {
         authApiBaseUrl: "https://rts-royal.pages.dev",
       } : {}),
       productType: "business",
+      businessType,
       ownerUsername: adminUsername,
       ownerName: adminName,
       messaging: {
@@ -204,6 +211,7 @@ export async function onRequestPost(context) {
           adminUsername,
           messagingEnabled: licence.messaging.enabled,
           productType: "business",
+          businessType,
         },
       },
       201
@@ -216,11 +224,15 @@ export async function onRequestPatch(context) {
     requireTrustedMutationRequest(request);
     requireJsonContentType(request);
     await authorizeMutation(context, "pos_stores_licence");
-    const payload = await parseJsonBody(request, ["id", "action", "warrantyMonths"]);
+    const payload = await parseJsonBody(request, ["id", "action", "warrantyMonths", "businessType"]);
     const id = normalizeStoreId(payload.id);
     if (!id) throw new ApiError(400, "INVALID_STORE_ID", "Store ID is invalid.");
-    if (payload.action !== "extend" && payload.action !== "disable") {
+    if (!["extend", "disable", "set-business-type"].includes(payload.action)) {
       throw new ApiError(400, "INVALID_STORE_ACTION", "Store action is invalid.");
+    }
+    const businessType = normalizeBusinessType(payload.businessType);
+    if (payload.action === "set-business-type" && !businessType) {
+      throw new ApiError(400, "INVALID_BUSINESS_TYPE", "Select shop or restaurant.");
     }
 
     const registry = await getFirestoreDocument(REGISTRY_PATH);
@@ -228,8 +240,12 @@ export async function onRequestPatch(context) {
     if (!stores.some((store) => store?.id === id && store.type !== "clinic")) {
       throw new ApiError(404, "STORE_NOT_FOUND", "Store not found.");
     }
-    const current = await getFirestoreDocument(licencePath(id));
+    const current = await getFirestoreDocumentSnapshot(licencePath(id));
     if (!current) throw new ApiError(404, "STORE_NOT_FOUND", "Store not found.");
+    if (payload.action === "set-business-type") {
+      await patchFirestoreDocumentAtUpdateTime(licencePath(id), { businessType }, current.updateTime);
+      return jsonResponse({ ok: true, id, businessType });
+    }
     const warrantyEnd = new Date();
     if (payload.action === "extend") {
       const months = normalizeWarrantyMonths(payload.warrantyMonths);
