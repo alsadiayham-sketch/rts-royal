@@ -11,6 +11,8 @@ import { onRequestPost as createClinic } from "../functions/api/clinics.js";
 import { onRequestPost as ownerLogin } from "../functions/owner/login.js";
 import { onRequestGet as ownerDashboard } from "../functions/owner/dashboard.js";
 import { createStoredPosPassword } from "../functions/_lib/pos-password.js";
+import * as storeUsers from "../functions/api/pos-store-users.js";
+import * as employees from "../functions/api/pos-employees.js";
 
 function firestoreFields(value) {
   if (Array.isArray(value)) return { arrayValue: { values: value.map(firestoreFields) } };
@@ -77,6 +79,7 @@ function useFirestoreMock(documents, { commitStatus = 200, patchStatus = 200, ca
       capture.push(JSON.parse(options.body));
       return new Response(JSON.stringify({ writeResults: [] }), { status: commitStatus });
     }
+
     const path = decodeURIComponent(url.pathname.split("/documents/")[1] || "");
     if (options.method === "PATCH") {
       const body = JSON.parse(options.body);
@@ -102,6 +105,116 @@ function useFirestoreMock(documents, { commitStatus = 200, patchStatus = 200, ca
     globalThis.fetch = originalFetch;
   };
 }
+
+test("admin-created POS accounts log in, change password, deactivate and delete without leaking credentials", async () => {
+  const storeId = "account-flow";
+  const path = `projects/${storeId}/settings/pos_users`;
+  const documents = {
+    "projects/_global/settings/pos_stores": firestoreDocument({ stores: [{ id: storeId, productType: "business", ownerUsername: "owner" }] }),
+    [`projects/${storeId}/settings/pos`]: firestoreDocument({ warrantyEnd: "2099-01-01T00:00:00Z" }),
+    [path]: firestoreDocument({ preserved: "metadata", users: [{ username: "owner", role: "admin", active: true, ...(await createStoredPosPassword("owner-test-password")) }] }),
+  };
+  const patches = [];
+  const restore = useFirestoreMock(documents, { patches });
+  const env = { DB: database(), AUTH_SECRET: "test-only-auth-secret-is-long-enough" };
+  const login = (username, password) => posLogin({ env, request: adminRequest("/api/pos-login", { storeId, username, password }) });
+  try {
+    let response = await storeUsers.onRequestPost({ env, request: adminRequest("/api/pos-store-users", {
+      storeId, username: " New.Worker ", name: "New Worker", password: "  worker-test-password  ", role: "worker",
+    }) });
+    assert.equal(response.status, 201);
+    const body = await response.json();
+    assert.equal(body.user.username, "new.worker");
+    assert.equal(body.user.passwordHash, undefined);
+    assert.equal((await login("NEW.WORKER", "  worker-test-password  ")).status, 200);
+    assert.equal((await login("new.worker", "worker-test-password")).status, 401, "Password whitespace must not silently change.");
+    response = await storeUsers.onRequestPost({ env, request: adminRequest("/api/pos-store-users", {
+      storeId, username: "new.worker", name: "Edited Worker", password: "updated-test-password", role: "worker",
+    }) });
+    assert.equal(response.status, 200);
+    assert.equal((await login("new.worker", "  worker-test-password  ")).status, 401);
+    assert.equal((await login("new.worker", "updated-test-password")).status, 200);
+    for (const active of [false, true]) {
+      response = await storeUsers.onRequestPatch({ env, request: adminRequest("/api/pos-store-users", { storeId, username: "new.worker", active }, "PATCH") });
+      assert.equal(response.status, 200, "A worker can be toggled even when there is only one admin.");
+      assert.equal((await login("new.worker", "updated-test-password")).status, active ? 200 : 401);
+    }
+    response = await storeUsers.onRequestDelete({ env, request: adminRequest("/api/pos-store-users", { storeId, username: "new.worker" }, "DELETE") });
+    assert.equal(response.status, 200);
+    assert.equal((await login("new.worker", "updated-test-password")).status, 401);
+    assert.equal(documents[path].fields.preserved.stringValue, "metadata");
+    assert.ok(patches.every((patch) => patch.updateTime && patch.updateMask.join() === "users"), "All edits use conditional writes preserving unrelated metadata.");
+  } finally { restore(); }
+});
+
+test("POS admin employee CRUD uses the same accounts and rejects workers, expired credentials and cross-store actions", async () => {
+  const storeId = "employee-flow";
+  const path = `projects/${storeId}/settings/pos_users`;
+  const documents = {
+    "projects/_global/settings/pos_stores": firestoreDocument({ stores: [{ id: storeId, productType: "business", ownerUsername: "owner" }] }),
+    [`projects/${storeId}/settings/pos`]: firestoreDocument({ warrantyEnd: "2099-01-01T00:00:00Z" }),
+    [path]: firestoreDocument({ users: [
+      { username: "owner", role: "admin", active: true, ...(await createStoredPosPassword("owner-test-password")) },
+      { username: "worker", role: "worker", active: true, ...(await createStoredPosPassword("worker-test-password")) },
+    ] }),
+  };
+  const restore = useFirestoreMock(documents);
+  const env = { DB: database(), AUTH_SECRET: "test-only-auth-secret-is-long-enough" };
+  async function token(username, password) {
+    const response = await posLogin({ env, request: adminRequest("/api/pos-login", { storeId, username, password }) });
+    assert.equal(response.status, 200);
+    return (await response.json()).token;
+  }
+  function req(bearer, method, payload) {
+    return { env, request: new Request("https://admin.example/api/pos-employees", {
+      method, headers: { Authorization: `Bearer ${bearer}`, "Content-Type": "application/json" },
+      ...(method === "GET" ? {} : { body: JSON.stringify(payload) }),
+    }) };
+  }
+  try {
+    const owner = await token("owner", "owner-test-password");
+    const worker = await token("worker", "worker-test-password");
+    assert.equal((await employees.onRequestGet(req(worker, "GET"))).status, 403);
+    let response = await employees.onRequestGet(req(owner, "GET"));
+    assert.equal(response.status, 200);
+    const list = (await response.json()).users;
+    assert.equal(list.find(u => u.username === "owner").canDelete, false);
+    assert.equal(list.find(u => u.username === "owner").canChangeRole, false);
+    assert.equal(list.find(u => u.username === "worker").canDelete, true);
+    assert.equal(list.some(u => u.passwordHash || u.passwordSalt), false);
+    assert.equal((await employees.onRequestPost(req(owner, "POST", { storeId: "other", username: "extra", name: "Extra User", role: "worker", password: "extra-test-password" }))).status, 403);
+    assert.equal((await employees.onRequestPost(req(owner, "POST", { username: "extra", name: "Extra User", role: "worker", password: "extra-test-password" }))).status, 201);
+    await token("extra", "extra-test-password");
+    assert.equal((await employees.onRequestPatch(req(owner, "PATCH", { username: "extra", active: false }))).status, 200);
+    assert.equal((await employees.onRequestDelete(req(owner, "DELETE", { username: "extra" }))).status, 200);
+    assert.equal((await employees.onRequestDelete(req(owner, "DELETE", { username: "owner" }))).status, 409);
+    assert.equal((await employees.onRequestPost(req(owner, "POST", { username: "manager", name: "Manager", role: "admin", password: "manager-test-password" }))).status, 201);
+    const manager = await token("manager", "manager-test-password");
+    assert.equal((await employees.onRequestDelete(req(manager, "DELETE", { username: "manager" }))).status, 409, "A POS manager cannot delete its own account.");
+    assert.equal((await employees.onRequestPatch(req(owner, "PATCH", { username: "manager", active: false }))).status, 200);
+    assert.equal((await employees.onRequestGet(req(manager, "GET"))).status, 401);
+    assert.equal((await employees.onRequestPatch(req(owner, "PATCH", { username: "manager", active: true }))).status, 200);
+    assert.equal((await employees.onRequestGet(req(manager, "GET"))).status, 401, "Reactivating an account must not revive its previous management token.");
+    assert.equal((await employees.onRequestDelete(req(owner, "DELETE", { username: "manager" }))).status, 200);
+    assert.equal((await employees.onRequestPost(req(owner, "POST", { username: "owner", name: "Owner", role: "worker", password: "" }))).status, 409);
+    assert.equal((await storeUsers.onRequestPost({ env, request: adminRequest("/api/pos-store-users", { storeId, username: "owner", name: "Owner", role: "admin", password: "new-owner-password" }) })).status, 200);
+    assert.equal((await employees.onRequestGet(req(owner, "GET"))).status, 401, "Password change must invalidate old management sessions.");
+    assert.equal((await employees.onRequestGet(req(await token("owner", "new-owner-password"), "GET"))).status, 200);
+  } finally { restore(); }
+});
+
+test("concurrent employee edits fail explicitly rather than overwriting another admin", async () => {
+  const restore = useFirestoreMock({
+    "projects/_global/settings/pos_stores": firestoreDocument({ stores: [{ id: "store", ownerUsername: "owner" }] }),
+    "projects/store/settings/pos_users": firestoreDocument({ users: [{ username: "owner", role: "admin", active: true }] }),
+  }, { patchStatus: 412 });
+  try {
+    const response = await storeUsers.onRequestPost({ env: { DB: database(), AUTH_SECRET: "test-only-auth-secret-is-long-enough" }, request: adminRequest("/api/pos-store-users", {
+      storeId: "store", username: "worker", name: "New Worker", role: "worker", password: "worker-test-password",
+    }) });
+    assert.equal(response.status, 409);
+  } finally { restore(); }
+});
 
 test("clinic provisioning atomically creates owner, licence, registry, and D1 credit account", async () => {
   const commits = [];

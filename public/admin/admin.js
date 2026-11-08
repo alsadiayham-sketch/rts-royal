@@ -1280,12 +1280,14 @@ function renderStoreUsersTable() {
     toggle.type = "button";
     toggle.className = "secondary-btn compact-btn";
     toggle.textContent = user.active ? t("deactivate") : t("activate");
+    toggle.disabled = user.active && user.canDeactivate === false;
     toggle.addEventListener("click", () => toggleStoreUser(user));
     actionCell.append(toggle);
     const remove = document.createElement("button");
     remove.type = "button";
     remove.className = "secondary-btn compact-btn danger-btn";
     remove.textContent = t("deleteStoreUser");
+    remove.disabled = user.canDelete === false;
     remove.addEventListener("click", () => deleteStoreUser(user));
     actionCell.append(remove);
     row.append(usernameCell, nameCell, roleCell, statusCell, actionCell);
@@ -1298,6 +1300,7 @@ function renderStoreUsersTable() {
     els.storeUserForm.elements.username.readOnly = true;
     els.storeUserForm.elements.name.value = user.name;
     els.storeUserForm.elements.role.value = user.role;
+    els.storeUserForm.elements.role.disabled = user.canChangeRole === false;
     els.storeUserForm.elements.password.value = "";
     els.storeUserForm.elements.password.required = false;
     els.storeUserForm.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1319,6 +1322,10 @@ async function openStoreUsers(store) {
   els.storeUsersContext.textContent = `${t("storeUsersContext")} ${store.id}`;
   els.storeUsersPanel.classList.remove("hidden");
   els.storeUserForm.reset();
+  state.editingStoreUsername = "";
+  els.storeUserForm.elements.username.readOnly = false;
+  els.storeUserForm.elements.password.required = true;
+  els.storeUserForm.elements.role.disabled = false;
   try {
     await loadStoreUsers();
     els.storeUsersPanel.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1358,13 +1365,13 @@ async function handleStoreUserSave(event) {
     storeId: state.currentStore.id,
     username: String(data.get("username") || "").trim(),
     name: String(data.get("name") || "").trim(),
-    role: String(data.get("role") || ""),
+    role: els.storeUserForm.elements.role.value,
     password: String(data.get("password") || ""),
   };
   const submit = document.getElementById("store-user-submit");
   setPending("store-user-save", true, submit);
   try {
-    await apiFetch("/api/pos-store-users", {
+    const saved = await apiFetch("/api/pos-store-users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -1372,9 +1379,16 @@ async function handleStoreUserSave(event) {
     els.storeUserForm.reset();
     els.storeUserForm.elements.username.readOnly = false;
     els.storeUserForm.elements.password.required = true;
+    els.storeUserForm.elements.role.disabled = false;
     state.editingStoreUsername = "";
     await loadStoreUsers();
-    showStatus(t("storeUserSaved"));
+    const loginHint = state.lang === "ar"
+      ? ` الدخول في POS: رمز المتجر ${payload.storeId}، اسم المستخدم ${saved.user.username}.`
+      : ` POS login: store ID ${payload.storeId}, username ${saved.user.username}.`;
+    const inactiveHint = saved.user.active ? "" : (state.lang === "ar"
+      ? " الحساب معطّل؛ فعّله قبل تسجيل الدخول."
+      : " This account is inactive; activate it before signing in.");
+    showStatus(t("storeUserSaved") + loginHint + inactiveHint);
   } catch (error) {
     showAlert(error.message);
   } finally {
@@ -1908,12 +1922,20 @@ function mapApiError(errorCode, fallbackMessage) {
         : "The POS store registry is currently unavailable.",
     LAST_POS_ADMIN_FORBIDDEN:
       state.lang === "ar"
-        ? "لا يمكن تعطيل آخر مدير نشط للمتجر."
-        : "The last active store manager cannot be disabled.",
+        ? "لا يمكن حذف أو تعطيل أو خفض صلاحية آخر مدير نشط للمتجر."
+        : "The last active store manager cannot be deleted, disabled or demoted.",
     OWNER_ACCOUNT_REQUIRED:
       state.lang === "ar"
-        ? "لا يمكن تعطيل أو حذف حساب المالك المرتبط."
-        : "The linked owner account cannot be disabled or deleted.",
+        ? "يجب إبقاء حساب المالك المرتبط مفعّلاً وبصلاحية مدير."
+        : "The linked owner must remain an active administrator.",
+    INVALID_POS_PASSWORD:
+      state.lang === "ar"
+        ? "استخدم كلمة مرور من 12 إلى 128 حرفاً. اتركها فارغة فقط للاحتفاظ بكلمة المرور الحالية."
+        : "Use a password of 12–128 characters. Leave blank only to keep the current password.",
+    DUPLICATE_POS_USERNAME:
+      state.lang === "ar" ? "توجد أسماء مستخدمين مكررة. تواصل مع دعم RTS." : "Duplicate usernames exist. Contact RTS support.",
+    SELF_CHANGE_FORBIDDEN:
+      state.lang === "ar" ? "لا يمكن تعطيل أو حذف أو خفض صلاحية حسابك الحالي." : "You cannot disable, delete or demote your current account.",
     INVALID_CURRENCY:
       state.lang === "ar" ? "العملة غير مدعومة." : "Unsupported currency.",
     INVALID_AMOUNT:

@@ -31,6 +31,13 @@ export async function createPosSessionToken(secret, claims) {
   return `${encodedClaims}.${signature}`;
 }
 
+export function getPosUserAuthVersion(secret, user) {
+  return hmacSha256Hex(secret, JSON.stringify([
+    user.username, user.passwordHash || "", user.passwordSalt || "",
+    user.passwordVersion || 1, user.role, user.active !== false,
+  ]));
+}
+
 export async function requirePosSession(request, secret) {
   const authorization = request.headers.get("Authorization") || "";
   const match = authorization.match(/^Bearer\s+([^\s]+)$/i);
@@ -71,5 +78,6 @@ export async function requirePosSession(request, secret) {
     role: claims.role,
     productType: claims.productType,
     exp: claims.exp,
+    ...(typeof claims.authVersion === "string" ? { authVersion: claims.authVersion } : {}),
   };
 }

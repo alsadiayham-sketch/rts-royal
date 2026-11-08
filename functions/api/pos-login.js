@@ -1,4 +1,4 @@
-import { getFirestoreDocument, setFirestoreDocument } from "../_lib/firestore.js";
+import { getFirestoreDocument, getFirestoreDocumentSnapshot, patchFirestoreDocumentAtUpdateTime } from "../_lib/firestore.js";
 import { verifyStoredPosPassword } from "../_lib/pos-password.js";
 import { getPosStoreMode } from "../_lib/pos-store-mode.js";
 import {
@@ -9,7 +9,7 @@ import {
   withApiGuard,
 } from "../_lib/http.js";
 import { enforceRateLimit } from "../_lib/rate-limit.js";
-import { createPosSessionToken } from "../_lib/pos-session.js";
+import { createPosSessionToken, getPosUserAuthVersion } from "../_lib/pos-session.js";
 import { normalizeBusinessType, normalizeStoreId } from "../_lib/pos-store-validation.js";
 import { normalizeUsername } from "../_lib/validation.js";
 
@@ -51,10 +51,12 @@ export async function onRequestPost(context) {
       throw new ApiError(403, "LICENCE_EXPIRED", "This tenant licence is inactive.");
     }
 
-    const usersDocument = await getFirestoreDocument(usersPath(storeId));
-    const user = (Array.isArray(usersDocument?.users) ? usersDocument.users : []).find(
-      (candidate) => candidate.username === username
+    const snapshot = await getFirestoreDocumentSnapshot(usersPath(storeId));
+    const usersDocument = snapshot?.data;
+    const matchingUsers = (Array.isArray(usersDocument?.users) ? usersDocument.users : []).filter(
+      (candidate) => normalizeUsername(candidate.username) === username
     );
+    const user = matchingUsers.length === 1 ? matchingUsers[0] : null;
     const verification = user
       ? await verifyStoredPosPassword(user, password)
       : { verified: false, migratedUser: null };
@@ -63,10 +65,10 @@ export async function onRequestPost(context) {
     }
     if (verification.migratedUser) {
       const users = Array.isArray(usersDocument?.users) ? usersDocument.users : [];
-      const index = users.findIndex((candidate) => candidate.username === username);
+      const index = users.indexOf(user);
       if (index >= 0) {
         users[index] = verification.migratedUser;
-        await setFirestoreDocument(usersPath(storeId), { users });
+        await patchFirestoreDocumentAtUpdateTime(usersPath(storeId), { users }, snapshot.updateTime);
       }
     }
 
@@ -77,6 +79,7 @@ export async function onRequestPost(context) {
       username,
       role,
       productType,
+      authVersion: await getPosUserAuthVersion(env.AUTH_SECRET, verification.migratedUser || user),
       exp: Math.floor(Date.now() / 1000) + 60 * 60 * 8,
     });
 
