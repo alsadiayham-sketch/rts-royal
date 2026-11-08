@@ -282,6 +282,10 @@ const I18N = {
     roleAdmin: "مدير",
     saveStoreUser: "حفظ المستخدم",
     storeUserSaved: "تم حفظ مستخدم المتجر.",
+    storeUserLoginVerified: "تم التحقق من تسجيل الدخول إلى POS. استخدم أحدث إصدار من RTS Business.",
+    storeUserLoginUnverified: "لم يتم اختبار تسجيل الدخول؛ كلمة المرور الحالية لم تتغير أو يستخدم المتجر خادماً منفصلاً.",
+    storeUserLoginFailed: "تم حفظ الحساب، لكن لم ينجح التحقق من تسجيل الدخول إلى POS. لا حاجة إلى إنشاء الحساب مجدداً.",
+    storeUserListRefreshFailed: "تم حفظ الحساب، لكن تعذر تحديث قائمة المستخدمين.",
     storeUserDeleted: "تم حذف مستخدم المتجر.",
     editStoreUser: "تعديل",
     deleteStoreUser: "حذف",
@@ -592,6 +596,10 @@ const I18N = {
     roleAdmin: "Manager",
     saveStoreUser: "Save User",
     storeUserSaved: "Store user saved.",
+    storeUserLoginVerified: "POS sign-in verified. Use the latest RTS Business version.",
+    storeUserLoginUnverified: "Sign-in was not tested: the existing password is unchanged or this store uses a separate server.",
+    storeUserLoginFailed: "The account was saved, but POS sign-in verification failed. Do not create the account again.",
+    storeUserListRefreshFailed: "The account was saved, but the user list could not be refreshed.",
     storeUserDeleted: "Store user deleted.",
     editStoreUser: "Edit",
     deleteStoreUser: "Delete",
@@ -1363,11 +1371,12 @@ async function handleStoreUserSave(event) {
   const data = new FormData(els.storeUserForm);
   const payload = {
     storeId: state.currentStore.id,
-    username: String(data.get("username") || "").trim(),
+    username: state.editingStoreUsername || String(data.get("username") || "").trim(),
     name: String(data.get("name") || "").trim(),
     role: els.storeUserForm.elements.role.value,
     password: String(data.get("password") || ""),
   };
+  const usesPlatformLogin = state.currentStore.backend !== "d1";
   const submit = document.getElementById("store-user-submit");
   setPending("store-user-save", true, submit);
   try {
@@ -1376,24 +1385,55 @@ async function handleStoreUserSave(event) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    els.storeUserForm.reset();
-    els.storeUserForm.elements.username.readOnly = false;
-    els.storeUserForm.elements.password.required = true;
-    els.storeUserForm.elements.role.disabled = false;
-    state.editingStoreUsername = "";
-    await loadStoreUsers();
     const loginHint = state.lang === "ar"
       ? ` الدخول في POS: رمز المتجر ${payload.storeId}، اسم المستخدم ${saved.user.username}.`
       : ` POS login: store ID ${payload.storeId}, username ${saved.user.username}.`;
     const inactiveHint = saved.user.active ? "" : (state.lang === "ar"
       ? " الحساب معطّل؛ فعّله قبل تسجيل الدخول."
       : " This account is inactive; activate it before signing in.");
-    showStatus(t("storeUserSaved") + loginHint + inactiveHint);
+    let verificationHint = "";
+    let verificationError = "";
+    if (saved.user.active && payload.password && usesPlatformLogin) {
+      try {
+        const login = await apiFetch("/api/pos-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            storeId: payload.storeId, username: saved.user.username, password: payload.password,
+          }),
+        });
+        if (!login?.token || login.store?.id !== payload.storeId
+            || login.user?.username !== saved.user.username || login.user?.role !== saved.user.role) {
+          throw new Error(t("unexpectedError"));
+        }
+        verificationHint = ` ${t("storeUserLoginVerified")}`;
+      } catch (error) {
+        verificationError = `${t("storeUserLoginFailed")}${loginHint} ${error.message}`;
+      }
+    } else if (saved.user.active) {
+      verificationHint = ` ${t("storeUserLoginUnverified")}`;
+    }
+    if (state.currentStore?.id === payload.storeId) {
+      els.storeUserForm.reset();
+      els.storeUserForm.elements.username.readOnly = false;
+      els.storeUserForm.elements.password.required = true;
+      els.storeUserForm.elements.role.disabled = false;
+      state.editingStoreUsername = "";
+      try {
+        await loadStoreUsers();
+      } catch (error) {
+        verificationError += ` ${t("storeUserListRefreshFailed")} ${error.message}`;
+      }
+    }
+    if (verificationError) showAlert(verificationError.trim());
+    else showStatus(t("storeUserSaved") + loginHint + inactiveHint + verificationHint);
   } catch (error) {
     showAlert(error.message);
   } finally {
     setPending("store-user-save", false, submit);
-    document.getElementById("store-user-password").value = "";
+    if (state.currentStore?.id === payload.storeId) {
+      document.getElementById("store-user-password").value = "";
+    }
   }
 
 }
@@ -1936,6 +1976,8 @@ function mapApiError(errorCode, fallbackMessage) {
       state.lang === "ar" ? "توجد أسماء مستخدمين مكررة. تواصل مع دعم RTS." : "Duplicate usernames exist. Contact RTS support.",
     SELF_CHANGE_FORBIDDEN:
       state.lang === "ar" ? "لا يمكن تعطيل أو حذف أو خفض صلاحية حسابك الحالي." : "You cannot disable, delete or demote your current account.",
+    LICENCE_EXPIRED:
+      state.lang === "ar" ? "اشتراك المتجر منتهٍ؛ جدّده قبل تسجيل الدخول." : "The store licence has expired; renew it before signing in.",
     INVALID_CURRENCY:
       state.lang === "ar" ? "العملة غير مدعومة." : "Unsupported currency.",
     INVALID_AMOUNT:
