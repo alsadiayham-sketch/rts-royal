@@ -87,6 +87,119 @@ export async function getFirestoreDocumentSnapshot(path) {
     : null;
 }
 
+export async function listFirestoreDocuments(collectionPath, {
+  pageSize = 100,
+  pageToken = "",
+  orderBy = "",
+} = {}) {
+  if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > 500) {
+    throw new TypeError("Firestore list page size must be between 1 and 500.");
+  }
+  const url = new URL(`${FIRESTORE_ROOT}/${collectionPath}`);
+  url.searchParams.set("key", FIREBASE_WEB_API_KEY);
+  url.searchParams.set("pageSize", String(pageSize));
+  if (pageToken) url.searchParams.set("pageToken", pageToken);
+  if (orderBy) url.searchParams.set("orderBy", orderBy);
+
+  let response;
+  try {
+    response = await fetch(url);
+  } catch {
+    throw new ApiError(502, "POS_REGISTRY_UNAVAILABLE", "POS store registry is unavailable.");
+  }
+  if (!response.ok) {
+    throw new ApiError(502, "POS_REGISTRY_UNAVAILABLE", "POS store registry request failed.");
+  }
+  const payload = await response.json();
+  return {
+    documents: (payload.documents ?? []).map((document) => ({
+      id: decodeURIComponent(document.name.split("/").pop()),
+      data: decodeFields(document.fields),
+      updateTime: document.updateTime || null,
+    })),
+    nextPageToken: typeof payload.nextPageToken === "string" ? payload.nextPageToken : "",
+  };
+}
+
+export async function queryFirestoreDocuments({
+  parentPath = "",
+  collectionId,
+  allDescendants = false,
+  fieldFilters = [],
+  orderBy = [],
+  limit = 100,
+} = {}) {
+  if (typeof collectionId !== "string" || !/^[A-Za-z0-9_-]{1,1500}$/.test(collectionId)) {
+    throw new TypeError("Firestore query requires a valid collection ID.");
+  }
+  if (typeof parentPath !== "string" || parentPath.startsWith("/") || parentPath.endsWith("/")) {
+    throw new TypeError("Firestore query parent path is invalid.");
+  }
+  if (!Number.isInteger(limit) || limit < 1 || limit > 500) {
+    throw new TypeError("Firestore query limit must be between 1 and 500.");
+  }
+  const allowedOperators = new Set([
+    "EQUAL", "NOT_EQUAL", "LESS_THAN", "LESS_THAN_OR_EQUAL",
+    "GREATER_THAN", "GREATER_THAN_OR_EQUAL", "ARRAY_CONTAINS",
+    "IN", "ARRAY_CONTAINS_ANY", "NOT_IN",
+  ]);
+  const filters = fieldFilters.map((filter) => {
+    if (!filter || typeof filter.field !== "string" || !filter.field
+        || !allowedOperators.has(filter.op)) {
+      throw new TypeError("Firestore field filter is invalid.");
+    }
+    return {
+      fieldFilter: {
+        field: { fieldPath: filter.field },
+        op: filter.op,
+        value: encodeValue(filter.value),
+      },
+    };
+  });
+  const ordering = orderBy.map((entry) => {
+    if (!entry || typeof entry.field !== "string" || !entry.field
+        || !["ASCENDING", "DESCENDING"].includes(entry.direction)) {
+      throw new TypeError("Firestore query ordering is invalid.");
+    }
+    return { field: { fieldPath: entry.field }, direction: entry.direction };
+  });
+  const structuredQuery = {
+    from: [{ collectionId, ...(allDescendants ? { allDescendants: true } : {}) }],
+    ...(filters.length === 1 ? { where: filters[0] }
+      : filters.length > 1 ? { where: { compositeFilter: { op: "AND", filters } } } : {}),
+    ...(ordering.length ? { orderBy: ordering } : {}),
+    limit,
+  };
+  const url = new URL(`${FIRESTORE_ROOT}${parentPath ? `/${parentPath}` : ""}:runQuery`);
+  url.searchParams.set("key", FIREBASE_WEB_API_KEY);
+
+  let response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ structuredQuery }),
+    });
+  } catch {
+    throw new ApiError(502, "POS_REGISTRY_UNAVAILABLE", "POS store registry is unavailable.");
+  }
+  if (!response.ok) {
+    throw new ApiError(502, "POS_REGISTRY_UNAVAILABLE", "POS store registry request failed.");
+  }
+  const rows = await response.json();
+  return {
+    documents: (Array.isArray(rows) ? rows : []).filter((row) => row?.document).map(({ document }) => {
+      const path = decodeURIComponent(document.name.split("/documents/")[1] || "");
+      return {
+        path,
+        id: path.split("/").pop(),
+        data: decodeFields(document.fields),
+        updateTime: document.updateTime || null,
+      };
+    }),
+  };
+}
+
 export async function setFirestoreDocument(path, data) {
   const fields = Object.fromEntries(Object.entries(data).map(([key, value]) => [key, encodeValue(value)]));
   const document = await firestoreRequest(path, {
@@ -124,7 +237,14 @@ export async function commitFirestoreWrites(writes) {
   }
 
   const payload = {
-    writes: writes.map(({ path, data, create = false, updateTime = null }) => {
+    writes: writes.map(({ path, data, create = false, updateTime = null, verify = false }) => {
+      if (verify) {
+        if (!updateTime) throw new TypeError("Firestore verify write requires an update time.");
+        return {
+          verify: `projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/${path}`,
+          currentDocument: { updateTime },
+        };
+      }
       const fields = Object.fromEntries(Object.entries(data).map(([key, value]) => [key, encodeValue(value)]));
       const write = {
         update: {
