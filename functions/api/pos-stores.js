@@ -1,4 +1,4 @@
-import { requirePlatformAdmin } from "../_lib/auth.js";
+import { requirePlatformAdmin, requirePlatformReader } from "../_lib/auth.js";
 import {
   commitFirestoreWrites,
   firestoreTimestamp,
@@ -74,7 +74,7 @@ async function authorizeMutation(context, scope) {
 
 export async function onRequestGet(context) {
   return withApiGuard(context, async () => {
-    await requirePlatformAdmin(context, false);
+    await requirePlatformReader(context);
     return jsonResponse({ stores: await loadStores() });
   });
 }

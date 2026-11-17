@@ -31,6 +31,7 @@
       <div id="global-status" class="status-message hidden" role="status" aria-live="polite"></div>
       <div id="global-alert" class="alert-message hidden" role="alert" aria-live="assertive"></div>
       <section id="password-warning" class="warning-banner hidden" role="status" aria-live="polite"></section>
+      <section id="reader-warning" class="warning-banner hidden" role="status" data-i18n="readerNotice">حساب قارئ: عرض فقط. تغيير كلمة مرورك وتسجيل الخروج متاحان.</section>
 
       <div id="session-loading" class="session-loading" role="status">
         <img src="/assets/rts-mark.svg" alt="" width="40" height="40" />
@@ -837,6 +838,7 @@
                       <th data-i18n="nameLabel">الاسم</th>
                       <th data-i18n="statusLabel">الحالة</th>
                       <th data-i18n="passwordStatusLabel">حالة كلمة المرور</th>
+                      <th data-i18n="roleLabel">الدور</th>
                       <th data-i18n="actionsLabel">إجراءات</th>
                     </tr>
                   </thead>
@@ -855,6 +857,13 @@
                 <div class="field">
                   <label for="add-name" data-i18n="nameLabel">الاسم المعروض</label>
                   <input id="add-name" name="name" type="text" autocomplete="name" required />
+                </div>
+                <div class="field">
+                  <label for="add-role" data-i18n="roleLabel">الدور</label>
+                  <select id="add-role" name="role">
+                    <option value="admin" data-i18n="portalAdmin">مدير</option>
+                    <option value="reader" data-i18n="portalReader">قارئ — عرض فقط</option>
+                  </select>
                 </div>
                 <div class="field">
                   <label for="add-password" data-i18n="newPasswordLabel">كلمة المرور الجديدة</label>

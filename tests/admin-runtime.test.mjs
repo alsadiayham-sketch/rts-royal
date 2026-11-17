@@ -190,3 +190,26 @@ test("editing a POS account targets its original username despite input changes"
   assert.equal(context.calls[0].username, "original-worker");
   assert.equal(context.calls[0].name, "Updated name");
 });
+
+test("reader disables write controls and blocks direct mutation calls while retaining safe reads and own password changes", async () => {
+  const { context } = adminContext();
+  const control = { disabled: false, dataset: {} };
+  context.document.querySelectorAll = () => [control];
+  context.AbortSignal = AbortSignal;
+  const calls = [];
+  context.fetch = async (url) => {
+    calls.push(url);
+    return Response.json({ ok: true });
+  };
+  vm.runInContext('state.currentUser = { role: "platform_reader" }; applyPortalAccess();', context);
+  assert.equal(control.disabled, true);
+  await assert.rejects(vm.runInContext('apiFetch("/api/users", { method: "POST" })', context), /read-only|للعرض فقط/);
+  await assert.rejects(vm.runInContext('apiFetch("/api/jahiz/admin", { method: "POST" })', context), /read-only|للعرض فقط/);
+  assert.equal(calls.length, 0);
+  await vm.runInContext('apiFetch("/api/users")', context);
+  await vm.runInContext('apiFetch("/api/password", { method: "POST" })', context);
+  await vm.runInContext('apiFetch("/api/logout", { method: "POST" })', context);
+  assert.deepEqual(calls, ["/api/users", "/api/password", "/api/logout"]);
+  vm.runInContext('state.currentUser = { role: "platform_admin" }; applyPortalAccess();', context);
+  assert.equal(control.disabled, false);
+});

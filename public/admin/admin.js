@@ -278,6 +278,11 @@ const I18N = {
     storeUsersCaption: "مستخدمو متجر RTS Business",
     addStoreUserTitle: "إضافة أو تحديث مستخدم",
     roleLabel: "الدور",
+    portalAdmin: "مدير",
+    portalReader: "قارئ — عرض فقط",
+    readerNotice: "حساب قارئ: عرض فقط. تغيير كلمة مرورك وتسجيل الخروج متاحان.",
+    readerDenied: "هذا الحساب للعرض فقط. لا يمكنك تعديل البيانات.",
+    roleSaved: "تم تحديث صلاحية حساب البوابة.",
     roleWorker: "كاشير / موظف",
     roleAdmin: "مدير",
     saveStoreUser: "حفظ المستخدم",
@@ -592,6 +597,11 @@ const I18N = {
     storeUsersCaption: "RTS Business store users",
     addStoreUserTitle: "Add or Update User",
     roleLabel: "Role",
+    portalAdmin: "Admin",
+    portalReader: "Reader — view only",
+    readerNotice: "Reader account: view only. You can still change your own password and sign out.",
+    readerDenied: "This account is read-only. You cannot modify data.",
+    roleSaved: "Portal account role updated.",
     roleWorker: "Cashier / Staff",
     roleAdmin: "Manager",
     saveStoreUser: "Save User",
@@ -1562,6 +1572,7 @@ function renderStoresTable() {
     users.type = "button";
     users.className = "secondary-btn compact-btn";
     users.textContent = t("manageStoreUsers");
+    users.dataset.readerView = "true";
     users.addEventListener("click", () => openStoreUsers(store));
     actions.prepend(users);
     actionsCell.append(actions);
@@ -1720,6 +1731,7 @@ function renderClinicsTable() {
     users.type = "button";
     users.className = "secondary-btn compact-btn";
     users.textContent = t("manageStoreUsers");
+    users.dataset.readerView = "true";
     users.addEventListener("click", () => openStoreUsers({ ...clinic, backend: "clinic" }));
     actions.append(users);
 
@@ -1976,6 +1988,12 @@ function mapApiError(errorCode, fallbackMessage) {
       state.lang === "ar" ? "توجد أسماء مستخدمين مكررة. تواصل مع دعم RTS." : "Duplicate usernames exist. Contact RTS support.",
     SELF_CHANGE_FORBIDDEN:
       state.lang === "ar" ? "لا يمكن تعطيل أو حذف أو خفض صلاحية حسابك الحالي." : "You cannot disable, delete or demote your current account.",
+    SELF_ROLE_CHANGE_FORBIDDEN:
+      state.lang === "ar" ? "لا يمكنك تغيير صلاحية حسابك الحالي." : "You cannot change your own portal role.",
+    LAST_ADMIN_FORBIDDEN:
+      state.lang === "ar" ? "يجب الإبقاء على مدير نشط واحد على الأقل." : "At least one active administrator must remain.",
+    INVALID_ROLE:
+      state.lang === "ar" ? "اختر مديراً أو قارئاً." : "Choose Admin or Reader.",
     LICENCE_EXPIRED:
       state.lang === "ar" ? "اشتراك المتجر منتهٍ؛ جدّده قبل تسجيل الدخول." : "The store licence has expired; renew it before signing in.",
     INVALID_CURRENCY:
@@ -1994,6 +2012,11 @@ function mapApiError(errorCode, fallbackMessage) {
 }
 
 async function apiFetch(url, options = {}) {
+  const method = (options.method || "GET").toUpperCase();
+  if (state.currentUser?.role === "platform_reader" && !["GET", "HEAD"].includes(method)
+      && !["/api/logout", "/api/password"].includes(url)) {
+    throw new Error(t("readerDenied"));
+  }
   const response = await fetch(url, {
     credentials: "same-origin",
     cache: "no-store",
@@ -2163,8 +2186,62 @@ function renderUsersTable() {
     btn.addEventListener("click", () => toggleUser(user));
     actionCell.append(btn);
 
-    row.append(usernameCell, nameCell, statusCell, passwordCell, actionCell);
+    const roleCell = document.createElement("td");
+    const roleSelect = document.createElement("select");
+    roleSelect.setAttribute("aria-label", `${t("roleLabel")} · ${user.username}`);
+    for (const [value, label] of [["admin", t("portalAdmin")], ["reader", t("portalReader")]]) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      roleSelect.append(option);
+    }
+    roleSelect.value = user.role || "admin";
+    roleSelect.disabled = state.currentUser?.role !== "platform_admin"
+      || user.username === state.currentUser?.username || state.pending.has(`role-${user.username}`);
+    roleSelect.addEventListener("change", () => changePortalRole(user, roleSelect.value));
+    roleCell.append(roleSelect);
+    row.append(usernameCell, nameCell, statusCell, passwordCell, roleCell, actionCell);
     els.usersTbody.append(row);
+  }
+}
+
+function applyPortalAccess() {
+  const reader = state.currentUser?.role === "platform_reader";
+  document.getElementById("reader-warning")?.classList.toggle("hidden", !reader);
+  const controls = document.querySelectorAll(
+    'form:not(#login-form):not(#password-form) input, form:not(#login-form):not(#password-form) select, '
+    + 'form:not(#login-form):not(#password-form) textarea, form:not(#login-form):not(#password-form) button, '
+    + '.table-wrap button:not([data-reader-view]), .table-wrap select, .request-actions button'
+  );
+  for (const control of controls) {
+    if (reader) {
+      if (control.dataset.readerDisabled === undefined) control.dataset.readerDisabled = String(control.disabled);
+      control.disabled = true;
+    } else if (control.dataset.readerDisabled !== undefined) {
+      control.disabled = control.dataset.readerDisabled === "true";
+      delete control.dataset.readerDisabled;
+    }
+  }
+}
+
+async function changePortalRole(user, role) {
+  const key = `role-${user.username}`;
+  if (state.pending.has(key)) return;
+  state.pending.add(key);
+  renderUsersTable();
+  clearMessages();
+  try {
+    await apiFetch("/api/users", {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: user.username, role }),
+    });
+    await loadUsers();
+    showStatus(t("roleSaved"));
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    state.pending.delete(key);
+    renderUsersTable();
   }
 }
 
@@ -3121,6 +3198,7 @@ async function bootstrapSession() {
     const session = await apiFetch("/api/session");
     document.getElementById("session-loading").classList.add("hidden");
     state.currentUser = session.user;
+    applyPortalAccess();
     state.passwordChangeRecommended = Boolean(session.passwordChangeRecommended);
     els.loginPanel.classList.add("hidden");
     els.appPanel.classList.remove("hidden");
@@ -3141,6 +3219,7 @@ async function bootstrapSession() {
     const failed = results.find((result) => result.status === "rejected");
     if (failed) showAlert(failed.reason?.message || t("serviceUnavailable"));
     switchTab(state.currentSection);
+    applyPortalAccess();
   } catch (error) {
     resetAuthenticatedUi();
     if (error.status === 401) {
@@ -3156,6 +3235,7 @@ async function bootstrapSession() {
 
 function resetAuthenticatedUi() {
   state.currentUser = null;
+  applyPortalAccess();
   state.passwordChangeRecommended = false;
   state.users = [];
   state.usersLoaded = false;
@@ -3323,7 +3403,7 @@ async function handleAddUser(event) {
     await apiFetch("/api/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, name, password }),
+      body: JSON.stringify({ username, name, password, role: document.getElementById("add-role").value }),
     });
     els.addUserForm.reset();
     clearSensitiveInputs();
@@ -3535,6 +3615,9 @@ function initForms() {
 }
 
 function initAdmin() {
+  if (typeof MutationObserver !== "undefined") {
+    new MutationObserver(applyPortalAccess).observe(document.body, { childList: true, subtree: true });
+  }
   initTabs();
   initForms();
   initLanguageToggle();

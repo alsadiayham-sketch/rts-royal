@@ -1,4 +1,4 @@
-import { requirePlatformAdmin } from "../_lib/auth.js";
+import { requirePlatformAdmin, requirePlatformReader } from "../_lib/auth.js";
 import {
   ApiError,
   jsonResponse,
@@ -88,7 +88,7 @@ export async function onRequestPost(context) {
 
 export async function onRequestGet(context) {
   return withApiGuard(context, async ({ env }) => {
-    await requirePlatformAdmin(context, false);
+    await requirePlatformReader(context);
     return jsonResponse(await listRequests(env.DB));
   });
 }

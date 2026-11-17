@@ -19,8 +19,8 @@ export async function requireAuthenticatedUser(context, includePasswordFields = 
   const now = Math.floor(Date.now() / 1000);
 
   const fields = includePasswordFields
-    ? "u.username, u.name, u.role, u.need_change, u.session_version, u.password_salt, u.password_hash, u.password_iterations"
-    : "u.username, u.name, u.role, u.need_change, u.session_version";
+    ? "u.username, u.name, u.role, u.portal_access, u.need_change, u.session_version, u.password_salt, u.password_hash, u.password_iterations"
+    : "u.username, u.name, u.role, u.portal_access, u.need_change, u.session_version";
 
   const row = await env.DB.prepare(
     `SELECT ${fields}
@@ -44,8 +44,17 @@ export async function requireAuthenticatedUser(context, includePasswordFields = 
 
   return {
     ...row,
+    role: row.portal_access === "reader" ? "platform_reader" : row.role,
     tokenHash,
   };
+}
+
+export async function requirePlatformReader(context) {
+  const user = await requireAuthenticatedUser(context, false);
+  if (!["platform_admin", "platform_reader"].includes(user.role)) {
+    throw new ApiError(403, "ADMIN_REQUIRED", "Platform access is required.");
+  }
+  return user;
 }
 
 export async function requirePlatformAdmin(context, includePasswordFields = false) {
@@ -89,7 +98,7 @@ export async function authenticateCredentials(db, username, password) {
   const genericFailure = new ApiError(401, "AUTH_FAILED", "Invalid username or password.");
   const row = await db
     .prepare(
-      `SELECT username, name, role, password_salt, password_hash, password_iterations, need_change, active, session_version
+      `SELECT username, name, role, portal_access, password_salt, password_hash, password_iterations, need_change, active, session_version
        FROM users
        WHERE username = ?`
     )
@@ -108,5 +117,5 @@ export async function authenticateCredentials(db, username, password) {
   if (!verified) {
     throw genericFailure;
   }
-  return row;
+  return { ...row, role: row.portal_access === "reader" ? "platform_reader" : row.role };
 }

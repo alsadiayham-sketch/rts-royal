@@ -66,6 +66,7 @@ async function fixture() {
       username TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       role TEXT NOT NULL,
+      portal_access TEXT NOT NULL DEFAULT 'admin',
       need_change INTEGER NOT NULL DEFAULT 0,
       session_version INTEGER NOT NULL DEFAULT 1,
       active INTEGER NOT NULL DEFAULT 1

@@ -1,4 +1,4 @@
-import { requirePlatformAdmin } from "../_lib/auth.js";
+import { requirePlatformAdmin, requirePlatformReader } from "../_lib/auth.js";
 import {
   ApiError,
   jsonResponse,
@@ -281,7 +281,7 @@ function findOrganization(organizations, organizationType, organizationId) {
 
 export async function onRequestGet(context) {
   return withApiGuard(context, async ({ request, env }) => {
-    await requirePlatformAdmin(context, false);
+    await requirePlatformReader(context);
     const url = new URL(request.url);
     const rawType = url.searchParams.get("type") || "";
     const organizationType = rawType ? normalizeOrganizationType(rawType) : null;

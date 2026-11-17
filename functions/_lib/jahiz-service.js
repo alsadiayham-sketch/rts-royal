@@ -1,4 +1,4 @@
-import { requirePlatformAdmin } from "./auth.js";
+import { requirePlatformAdmin, requirePlatformReader } from "./auth.js";
 import { createPasswordRecord, createSessionToken, sha256Hex, verifyPassword } from "./crypto.js";
 import {
   ApiError,
@@ -193,7 +193,7 @@ async function createVenueStatements(db, data) {
 }
 
 async function adminGet(context) {
-  await requirePlatformAdmin(context);
+  await requirePlatformReader(context);
   const [venuesResult, applicationsResult, plansResult] = await Promise.all([
     context.env.DB.prepare(
       `SELECT v.*, u.username AS owner_username

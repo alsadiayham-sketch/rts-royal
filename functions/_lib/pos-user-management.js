@@ -1,4 +1,4 @@
-import { requirePlatformAdmin } from "./auth.js";
+import { requirePlatformAdmin, requirePlatformReader } from "./auth.js";
 import { commitFirestoreWrites, getFirestoreDocument, getFirestoreDocumentSnapshot, patchFirestoreDocumentAtUpdateTime } from "./firestore.js";
 import { ApiError, jsonResponse, parseJsonBody, requireJsonContentType, requireTrustedMutationRequest, withApiGuard } from "./http.js";
 import { createStoredPosPassword } from "./pos-password.js";
@@ -54,7 +54,7 @@ export function createPosUserHandlers({ desktop = false } = {}) {
     if (mutation && !desktop) requireTrustedMutationRequest(context.request);
     const actor = desktop
       ? { ...(await requirePosSession(context.request, context.env.AUTH_SECRET)), desktop: true }
-      : { ...(await requirePlatformAdmin(context, false)), desktop: false };
+      : { ...(await (mutation ? requirePlatformAdmin(context, false) : requirePlatformReader(context))), desktop: false };
     const requestedStore = payload?.storeId ?? new URL(context.request.url).searchParams.get("storeId");
     const storeId = desktop ? actor.storeId : normalizeStoreId(requestedStore);
     if (!storeId) throw new ApiError(400, "INVALID_STORE_ID", "Store ID is invalid.");
