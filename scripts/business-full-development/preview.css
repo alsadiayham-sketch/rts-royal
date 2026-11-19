@@ -1,0 +1,6 @@
+#full-preview-warning { position: sticky; top: 0; z-index: 100; background: #ffde73; color: #201900; padding: 10px; text-align: center; font-weight: bold; }
+#full-preview-print { display: none; }
+@media print {
+  body > * { display: none !important; }
+  #full-preview-print { display: block !important; white-space: pre-wrap; color: black; }
+}

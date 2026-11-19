@@ -60,3 +60,37 @@ test("Firestore verify-only writes require an update time before making a reques
     globalThis.fetch = originalFetch;
   }
 });
+
+test("Firestore conditional variant update masks only the supplied field", async () => {
+  const originalFetch = globalThis.fetch;
+  let payload;
+  globalThis.fetch = async (_input, options) => {
+    payload = JSON.parse(options.body);
+    return Response.json({ writeResults: [] });
+  };
+  try {
+    await commitFirestoreWrites([{
+      path: "projects/store/products/p1", data: { variants: [{ stock: 3 }] },
+      updateTime: "2026-11-17T13:00:00.000000Z", updateMask: ["variants"],
+    }]);
+    assert.deepEqual(payload.writes[0].updateMask, { fieldPaths: ["variants"] });
+    assert.deepEqual(Object.keys(payload.writes[0].update.fields), ["variants"]);
+    assert.equal(payload.writes[0].currentDocument.updateTime, "2026-11-17T13:00:00.000000Z");
+    await assert.rejects(() => commitFirestoreWrites([{
+      path: "projects/store/products/p1", data: { variants: [], name: "unexpected" },
+      updateMask: ["variants"],
+    }]), /update mask/);
+    const raw = { arrayValue: { values: [{ mapValue: { fields: {
+      stock: { integerValue: "2" }, source: { referenceValue: "projects/x/databases/(default)/documents/y/z" },
+    } } }] } };
+    await commitFirestoreWrites([{
+      path: "projects/store/products/p1", encodedFields: { variants: raw },
+      updateTime: "2026-11-17T13:00:00.000000Z", updateMask: ["variants"],
+    }]);
+    assert.deepEqual(payload.writes[0].update.fields.variants, raw);
+    await assert.rejects(() => commitFirestoreWrites([{
+      path: "projects/store/products/p1", data: { variants: [] },
+      encodedFields: { variants: raw }, updateMask: ["variants"],
+    }]), /encoded fields/);
+  } finally { globalThis.fetch = originalFetch; }
+});

@@ -27,6 +27,10 @@ test('public artifact excludes credentials and private deployment files', async 
 });
 
 test('HTML uses local, existing assets and CSP-compatible markup', async () => {
+  const functionsRoot = path.resolve('functions');
+  const functionRoutes = new Set((await files(functionsRoot))
+    .filter(file => file.endsWith('.js'))
+    .map(file => '/' + path.relative(functionsRoot, file).split(path.sep).join('/').replace(/\.js$/, '')));
   for (const file of (await files(root)).filter(file => file.endsWith('.html'))) {
     const source = await readFile(file, 'utf8');
     assert.doesNotMatch(source, /<script\b(?![^>]*\bsrc=)[^>]*>(?!\s*<\/script>)/i, file);
@@ -35,6 +39,7 @@ test('HTML uses local, existing assets and CSP-compatible markup', async () => {
     for (const match of source.matchAll(/\b(?:src|href)=["']([^"'?#]+)(?:[?#][^"']*)?["']/g)) {
       const url = match[1];
       if (!url || /^(?:https?:|data:|mailto:|tel:)/.test(url)) continue;
+      if (functionRoutes.has(url)) continue;
       let target = url.startsWith('/') ? path.join(root, url) : path.resolve(path.dirname(file), url);
       if (url.endsWith('/')) target = path.join(target, 'index.html');
       assert.ok((await stat(target)).isFile(), `${file}: missing ${url}`);

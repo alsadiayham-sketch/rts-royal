@@ -80,10 +80,11 @@ export async function getFirestoreDocument(path) {
   return document ? decodeFields(document.fields) : null;
 }
 
-export async function getFirestoreDocumentSnapshot(path) {
+export async function getFirestoreDocumentSnapshot(path, { includeRawFields = false } = {}) {
   const document = await firestoreRequest(path, { allowMissing: true });
   return document
-    ? { data: decodeFields(document.fields), updateTime: document.updateTime || null }
+    ? { data: decodeFields(document.fields), updateTime: document.updateTime || null,
+      ...(includeRawFields ? { rawFields: document.fields || {} } : {}) }
     : null;
 }
 
@@ -237,21 +238,36 @@ export async function commitFirestoreWrites(writes) {
   }
 
   const payload = {
-    writes: writes.map(({ path, data, create = false, updateTime = null, verify = false }) => {
+    writes: writes.map(({ path, data, encodedFields = null, create = false, updateTime = null, verify = false, updateMask = null }) => {
       if (verify) {
+        if (updateMask || encodedFields) throw new TypeError("Firestore verify writes cannot have an update mask or encoded fields.");
         if (!updateTime) throw new TypeError("Firestore verify write requires an update time.");
         return {
           verify: `projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/${path}`,
           currentDocument: { updateTime },
         };
       }
-      const fields = Object.fromEntries(Object.entries(data).map(([key, value]) => [key, encodeValue(value)]));
+      if (encodedFields !== null && (data !== undefined || !encodedFields || typeof encodedFields !== "object"
+          || Array.isArray(encodedFields) || !updateMask)) {
+        throw new TypeError("Firestore encoded fields require a masked update and no decoded data.");
+      }
+      const fields = encodedFields || Object.fromEntries(Object.entries(data).map(([key, value]) => [key, encodeValue(value)]));
       const write = {
         update: {
           name: `projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/${path}`,
           fields,
         },
       };
+      if (updateMask !== null) {
+        if (create || !Array.isArray(updateMask) || !updateMask.length
+            || updateMask.some((field) => typeof field !== "string"
+              || !/^[A-Za-z_][A-Za-z0-9_]*$/.test(field) || !Object.hasOwn(fields, field))
+            || new Set(updateMask).size !== updateMask.length
+            || Object.keys(fields).some((field) => !updateMask.includes(field))) {
+          throw new TypeError("Firestore update mask must match the supplied top-level fields.");
+        }
+        write.updateMask = { fieldPaths: updateMask };
+      }
       if (create) write.currentDocument = { exists: false };
       else if (updateTime) write.currentDocument = { updateTime };
       return write;

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>RTS Business</title>
+  <link rel="icon" href="/business-mobile/ada-icon.png">
+  <link rel="stylesheet" href="/business-mobile/mobile.css">
+</head>
+<body>
+  <header class="topbar"><img src="/business-mobile/ada-icon.png" width="36" height="36" alt=""><div><strong>RTS Business</strong><small>مساحة العمل</small></div><div class="topbar-actions"><button id="check-update" class="quiet" type="button" hidden>تحديث التطبيق</button><button id="logout" class="quiet" hidden>تسجيل الخروج</button></div></header>
+  <main>
+    <p id="notice" role="status" aria-live="polite"></p>
+    <section id="login" class="login-panel">
+      <h1>تسجيل الدخول</h1>
+      <p>استخدم حساب المتجر الخاص بك. يتطلب التطبيق اتصالاً بالإنترنت.</p>
+      <form id="login-form">
+        <label>رمز المتجر<input name="storeId" autocomplete="organization" required maxlength="80"></label>
+        <label>اسم المستخدم<input name="username" autocomplete="username" required maxlength="80"></label>
+        <label>كلمة المرور<input name="password" type="password" autocomplete="current-password" required maxlength="128"></label>
+        <button type="submit">دخول</button>
+      </form>
+    </section>
+    <section id="workspace" hidden>
+      <div class="workspace-heading"><div><h1 id="store-name"></h1><p id="user-name"></p></div><button id="refresh" class="quiet">تحديث</button></div>
+      <p class="warning">تتزامن الطلبات المشتركة مع إصدار Windows المتوافق. الطلبات القديمة على الجهاز لا تُنقل تلقائياً.</p>
+      <section id="restaurant-setup" hidden aria-labelledby="setup-title">
+        <h2 id="setup-title">إعداد المطعم المشترك</h2>
+        <p id="setup-status" role="status"></p>
+        <p>يتطلب الدفع إعداد الضريبة والطاولات المشتركة وتحديث جميع أجهزة Windows. لا تُنقل الطلبات أو الطاولات المحلية تلقائياً.</p>
+        <div id="setup-admin" hidden>
+          <details id="config-setup"><summary>إعداد الضريبة من سجل موجود أو إدخالها صراحةً</summary>
+            <p>اعرض السجل واختر المصدر الصحيح قبل الترحيل. لا يُحذف السجل القديم.</p>
+            <div class="actions"><button id="preview-config" type="button" class="quiet">عرض السجلات</button></div>
+            <label>معرّف سجل محدد<input id="config-source-id" maxlength="150" autocomplete="off"></label>
+            <button id="preview-source" type="button" class="quiet">عرض هذا السجل</button>
+            <label>السجلات المتاحة<select id="config-candidates"><option value="">اختر سجلاً</option></select></label>
+            <button id="preview-candidate" type="button" class="quiet">عرض السجل المحدد</button>
+            <pre id="config-preview" class="setup-preview"></pre>
+            <button id="cutover-config" type="button" disabled>اعتماد السجل المعروض</button>
+            <form id="initialize-config">
+              <p>إذا لم يوجد سجل، أدخل إعدادات الضريبة الجديدة بنفسك.</p>
+              <label>الضريبة<select name="tax" required><option value="">اختر</option><option value="true">مفعّلة</option><option value="false">غير مفعّلة</option></select></label>
+              <label>نسبة الضريبة %<input name="percent" type="number" min="0" max="100" step="any" required></label>
+              <label>الأسعار تشمل الضريبة<select name="included" required><option value="">اختر</option><option value="true">نعم</option><option value="false">لا</option></select></label>
+              <button id="initialize-config-button" type="submit" disabled>إنشاء إعدادات صريحة</button>
+            </form>
+          </details>
+          <details id="tables-setup"><summary>تهيئة الطاولات المشتركة</summary>
+            <p>يمكن البدء بقائمة فارغة أو لصق قائمة JSON محددة. راجع المعرّفات والأسماء قبل الاعتماد؛ الطلبات المحلية على Windows لا تُنقل.</p>
+            <label>قائمة الطاولات JSON<textarea id="tables-import" rows="5" spellcheck="false" placeholder='[{"id":1,"name":"طاولة 1","archived":false}]'></textarea></label>
+            <div class="actions"><button id="preview-tables" type="button" class="quiet">مراجعة القائمة</button><button id="empty-tables" type="button" class="quiet">البدء بلا طاولات</button></div>
+            <pre id="tables-preview" class="setup-preview"></pre>
+            <button id="initialize-tables" type="button" disabled>اعتماد القائمة المعروضة</button>
+          </details>
+        </div>
+        <div id="pending-setup" class="warning" hidden><p>لم تتأكد نتيجة الإعداد. أعد تأكيد العملية نفسها قبل أي تعديل آخر.</p><button id="retry-setup" type="button">تأكيد نتيجة الإعداد</button></div>
+      </section>
+      <div id="notification-controls" hidden>
+        <button id="enable-notifications" class="quiet" type="button">تفعيل تنبيهات المخزون على هذا الجهاز</button>
+        <p id="notification-status" role="status">التنبيهات غير مفعّلة لهذه الجلسة.</p>
+      </div>
+      <nav class="tabs" aria-label="أقسام مساحة العمل">
+        <button type="button" data-tab="catalog" aria-current="page">الأصناف</button>
+        <button type="button" data-tab="orders" id="orders-tab" hidden>الطلب والدفع</button>
+        <button type="button" data-tab="supplies" id="supplies-tab">المستلزمات</button>
+        <button type="button" data-tab="accounts" id="accounts-tab" hidden>الحسابات</button>
+      </nav>
+      <section id="catalog">
+        <h2>الأصناف والمخزون</h2>
+        <label>بحث<input id="search" type="search" placeholder="اسم الصنف أو القسم"></label>
+        <div id="products" class="list"></div>
+        <button id="more" class="quiet" hidden>تحميل المزيد</button>
+      </section>
+      <section id="orders" hidden>
+        <div class="workspace-heading"><h2>الطلب والدفع</h2><button id="new-order" class="quiet" type="button">طلب جديد</button></div>
+        <p>الطلبات المشتركة متاحة على الأجهزة المتوافقة. لا يمكن الدفع دون اتصال.</p>
+        <p>لا يدعم الهاتف حالياً الولاء والمكافآت والرصيد والديون وتقسيم الدفع والعروض والمرتجعات.</p>
+        <details><summary>الطلبات المفتوحة</summary><div id="held-list" class="list"></div></details>
+        <div id="cart-list" class="list"></div>
+        <form id="order-form">
+          <label>نوع الطلب<select name="type"><option value="takeaway">سفري</option><option value="dinein">داخل المطعم</option><option value="delivery">توصيل</option></select></label>
+          <label id="table-field" hidden>الطاولة<select name="table"><option value="">اختر طاولة</option></select></label>
+          <label>اسم العميل<input name="customerName" maxlength="100"></label>
+          <label>الهاتف<input name="phone" maxlength="40" type="tel"></label>
+          <label id="address-field" hidden>العنوان<input name="address" maxlength="500"></label>
+          <label id="fee-field" hidden>رسوم التوصيل<input name="deliveryFee" inputmode="decimal" value="0"></label>
+          <label>ملاحظة الطلب<input name="note" maxlength="500"></label>
+          <div class="actions"><button type="button" id="save-order">حفظ الطلب</button><button type="button" id="review-order" class="quiet">مراجعة المبلغ</button><button type="button" id="cancel-order" class="quiet">إلغاء الطلب المفتوح</button></div>
+        </form>
+        <div id="pending-hold" class="warning" hidden><p>لم تتأكد نتيجة حفظ أو إلغاء الطلب. أعد تأكيد العملية نفسها قبل إنشاء طلب آخر.</p><button id="retry-hold" type="button">تأكيد نتيجة الطلب</button></div>
+        <div id="quote-panel" hidden>
+          <h3>مراجعة الدفع</h3><div id="quote-details"></div>
+          <div class="actions"><button id="pay-cash" type="button">تأكيد الدفع النقدي</button><button id="pay-card" type="button" class="quiet">تسجيل الدفع بالبطاقة</button></div>
+          <p>تسجيل البطاقة لا ينفّذ عملية على جهاز الدفع.</p>
+        </div>
+        <div id="pending-checkout" class="warning" hidden><p>يوجد دفع لم يتأكد ردّه. لا تكرر التحصيل؛ اضغط لتأكيد نتيجة العملية السابقة.</p><button id="retry-checkout" type="button">تأكيد نتيجة الدفع السابق</button></div>
+        <section id="receipt" hidden aria-live="polite"></section>
+        <div id="receipt-actions" class="actions" hidden><button type="button" id="print-receipt" class="quiet">طباعة</button><button type="button" id="share-receipt" class="quiet">مشاركة النص</button></div>
+      </section>
+      <section id="supplies" hidden>
+        <h2>المستلزمات</h2>
+        <p>أرصدة المستلزمات منفصلة عن مخزون أصناف البيع.</p>
+        <div id="supply-list" class="list"></div>
+        <details><summary>إضافة مستلزم</summary>
+          <form id="create-supply">
+            <label>الاسم<input name="name" required maxlength="80"></label>
+            <label>التصنيف<input name="category" required maxlength="50"></label>
+            <label>الوحدة<input name="unit" required maxlength="24"></label>
+            <label>الكمية<input name="quantity" inputmode="decimal" required pattern="(0|[1-9][0-9]{0,5})([.][0-9]{1,3})?"></label>
+            <label>حد التنبيه<input name="lowStockThreshold" inputmode="decimal" required pattern="(0|[1-9][0-9]{0,5})([.][0-9]{1,3})?"></label>
+            <button type="submit">إضافة</button>
+          </form>
+        </details>
+      </section>
+      <section id="accounts" hidden>
+        <h2>حسابات الدخول</h2>
+        <div id="account-list" class="list"></div>
+      </section>
+    </section>
+  </main>
+  <script src="/business-mobile/mobile.js" defer></script>
+</body>
+</html>
